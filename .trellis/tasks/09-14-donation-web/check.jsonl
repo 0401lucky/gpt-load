@@ -1,5 +1,0 @@
-{"file":".trellis/tasks/09-14-key-donation-rewards/research/new-api-conventions.md","reason":"new-api 独立仓库规则、React/Bun、三数据库与账务验证要求"}
-{"file":".trellis/tasks/09-14-key-donation-rewards/research/integration-contract.md","reason":"两端接口、数据唯一性、身份与恢复状态的权威契约"}
-{"file":".trellis/tasks/09-14-key-donation-rewards/research/codebase-findings.md","reason":"已核实能力、文件锚点和产品决定，避免重复实现或误判已有接口"}
-{"file": ".trellis/tasks/09-14-key-donation-rewards/research/security-controls.md", "reason": "实施前已阅读的 OWASP 控制与定向验证要求"}
-{"file": ".trellis/tasks/09-14-donation-rewards-backend/research/implementation-handoff.md", "reason": "按实际后端接口复核页面与权限、幂等恢复及逐项状态"}

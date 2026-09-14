@@ -1,5 +1,12 @@
 {
-  "status": "approved_in_progress",
+  "status": "completed",
+  "archive_directory": ".trellis/tasks/archive/2026-09",
+  "work_commits": {
+    "gpt_load_intake": "59a2d958506f86e3d8c80fa4512c705dd8d050d1",
+    "new_api_backend": "7b6a3c7b434b72a777db5b5b8855cf777ef53dec",
+    "new_api_web": "68079045ee2dd424884498d6225e982eae5325e4",
+    "gpt_load_documents": "a9cd302775552f2a6abd7b115f3f7a1206f3ac9e"
+  },
   "date": "2026-09-14",
   "branches": {
     "gpt-load": "feat/key-donation-rewards",

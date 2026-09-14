@@ -3,7 +3,7 @@
   "name": "key-donation-rewards",
   "title": "密钥捐献与社区额度奖励",
   "description": "按既定规划实现gpt-load与new-api的密钥捐献、登录身份关联和永久额度奖励，完成真实数据库及跨仓库本地验收。",
-  "status": "in_progress",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -11,11 +11,11 @@
   "creator": "0401lucky",
   "assignee": "0401lucky",
   "createdAt": "2026-09-14",
-  "completedAt": null,
+  "completedAt": "2026-09-14",
   "branch": "feat/key-donation-rewards",
   "base_branch": "main",
   "worktree_path": null,
-  "commit": null,
+  "commit": "a9cd302775552f2a6abd7b115f3f7a1206f3ac9e",
   "pr_url": null,
   "subtasks": [],
   "children": [
@@ -25,6 +25,6 @@
   ],
   "parent": null,
   "relatedFiles": [],
-  "notes": "三个子任务及跨仓库本地验收完成，用户已确认本地提交与归档。按批准分组执行；未推送或生产操作。",
+  "notes": "三个子任务及跨仓库本地验收完成。用户确认的四组工作提交均已完成，任务树已归档，提交哈希见progress及会话日志；未推送或生产操作。",
   "meta": {}
 }

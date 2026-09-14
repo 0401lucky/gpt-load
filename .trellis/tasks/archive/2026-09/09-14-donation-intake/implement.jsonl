@@ -4,5 +4,5 @@
 {"file":".trellis/spec/backend/error-handling.md","reason":"结构化错误与标准响应"}
 {"file":".trellis/spec/backend/logging-guidelines.md","reason":"凭据与集成 token 脱敏"}
 {"file":".trellis/spec/backend/i18n-guidelines.md","reason":"新增错误与用户可见文案三语言一致"}
-{"file":".trellis/tasks/09-14-key-donation-rewards/research/integration-contract.md","reason":"两端接口、数据唯一性、身份与恢复状态的权威契约"}
-{"file":".trellis/tasks/09-14-key-donation-rewards/research/codebase-findings.md","reason":"已核实能力、文件锚点和产品决定，避免重复实现或误判已有接口"}
+{"file":".trellis/tasks/archive/2026-09/09-14-key-donation-rewards/research/integration-contract.md","reason":"两端接口、数据唯一性、身份与恢复状态的权威契约"}
+{"file":".trellis/tasks/archive/2026-09/09-14-key-donation-rewards/research/codebase-findings.md","reason":"已核实能力、文件锚点和产品决定，避免重复实现或误判已有接口"}
