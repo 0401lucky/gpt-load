@@ -1,0 +1,431 @@
+ok  	github.com/QuantumNous/new-api/model	6.388s
+ok  	github.com/QuantumNous/new-api/controller	137.980s
+ok  	github.com/QuantumNous/new-api/middleware	0.407s
+
+2026/09/14 15:27:02 [34;1mD:/code/Claude code program/new-api/service/auth_session_test.go:206
+[0m[35m[warn] [0mremoving callback `test:fail_user_session_limit_count` from D:/code/Claude code program/new-api/service/auth_session_test.go:206
+[SYS] 2026/09/14 - 15:27:02 | failed to delete expired user sessions: forced expired cleanup failure 
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/service/auth_session_test.go:324 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `user_sessions` WHERE sid = "independent-revoked-cleanup" ORDER BY `user_sessions`.`sid` LIMIT 1
+
+2026/09/14 15:27:02 [34;1mD:/code/Claude code program/new-api/service/auth_session_test.go:317
+[0m[35m[warn] [0mremoving callback `test:fail_first_user_session_cleanup_batch` from D:/code/Claude code program/new-api/service/auth_session_test.go:317
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/token.go:297 [35;1mSQL logic error: near "=": syntax error (1)
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `tokens` WHERE  = "sk-reserve-rollback" AND `tokens`.`deleted_at` IS NULL ORDER BY `tokens`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 4242 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9001 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.537ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9001 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.549ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9002 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9002 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9003 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9003 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9004 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9004 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9006 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9102 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9103 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.547ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9103 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:164 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9104 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+
+2026/09/14 15:27:02 [31;1mD:/code/Claude code program/new-api/model/blackroom.go:264 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `blackroom_bans` WHERE user_id = 9104 AND status = "active" AND (banned_until = 0 OR banned_until > 1789370822) ORDER BY id desc,`blackroom_bans`.`id` LIMIT 1
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[SYS] 2026/09/14 - 15:27:02 | channels synced from database 
+2026/09/14 15:27:03 http: TLS handshake error from 127.0.0.1:64280: remote error: tls: bad certificate
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | legacy proxy URL suffix ignored at runtime: scheme=http host=proxy.example:8080; update the channel proxy setting 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | invalid channel http transport setting clamped: http_protocol+http2_connection_shards="http1+8" 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | invalid channel http transport setting clamped: http_protocol="http3" 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | invalid channel http transport setting clamped: http2_connection_shards="-3" 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | invalid channel http transport setting clamped: http2_connection_shards="99" 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | quota saturation on consume log: op=QuotaFromDecimal kind=overflow original=1.8e+19 clamped=2147483647 user=7 model=gpt-image-1 
+[SYS] 2026/09/14 - 15:27:03 | quota conversion (QuotaFromDecimal) overflow: original=5e+25, clamped=2147483647 
+[SYS] 2026/09/14 - 15:27:03 | quota conversion (QuotaRound) overflow: original=+Inf, clamped=2147483647 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | quota saturation on consume log: op=QuotaFromFloat kind=underflow original=0 clamped=-2147483648 user=0 model= 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/system_task.go:138 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `system_tasks` WHERE type = "test_enqueue" AND status IN ("pending","running") ORDER BY id desc,`system_tasks`.`id` LIMIT 1
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/system_task.go:138 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `system_tasks` WHERE type = "test_enqueue" AND status IN ("pending","running") ORDER BY id desc,`system_tasks`.`id` LIMIT 1
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | record consume log: userId=40, params={"channel_id":40,"prompt_tokens":0,"completion_tokens":0,"model_name":"wan2.5-i2v-preview","token_name":"test_token","quota":100,"content":"操作 GENERATE, 计算参数：resolution: 720P, seconds: 5","token_id":0,"use_time_seconds":0,"is_stream":false,"group":"default","other":{"billing_mode":"tiered_expr","expr_b64":"dGllcigiNzIwUCIsIHUoInNlY29uZHMiKSAqIDUp","group_ratio":1,"is_task":true,"matched_tier":"720P","model_price":0.02,"request_path":"/v1/videos","task_id":"task_152703.880","usage_facts":{"resolution":"720P","seconds":5}}} 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/model_health_slice.go:123 [35;1mSQL logic error: no such table: model_health_slice_5m (1)
+[0m[33m[0.526ms] [34;1m[rows:0][0m INSERT INTO `model_health_slice_5m` (`slice_start_ts`,`model_name`,`total_requests`,`error_requests`,`success_qualified_requests`,`success_tokens`,`has_success_qualified`,`max_response_bytes`,`max_completion_tokens`,`max_assistant_chars`,`updated_at`) VALUES (1789370700,"wan2.5-i2v-preview",1,0,0,0,false,0,0,0,"2026-09-14 15:27:03.881") ON CONFLICT (`slice_start_ts`,`model_name`) DO UPDATE SET `error_requests`=error_requests + excluded.error_requests,`has_success_qualified`=has_success_qualified OR excluded.has_success_qualified,`max_assistant_chars`=MAX(max_assistant_chars, excluded.max_assistant_chars),`max_completion_tokens`=MAX(max_completion_tokens, excluded.max_completion_tokens),`max_response_bytes`=MAX(max_response_bytes, excluded.max_response_bytes),`success_qualified_requests`=success_qualified_requests + excluded.success_qualified_requests,`success_tokens`=success_tokens + excluded.success_tokens,`total_requests`=total_requests + excluded.total_requests
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | record consume log: userId=41, params={"channel_id":41,"prompt_tokens":0,"completion_tokens":0,"model_name":"test-model","token_name":"test_token","quota":100,"content":"操作 GENERATE, 计算参数：size: 2.00","token_id":0,"use_time_seconds":0,"is_stream":false,"group":"default","other":{"group_ratio":1,"is_task":true,"model_price":0.02,"request_path":"/v1/videos","task_id":"task_152703.882"}} 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/model_health_slice.go:123 [35;1mSQL logic error: no such table: model_health_slice_5m (1)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO `model_health_slice_5m` (`slice_start_ts`,`model_name`,`total_requests`,`error_requests`,`success_qualified_requests`,`success_tokens`,`has_success_qualified`,`max_response_bytes`,`max_completion_tokens`,`max_assistant_chars`,`updated_at`) VALUES (1789370700,"test-model",1,0,0,0,false,0,0,0,"2026-09-14 15:27:03.883") ON CONFLICT (`slice_start_ts`,`model_name`) DO UPDATE SET `error_requests`=error_requests + excluded.error_requests,`has_success_qualified`=has_success_qualified OR excluded.has_success_qualified,`max_assistant_chars`=MAX(max_assistant_chars, excluded.max_assistant_chars),`max_completion_tokens`=MAX(max_completion_tokens, excluded.max_completion_tokens),`max_response_bytes`=MAX(max_response_bytes, excluded.max_response_bytes),`success_qualified_requests`=success_qualified_requests + excluded.success_qualified_requests,`success_tokens`=success_tokens + excluded.success_tokens,`total_requests`=total_requests + excluded.total_requests
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/quota_reserve.go:147 [35;1mconstraint failed: forced user quota failure (1811)
+[0m[33m[0.521ms] [34;1m[rows:0][0m UPDATE `users` SET `quota`=quota - 3000 WHERE (id = 52 AND quota >= 3000) AND `users`.`deleted_at` IS NULL
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/token.go:435 [35;1mconstraint failed: forced token quota failure (1811)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tokens` SET `accessed_time`=1789370823,`remain_quota`=remain_quota - 3000,`used_quota`=used_quota + 3000 WHERE id = 53 AND `tokens`.`deleted_at` IS NULL
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/subscription.go:1856 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `user_subscriptions` WHERE id = 9999 ORDER BY `user_subscriptions`.`id` LIMIT 1
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | 原子退款失败 task task_152703.898: record not found 
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 拒绝异常负额度任务退款 task task_152703.899: quota=-1200 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.901 差额结算：delta=＄0.002000 额度（实际：＄0.006000 额度，预扣：＄0.004000 额度，adaptor adjustment） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""token_id"":10,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""},""permanent_quota_consumed"":1000}",`quota`=3000,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.901: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.903 差额结算：delta=＄-0.004000 额度（实际：＄0.006000 额度，预扣：＄0.010000 额度，adaptor adjustment） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""token_id"":11,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""}}",`quota`=3000,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.903: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.904 预扣费准确（＄0.006000 额度，exact match） 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.904 差额结算：delta=＄-0.010000 额度（实际：＄0.000000 额度，预扣：＄0.010000 额度，zero actual） 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.906 差额结算：delta=＄-0.006000 额度（实际：＄0.004000 额度，预扣：＄0.010000 额度，subscription over-charge） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""subscription"",""subscription_id"":2,""token_id"":14,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""}}",`quota`=2000,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.906: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.911 差额结算：delta=＄-0.004000 额度（实际：＄0.006000 额度，预扣：＄0.010000 额度，test settle） 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.914 按次计费，跳过差额结算 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.915 按次计费，跳过差额结算 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.916 差额结算：delta=＄-0.004000 额度（实际：＄0.006000 额度，预扣：＄0.010000 额度，adaptor计费调整） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.523ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""token_id"":32,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""}}",`quota`=3000,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.916: WHERE conditions required 
+[WARN] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.918 表达式结算失败，保留预扣额度: expr compile error: unexpected token EOF (1:14)
+ | tier("broken",
+ | .............^ 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.919 差额结算：delta=＄-0.000044 额度（实际：＄0.000056 额度，预扣：＄0.000100 额度，任务用量表达式结算） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model"",""tiered_snapshot"":{""billing_mode"":"""",""model_name"":"""",""expr_string"":""tier(\""base\"", u(\""seconds\"") + u(\""clips\"") * 10)"",""expr_hash"":""321a349b6ae0ebae2064e58ecc95e4dfe82860e1a0c46943735d2e85c6e8a7f2"",""group_ratio"":1,""estimated_prompt_tokens"":0,""estimated_completion_tokens"":0,""estimated_quota_before_group"":0,""estimated_quota_after_group"":0,""estimated_tier"":""base"",""quota_per_unit"":1,""expr_version"":1,""task_usage_billing"":true,""usage_facts"":{""clips"":2,""seconds"":8}}}}",`quota`=28,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.919: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.920 差额结算：delta=＄-0.000050 额度（实际：＄0.000050 额度，预扣：＄0.000100 额度，任务用量表达式结算） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model"",""tiered_snapshot"":{""billing_mode"":"""",""model_name"":"""",""expr_string"":""tier(\""base\"", u(\""seconds\"") + u(\""clips\"") * 10)"",""expr_hash"":""321a349b6ae0ebae2064e58ecc95e4dfe82860e1a0c46943735d2e85c6e8a7f2"",""group_ratio"":1,""estimated_prompt_tokens"":0,""estimated_completion_tokens"":0,""estimated_quota_before_group"":0,""estimated_quota_after_group"":0,""estimated_tier"":""base"",""quota_per_unit"":1,""expr_version"":1,""task_usage_billing"":true,""usage_facts"":{""clips"":2,""seconds"":5}}}}",`quota`=25,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.920: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.921 差额结算：delta=＄-0.000044 额度（实际：＄0.000056 额度，预扣：＄0.000100 额度，任务用量表达式结算） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model"",""tiered_snapshot"":{""billing_mode"":"""",""model_name"":"""",""expr_string"":""tier(\""base\"", u(\""seconds\"") + u(\""clips\"") * 10)"",""expr_hash"":""321a349b6ae0ebae2064e58ecc95e4dfe82860e1a0c46943735d2e85c6e8a7f2"",""group_ratio"":1,""estimated_prompt_tokens"":0,""estimated_completion_tokens"":0,""estimated_quota_before_group"":0,""estimated_quota_after_group"":0,""estimated_tier"":""base"",""quota_per_unit"":1,""expr_version"":1,""task_usage_billing"":true,""usage_facts"":{""clips"":2,""seconds"":8}}}}",`quota`=28,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.921: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.922 差额结算：delta=＄-0.000024 额度（实际：＄0.000076 额度，预扣：＄0.000100 额度，任务用量表达式结算） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model"",""tiered_snapshot"":{""billing_mode"":"""",""model_name"":"""",""expr_string"":""tier(\""base\"", u(\""seconds\"") + u(\""clips\"") * 10)"",""expr_hash"":""321a349b6ae0ebae2064e58ecc95e4dfe82860e1a0c46943735d2e85c6e8a7f2"",""group_ratio"":1,""estimated_prompt_tokens"":0,""estimated_completion_tokens"":0,""estimated_quota_before_group"":0,""estimated_quota_after_group"":0,""estimated_tier"":""base"",""quota_per_unit"":1,""expr_version"":1,""task_usage_billing"":true,""usage_facts"":{""clips"":3,""seconds"":8}}}}",`quota`=38,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.922: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.924 差额结算：delta=＄0.000050 额度（实际：＄0.000100 额度，预扣：＄0.000050 额度，任务用量表达式结算） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model"",""tiered_snapshot"":{""billing_mode"":"""",""model_name"":"""",""expr_string"":""u(\""resolution\"") == \""1080P\"" ? tier(\""1080P\"", u(\""seconds\"") * 10) : tier(\""720P\"", u(\""seconds\"") * 5)"",""expr_hash"":""8a466a221a0e952514f77aaa9bf9b93c8115e40294ed0c4f5d7a4515ca0ff683"",""group_ratio"":1,""estimated_prompt_tokens"":0,""estimated_completion_tokens"":0,""estimated_quota_before_group"":0,""estimated_quota_after_group"":0,""estimated_tier"":""1080P"",""quota_per_unit"":1,""expr_version"":1,""task_usage_billing"":true,""usage_facts"":{""resolution"":""1080P"",""seconds"":5}}},""permanent_quota_consumed"":25}",`quota`=50,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.924: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.926 差额结算：delta=＄0.000060 额度（实际：＄0.000160 额度，预扣：＄0.000100 额度，token重算：tokens=80, modelRatio=1.00, groupRatio=1.00, otherMultiplier=1.0000） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""token_id"":35,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""},""permanent_quota_consumed"":30}",`quota`=80,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.926: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | 任务 task_152703.927 差额结算：delta=＄0.000060 额度（实际：＄0.000160 额度，预扣：＄0.000100 额度，token重算：tokens=80, modelRatio=1.00, groupRatio=1.00, otherMultiplier=1.0000） 
+
+2026/09/14 15:27:03 [31;1mD:/code/Claude code program/new-api/model/task.go:574 [35;1mWHERE conditions required
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `tasks` SET `private_data`="{""billing_source"":""wallet"",""token_id"":35,""billing_context"":{""model_price"":0.02,""group_ratio"":1,""origin_model_name"":""test-model""},""permanent_quota_consumed"":30}",`quota`=80,`updated_at`=1789370823
+[ERR] 2026/09/14 - 15:27:03 | SYSTEM | 差额结算回写 quota 失败 task task_152703.927: WHERE conditions required 
+[INFO] 2026/09/14 - 15:27:03 | SYSTEM | Channel #101 pending video tasks: 2 
+[ERR] 2026/09/14 - 15:27:04 | SYSTEM | Channel #101 failed to update video async tasks: context deadline exceeded 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #109 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #109 pending video tasks: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #109 pending video tasks: 1 
+[ERR] 2026/09/14 - 15:27:04 | SYSTEM | Channel #109 failed to update video async tasks: video adaptor not found 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_SUCCESS reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 任务 task_batch_tiered_SUCCESS 差额结算：delta=＄-0.004000 额度（实际：＄0.006000 额度，预扣：＄0.010000 额度，任务用量表达式结算） 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_SUCCESS reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_tiered_FAILURE 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_FAILURE reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_tiered_FAILURE 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_FAILURE reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_SUCCESS reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 任务 task_batch_tiered_SUCCESS 差额结算：delta=＄-0.010000 额度（实际：＄0.000000 额度，预扣：＄0.010000 额度，任务用量表达式结算） 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_SUCCESS reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_tiered_FAILURE 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_FAILURE reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #141 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_tiered_FAILURE 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_FAILURE reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #143 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_tiered_refund 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_tiered_refund reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #142 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | task_batch_refund 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task task_batch_refund reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #102 pending video tasks: 2 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #202 pending video tasks: 2 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #201 pending video tasks: 2 
+[ERR] 2026/09/14 - 15:27:04 | SYSTEM | Channel #202 failed to update video async tasks: context deadline exceeded 
+[ERR] 2026/09/14 - 15:27:04 | SYSTEM | Channel #201 failed to update video async tasks: context deadline exceeded 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #251 pending video tasks: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #252 pending video tasks: 2 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #301 pending video tasks: 2 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | Channel #302 pending video tasks: 2 
+[ERR] 2026/09/14 - 15:27:04 | SYSTEM | Channel #301 failed to update video async tasks: context deadline exceeded 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #401 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | suno_public_refund_once 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task suno_public_refund_once reached terminal status without data; preserving existing task data 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #401 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | suno_public_refund_once 构建失败，upstream failed 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task suno_public_refund_once reached terminal status without data; preserving existing task data 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | Batch task suno_public_refund_once already transitioned by another process, skip billing 
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/subscription.go:1856 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `user_subscriptions` WHERE id = 404 ORDER BY `user_subscriptions`.`id` LIMIT 1
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | 原子退款失败 task subscription_failed_pending_refund: record not found 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | task poll auth failure channel_id=510 task=task_poll_class http=401 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | task task_poll_class poll unrecognized (failures=1, http=200): weird; body={} 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | task task_poll_class poll unrecognized (failures=1, http=400): body={} 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #610 未完成的任务有: 1 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #610 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | task poll auth failure channel_id=610 http=401 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 渠道 #610 未完成的任务有: 1 
+[WARN] 2026/09/14 - 15:27:04 | SYSTEM | task task_batch_class poll unrecognized (failures=1, http=200): weird 
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 1 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 2 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 3 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 4 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 5 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 6 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 7 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 8 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 9 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 10 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 11 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 12 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+
+2026/09/14 15:27:04 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.532ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 13 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789370824
+--- FAIL: TestFixedPriceBillingDatabaseMatrix (0.02s)
+    --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite (0.02s)
+        text_quota_test.go:74: database: 3.50.4
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001d1dea8), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/zero_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c803d8), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/zero_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/stream_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c80870), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/stream_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/audio_zero_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c80d08), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/audio_zero_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/audio_missing_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c811a0), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/audio_missing_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/token_reservation_refunds_to_fixed_price (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c81770), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/token_reservation_refunds_to_fixed_price
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/fixed_reservation_settles_token_fallback (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc001c81c08), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/fixed_reservation_settles_token_fallback
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_uses_estimated_token_fallback (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0027e4120), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_uses_estimated_token_fallback
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/evaluation_error_retains_fixed_reservation_metadata (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0027e4708), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/evaluation_error_retains_fixed_reservation_metadata
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/explicit_zero_remains_free (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0027e4c30), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/explicit_zero_remains_free
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/multipliers_and_separate_tool_surcharge (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0027e5200), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/multipliers_and_separate_tool_surcharge
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/failed_request_refunds_exactly_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc000ba5e00), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/failed_request_refunds_exactly_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/insufficient_wallet_never_reserves_tokens (0.00s)
+            text_quota_test.go:144: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:144
+                	Error:      	Not equal: 
+                	            	expected: "insufficient_user_quota"
+                	            	actual  : "query_data_error"
+                	            	
+                	            	Diff:
+                	            	--- Expected
+                	            	+++ Actual
+                	            	@@ -1,2 +1,2 @@
+                	            	-(types.ErrorCode) (len=23) "insufficient_user_quota"
+                	            	+(types.ErrorCode) (len=16) "query_data_error"
+                	            	 
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/insufficient_wallet_never_reserves_tokens
+[SYS] 2026/09/14 - 15:27:04 | quota conversion (QuotaRound) overflow: original=5e+20, clamped=2147483647 
+[SYS] 2026/09/14 - 15:27:04 | tool surcharge call count overflow for custom_fn 
+[INFO] 2026/09/14 - 15:27:04 | SYSTEM | 用户 700 需要预扣费 ＄0.200000 (funding=wallet) 
+FAIL
+FAIL	github.com/QuantumNous/new-api/service	1.764s
+--- FAIL: TestSetUserPermissionsStoresOnlyOverrides (0.01s)
+    authz_test.go:100: 
+        	Error Trace:	D:/code/Claude code program/new-api/service/authz/authz_test.go:100
+        	Error:      	Not equal: 
+        	            	expected: authz.PermissionsMap{"audit":map[string]bool{"read":false}, "channel":map[string]bool{"operate":true, "read":true, "secret_view":false, "sensitive_write":true, "write":false}, "task_plugin":map[string]bool{"bind":false}}
+        	            	actual  : authz.PermissionsMap{"audit":map[string]bool{"read":false}, "channel":map[string]bool{"operate":true, "read":true, "secret_view":false, "sensitive_write":true, "write":false}, "donation_config":map[string]bool{"read":true, "write":true}, "donation_records":map[string]bool{"read":true}, "task_plugin":map[string]bool{"bind":false}}
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-(authz.PermissionsMap) (len=3) {
+        	            	+(authz.PermissionsMap) (len=5) {
+        	            	  (string) (len=5) "audit": (map[string]bool) (len=1) {
+        	            	@@ -11,2 +11,9 @@
+        	            	  },
+        	            	+ (string) (len=15) "donation_config": (map[string]bool) (len=2) {
+        	            	+  (string) (len=4) "read": (bool) true,
+        	            	+  (string) (len=5) "write": (bool) true
+        	            	+ },
+        	            	+ (string) (len=16) "donation_records": (map[string]bool) (len=1) {
+        	            	+  (string) (len=4) "read": (bool) true
+        	            	+ },
+        	            	  (string) (len=11) "task_plugin": (map[string]bool) (len=1) {
+        	Test:       	TestSetUserPermissionsStoresOnlyOverrides
+    authz_test.go:132: 
+        	Error Trace:	D:/code/Claude code program/new-api/service/authz/authz_test.go:132
+        	Error:      	Not equal: 
+        	            	expected: authz.PermissionsMap{"audit":map[string]bool{"read":false}, "channel":map[string]bool{"operate":true, "read":true, "secret_view":false, "sensitive_write":false, "write":true}, "task_plugin":map[string]bool{"bind":false}}
+        	            	actual  : authz.PermissionsMap{"audit":map[string]bool{"read":false}, "channel":map[string]bool{"operate":true, "read":true, "secret_view":false, "sensitive_write":false, "write":true}, "donation_config":map[string]bool{"read":true, "write":true}, "donation_records":map[string]bool{"read":true}, "task_plugin":map[string]bool{"bind":false}}
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-(authz.PermissionsMap) (len=3) {
+        	            	+(authz.PermissionsMap) (len=5) {
+        	            	  (string) (len=5) "audit": (map[string]bool) (len=1) {
+        	            	@@ -11,2 +11,9 @@
+        	            	  },
+        	            	+ (string) (len=15) "donation_config": (map[string]bool) (len=2) {
+        	            	+  (string) (len=4) "read": (bool) true,
+        	            	+  (string) (len=5) "write": (bool) true
+        	            	+ },
+        	            	+ (string) (len=16) "donation_records": (map[string]bool) (len=1) {
+        	            	+  (string) (len=4) "read": (bool) true
+        	            	+ },
+        	            	  (string) (len=11) "task_plugin": (map[string]bool) (len=1) {
+        	Test:       	TestSetUserPermissionsStoresOnlyOverrides
+
+2026/09/14 15:27:06 [31;1mD:/code/Claude code program/new-api/service/authz/enforcer.go:78 [35;1mrecord not found
+[0m[33m[0.000ms] [34;1m[rows:0][0m SELECT * FROM `options` WHERE `key` = "AuthzLegacyAdminPermissionsMigratedV1" ORDER BY `options`.`key` LIMIT 1
+FAIL
+FAIL	github.com/QuantumNous/new-api/service/authz	0.275s
+?   	github.com/QuantumNous/new-api/service/passkey	[no test files]
+ok  	github.com/QuantumNous/new-api/router	0.521s
+?   	github.com/QuantumNous/new-api	[no test files]
+FAIL

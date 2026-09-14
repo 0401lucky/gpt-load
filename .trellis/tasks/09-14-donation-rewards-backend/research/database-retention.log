@@ -1,0 +1,12 @@
+=== RUN   TestDonationSQLiteBackupRetainsIdentityAndRewards
+[SYS] 2026/09/14 - 21:57:44 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 21:57:44 | SQL_DSN not set, using SQLite as database 
+    donation_retention_test.go:18: real database sqlite version=3.50.4 upgrade=true prefix=dv_96f21526_
+--- PASS: TestDonationSQLiteBackupRetainsIdentityAndRewards (0.20s)
+=== RUN   TestDonationPermanentRewardSurvivesCheckinRetention
+[SYS] 2026/09/14 - 21:57:44 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 21:57:44 | SQL_DSN not set, using SQLite as database 
+    donation_retention_test.go:77: real database sqlite version=3.50.4 upgrade=true prefix=dv_dfce10d6_
+--- PASS: TestDonationPermanentRewardSurvivesCheckinRetention (0.10s)
+PASS
+ok  	github.com/QuantumNous/new-api/model	0.533s

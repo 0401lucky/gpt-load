@@ -1,0 +1,4 @@
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"父任务负责跨子任务契约一致性"}
+{"file":".trellis/tasks/09-14-key-donation-rewards/research/integration-contract.md","reason":"两端接口、数据唯一性、身份与恢复状态的权威契约"}
+{"file":".trellis/tasks/09-14-key-donation-rewards/research/codebase-findings.md","reason":"已核实能力、文件锚点和产品决定，避免重复实现或误判已有接口"}
+{"file":".trellis/tasks/09-14-key-donation-rewards/research/new-api-conventions.md","reason":"new-api 独立仓库规则、React/Bun、三数据库与账务验证要求"}

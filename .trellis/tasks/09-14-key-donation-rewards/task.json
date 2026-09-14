@@ -1,0 +1,30 @@
+{
+  "id": "key-donation-rewards",
+  "name": "key-donation-rewards",
+  "title": "密钥捐献与社区额度奖励",
+  "description": "按既定规划实现gpt-load与new-api的密钥捐献、登录身份关联和永久额度奖励，完成真实数据库及跨仓库本地验收。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "0401lucky",
+  "assignee": "0401lucky",
+  "createdAt": "2026-09-14",
+  "completedAt": null,
+  "branch": "feat/key-donation-rewards",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "09-14-donation-intake",
+    "09-14-donation-rewards-backend",
+    "09-14-donation-web"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "三个子任务及跨仓库本地验收完成，用户已确认本地提交与归档。按批准分组执行；未推送或生产操作。",
+  "meta": {}
+}

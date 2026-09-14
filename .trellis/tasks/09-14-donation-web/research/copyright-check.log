@@ -1,0 +1,26 @@
+$ node scripts/add-copyright.mjs --check
+copyright: checked 1350, added 7, updated 15, skipped generated 1, skipped third-party 1
+copyright: headers need to be updated in:
+- src/components/ai-elements/response-fade.ts
+- src/components/model-group-selector-layout.ts
+- src/features/active-tasks/types.ts
+- src/features/auth/lib/oauth-callback-mode.ts
+- src/features/channels/lib/__tests__/channel-form.test.ts
+- src/features/channels/lib/channel-field-update.ts
+- src/features/channels/lib/model-categories.ts
+- src/features/dashboard/components/users/user-charts.tsx
+- src/features/dynamic-ratio/types.ts
+- src/features/fingerprints/types.ts
+- src/features/model-health/types.ts
+- src/features/profile/components/__tests__/login-session-utils.test.ts
+- src/features/recent-calls/types.ts
+- src/features/security/components/__tests__/login-session-utils.test.ts
+- src/features/system-settings/lib/checkin-time.ts
+- src/features/task-plugins/__tests__/plugin-icon-image.test.tsx
+- src/features/task-plugins/components/javascript-viewer.tsx
+- src/features/task-plugins/components/plugin-detail-sheet.tsx
+- src/features/task-plugins/lib/host-protocols.ts
+- src/lib/chunk-reload.ts
+- src/lib/localized-text.ts
+- src/lib/session-hint.ts
+error: script "copyright:check" exited with code 1

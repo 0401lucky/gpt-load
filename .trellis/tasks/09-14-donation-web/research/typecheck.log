@@ -1,0 +1,5 @@
+$ tsgo -b
+src/components/layout/__tests__/donation-navigation.test.tsx(103,21): error TS2352: Conversion of type 'BeforeLoadContextOptions<unknown, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, undefined, ResolveParams<"/donations">, ... 4 more ..., undefined>' to type 'BeforeLoadContextOptions<Register, RootRoute<Register, undefined, { queryClient: QueryClient; }, AnyContext, ({ location }: BeforeLoadContextOptions<Register, any, undefined, {}, ... 4 more ..., undefined>) => Promise<...>, ... 6 more ..., undefined>, ... 6 more ..., undefined>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'context' are incompatible.
+    Property 'queryClient' is missing in type '{}' but required in type '{ queryClient: QueryClient; }'.
+error: script "typecheck" exited with code 1

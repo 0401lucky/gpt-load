@@ -1,0 +1,28 @@
+{
+  "id": "donation-web",
+  "name": "donation-web",
+  "title": "new-api 捐献页面与管理员记录",
+  "description": "实现顶部导航、多行捐献、风险小字、活动分组配置和用户与 key 关联记录界面。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "0401lucky",
+  "assignee": "0401lucky",
+  "createdAt": "2026-09-14",
+  "completedAt": null,
+  "branch": "feat/key-donation-rewards",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": "68079045ee2dd424884498d6225e982eae5325e4",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "09-14-key-donation-rewards",
+  "relatedFiles": [],
+  "notes": "本地页面、24项测试、变更范围检查、构建与最终浏览器验收已完成；全仓历史问题已记录，代码已在new-api提交，用户已授权归档。",
+  "meta": {
+    "target_repo": "D:/code/Claude code program/new-api/web"
+  }
+}

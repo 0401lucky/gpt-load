@@ -1,0 +1,28 @@
+{
+  "id": "donation-rewards-backend",
+  "name": "donation-rewards-backend",
+  "title": "new-api 捐献管理与永久奖励后端",
+  "description": "实现活动配置、gpt-load 集成、批次恢复、全站 key 去重、永久奖励事务和管理查询。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "0401lucky",
+  "assignee": "0401lucky",
+  "createdAt": "2026-09-14",
+  "completedAt": null,
+  "branch": "feat/key-donation-rewards",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": "7b6a3c7b434b72a777db5b5b8855cf777ef53dec",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "09-14-key-donation-rewards",
+  "relatedFiles": [],
+  "notes": "本地实现、真实数据库矩阵、双服务联调和保留性验证已完成；代码已在new-api提交，用户已授权统一归档。",
+  "meta": {
+    "target_repo": "D:/code/Claude code program/new-api"
+  }
+}

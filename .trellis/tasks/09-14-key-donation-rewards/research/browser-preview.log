@@ -1,0 +1,79 @@
+=== RUN   TestDonationBrowserFixture
+    donation_integration_test.go:577: Donation browser fixture ready; private metadata: C:\Users\lucky0401\AppData\Local\Temp\donation-browser-preview-58e31616324441d69d57f25afcb622d0\metadata.json
+    donation_integration_test.go:604: Donation browser fixture rate-limited key is now available
+panic: test timed out after 2h0m0s
+	running tests:
+		TestDonationBrowserFixture (3h23m57s)
+
+goroutine 129 [running]:
+testing.(*M).startAlarm.func1()
+	C:/Program Files/Go/src/testing/testing.go:2682 +0x345
+created by time.goFunc
+	C:/Program Files/Go/src/time/sleep.go:215 +0x2d
+
+goroutine 1 [chan receive, 203 minutes]:
+testing.(*T).Run(0xc000d148c0, {0x7ff75c1f0156?, 0x7ffa53ef3fb0?}, 0x7ff75c348ad0)
+	C:/Program Files/Go/src/testing/testing.go:2005 +0x469
+testing.runTests.func1(0xc000d148c0)
+	C:/Program Files/Go/src/testing/testing.go:2477 +0x37
+testing.tRunner(0xc000d148c0, 0xc0004b3c70)
+	C:/Program Files/Go/src/testing/testing.go:1934 +0xc3
+testing.runTests(0xc00060e318, {0x7ff75e66b640, 0x15a, 0x15a}, {0x7?, 0xc000644d80?, 0x7ff75e677f80?})
+	C:/Program Files/Go/src/testing/testing.go:2475 +0x4b4
+testing.(*M).Run(0xc000c75b80)
+	C:/Program Files/Go/src/testing/testing.go:2337 +0x63a
+main.main()
+	_testmain.go:737 +0x9b
+
+goroutine 21 [select, 167 minutes]:
+github.com/bytedance/gopkg/cache/asynccache.(*sharedTicker).tick(0xc0005c2870, 0xc00074cb60, 0x1)
+	C:/Users/lucky0401/go/pkg/mod/github.com/bytedance/gopkg@v0.1.3/cache/asynccache/asynccache.go:284 +0xd7
+created by github.com/bytedance/gopkg/cache/asynccache.NewAsyncCache in goroutine 1
+	C:/Users/lucky0401/go/pkg/mod/github.com/bytedance/gopkg@v0.1.3/cache/asynccache/asynccache.go:141 +0x295
+
+goroutine 22 [select, 167 minutes]:
+github.com/bytedance/gopkg/cache/asynccache.(*sharedTicker).tick(0xc0005c2960, 0xc00074cc40, 0x0)
+	C:/Users/lucky0401/go/pkg/mod/github.com/bytedance/gopkg@v0.1.3/cache/asynccache/asynccache.go:284 +0xd7
+created by github.com/bytedance/gopkg/cache/asynccache.NewAsyncCache in goroutine 1
+	C:/Users/lucky0401/go/pkg/mod/github.com/bytedance/gopkg@v0.1.3/cache/asynccache/asynccache.go:154 +0x438
+
+goroutine 23 [runnable]:
+testing.(*common).frameSkip(0xc000d14a80, 0x3)
+	C:/Program Files/Go/src/testing/testing.go:743 +0xc5
+testing.(*common).callSite(0xc000d14a80, 0x3)
+	C:/Program Files/Go/src/testing/testing.go:1067 +0x8a
+testing.(*common).log(0xc000d14a80, {0xc000732000?, 0x43?})
+	C:/Program Files/Go/src/testing/testing.go:1035 +0xf9
+testing.(*common).Fatal(0xc000d14a80, {0xc0004abf30?, 0x7ff75c65b820?, 0x0?})
+	C:/Program Files/Go/src/testing/testing.go:1211 +0x45
+github.com/QuantumNous/new-api/controller_test.TestDonationBrowserFixture(0xc000d14a80)
+	D:/code/Claude code program/new-api/controller/donation_integration_test.go:588 +0x29ef
+testing.tRunner(0xc000d14a80, 0x7ff75c348ad0)
+	C:/Program Files/Go/src/testing/testing.go:1934 +0xc3
+created by testing.(*T).Run in goroutine 1
+	C:/Program Files/Go/src/testing/testing.go:1997 +0x44b
+
+goroutine 24 [syscall, 203 minutes]:
+os/signal.signal_recv()
+	C:/Program Files/Go/src/runtime/sigqueue.go:152 +0x29
+os/signal.loop()
+	C:/Program Files/Go/src/os/signal/signal_unix.go:23 +0x13
+created by os/signal.Notify.func1.1 in goroutine 23
+	C:/Program Files/Go/src/os/signal/signal.go:152 +0x1f
+
+goroutine 25 [IO wait, 181 minutes]:
+internal/poll.runtime_pollWait(0x1f27d906c00, 0x72)
+	C:/Program Files/Go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0x1dc?, 0x7ff759c41186?, 0x0)
+	C:/Program Files/Go/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.waitIO(0x0?)
+	C:/Program Files/Go/src/internal/poll/fd_windows.go:187 +0x65
+internal/poll.execIO(0xc000bda7a0, 0xc000d39bd0)
+	C:/Program Files/Go/src/internal/poll/fd_windows.go:240 +0x13a
+internal/poll.(*FD).acceptOne(0xc000bda788, 0x2c4, {0xc00031f2c0?, 0xc000d39c30?, 0x7ff759d13265?}, 0xc000d39c64?)
+	C:/Program Files/Go/src/internal/poll/fd_windows.go:1059 +0x65
+internal/poll.(*FD).Accept(0xc000bda788, 0xc000d39db0)
+	C:/Program Files/Go/src/internal/poll/fd_windows.go:1093 +0x1b6
+*** Test killed: ran too long (2h12m0s).
+FAIL	github.com/QuantumNous/new-api/controller	12237.250s
+FAIL

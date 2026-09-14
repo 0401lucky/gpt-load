@@ -1,0 +1,55 @@
+=== RUN   TestDonationDatabase
+=== RUN   TestDonationDatabase/sqlite
+=== RUN   TestDonationDatabase/sqlite/upgrade_false
+[SYS] 2026/09/14 - 15:16:10 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 15:16:10 | SQL_DSN not set, using SQLite as database 
+    donation_test.go:172: real database sqlite version=3.50.4 upgrade=false prefix=dv_ac751e1c_
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/rollback_limits_and_account_pause
+
+2026/09/14 15:16:10 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/sqlite/upgrade_true
+[SYS] 2026/09/14 - 15:16:10 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 15:16:10 | SQL_DSN not set, using SQLite as database 
+    donation_test.go:172: real database sqlite version=3.50.4 upgrade=true prefix=dv_7af36fed_
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/rollback_limits_and_account_pause
+
+2026/09/14 15:16:11 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/mysql
+=== RUN   TestDonationDatabase/mysql/upgrade_false
+    donation_test.go:172: real database DSN is not configured
+=== RUN   TestDonationDatabase/mysql/upgrade_true
+    donation_test.go:172: real database DSN is not configured
+=== RUN   TestDonationDatabase/postgres
+=== RUN   TestDonationDatabase/postgres/upgrade_false
+    donation_test.go:172: real database DSN is not configured
+=== RUN   TestDonationDatabase/postgres/upgrade_true
+    donation_test.go:172: real database DSN is not configured
+--- PASS: TestDonationDatabase (0.44s)
+    --- PASS: TestDonationDatabase/sqlite (0.44s)
+        --- PASS: TestDonationDatabase/sqlite/upgrade_false (0.24s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/mixed_lines_and_frozen_rewards (0.03s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/cross_connection_ownership_and_ledger (0.04s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/rollback_limits_and_account_pause (0.04s)
+        --- PASS: TestDonationDatabase/sqlite/upgrade_true (0.20s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/mixed_lines_and_frozen_rewards (0.02s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/cross_connection_ownership_and_ledger (0.02s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/rollback_limits_and_account_pause (0.03s)
+    --- PASS: TestDonationDatabase/mysql (0.00s)
+        --- SKIP: TestDonationDatabase/mysql/upgrade_false (0.00s)
+        --- SKIP: TestDonationDatabase/mysql/upgrade_true (0.00s)
+    --- PASS: TestDonationDatabase/postgres (0.00s)
+        --- SKIP: TestDonationDatabase/postgres/upgrade_false (0.00s)
+        --- SKIP: TestDonationDatabase/postgres/upgrade_true (0.00s)
+=== RUN   TestDonationCacheAndIdentity
+[SYS] 2026/09/14 - 15:16:11 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 15:16:11 | SQL_DSN not set, using SQLite as database 
+    donation_test.go:376: real database sqlite version=3.50.4 upgrade=true prefix=dv_938c0b07_
+--- PASS: TestDonationCacheAndIdentity (0.13s)
+PASS
+ok  	github.com/QuantumNous/new-api/model	0.828s

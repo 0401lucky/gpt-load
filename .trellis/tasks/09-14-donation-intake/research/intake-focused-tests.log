@@ -1,0 +1,960 @@
+time="2026-09-14T14:29:35+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:35+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:40+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=temporary-model outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=rerank
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=probe
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=probe
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=probe
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=temporary-model outcome=passed protocol=openai-embeddings reason=
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=anthropic reason=
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=failed protocol=openai-completions reason=model_unavailable
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.30 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.40 retry_after_seconds=1800
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.31 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.41 retry_after_seconds=1800
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.32 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.42 retry_after_seconds=1800
+time="2026-09-14T14:29:41+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*fmt.wrapErrors" operation=system_update
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:999/credentials" resource_type=group_credential status_code=404
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=CHANNEL_TARGET_CONFLICT event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=409
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:41+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*control.controlOperationError" operation=update_settings stage=publish_committed_snapshot
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INTERNAL_SERVER_ERROR event=mutation operation=settings_update outcome=failed peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=500
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.52 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.52 retry_after_seconds=1800
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.61 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.51 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=413
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=428
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_IDEMPOTENCY_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=428
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_IDEMPOTENCY_KEY event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=428
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_IDEMPOTENCY_KEY event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.90 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.90 retry_after_seconds=1800
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" access_key_id=1 event=auth_failed peer_ip=198.51.100.92 reason=peer_not_allowed total=1
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:41+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_reveal outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:41+08:00" level=warning msg="[CONTROL] Authentication failed" access_key_id=1 event=auth_failed peer_ip=192.0.2.91 reason=access_key_expired total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" access_key_id=1 event=auth_failed peer_ip=192.0.2.56 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.58 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.58 retry_after_seconds=1800
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.55 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:19a63d65-ac80-4386-8bbc-997e246cbef3" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=list_request_logs
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:42+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=list_request_logs
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_credential_import outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_reveal outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_credential_reveal outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_credentials_batch outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:42+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:42+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=list_request_logs
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credentials_download_all outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_download outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credentials_download_all outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=413
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382726 duration_ms=2 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[anthropic google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:unknown" resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:unknown" resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:unknown" resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:unknown" resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_delete outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=access_key_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=404
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_credential_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=413
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[anthropic google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:42+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382804 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:999" resource_type=group status_code=404
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_update_models outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_NAME_CONFLICT event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=409
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=100 event=models_dev_catalog_sync outcome=succeeded successful_fetch_at_ms=100 trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382850 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382865 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=10 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=1 trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=settings_change
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=10 duration_ms=1 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=1 trigger=settings_change
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=10 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=1 trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=group_change
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=10 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=1 trigger=group_change
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382910 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=periodic
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367382910 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=periodic
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization skipped" event=models_dev_catalog_sync outcome=skipped skip_reason=auto_sync_disabled trigger=startup
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization skipped" event=models_dev_catalog_sync outcome=skipped skip_reason=auto_sync_disabled trigger=periodic
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization skipped" event=models_dev_catalog_sync outcome=skipped skip_reason=auto_sync_disabled trigger=group_change
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=250 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed successful_fetch_at_ms=90 trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[openai anthropic google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:42+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=100 duration_ms=3 event=models_dev_catalog_sync outcome=succeeded successful_fetch_at_ms=100 trigger=manual
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:42+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367383003 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=startup
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=periodic
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367383004 duration_ms=0 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=periodic
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=413
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=250 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed successful_fetch_at_ms=90 trigger=manual
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[anthropic google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:43+08:00" level=info msg="catalog runtime loaded" event=startup.catalog_load outcome=official_only
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=413
+time="2026-09-14T14:29:43+08:00" level=warning msg="Models.dev catalog cache is unavailable; starting with the official catalog only" component=models_dev_catalog
+time="2026-09-14T14:29:43+08:00" level=info msg="catalog runtime loaded" event=startup.catalog_load outcome=official_only
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=250 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=20 duration_ms=0 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=10 trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="catalog runtime loaded" event=startup.catalog_load outcome=last_known_good
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_RECOVERY_PENDING error_type="*errors.APIError" operation=probe
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_OPERATION_INCOMPLETE error_type="*errors.APIError" operation=probe
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*errors.errorString" operation=probe
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=100 event=models_dev_catalog_sync outcome=succeeded successful_fetch_at_ms=100 trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=startup
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Catalog missing automatic price priority providers" event=models_dev_catalog_price_priority_missing missing_provider_ids="[openai anthropic google deepseek moonshotai moonshotai-cn zhipuai zai alibaba alibaba-cn xai minimax minimax-cn mistral cohere stepfun-ai stepfun perplexity upstage xiaomi meta llama groq cerebras fireworks-ai togetherai deepinfra siliconflow siliconflow-cn nebius baseten openrouter]"
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=3000 duration_ms=2 event=models_dev_catalog_sync outcome=succeeded successful_fetch_at_ms=3000 trigger=startup
+time="2026-09-14T14:29:43+08:00" level=info msg="catalog runtime loaded" event=startup.catalog_load outcome=last_known_good
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*fmt.wrapError" operation=discover_models
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*fmt.wrapError" operation=discover_models
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=413
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*fmt.wrapError" operation=discover_models
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=reveal_access_key
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_OPERATION_INCOMPLETE error_type="*errors.APIError" operation=create_group
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_RECOVERY_PENDING error_type="*errors.APIError" operation=create_group
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization completed" checked_at_ms=20 event=models_dev_catalog_sync not_modified=true outcome=succeeded successful_fetch_at_ms=10 trigger=manual
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_UNPRICED_CONFIRMATION_REQUIRED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:unknown" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=model_price_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=model_price_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=model_price_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*fmt.wrapError" operation=discover_models
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_reset outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Models.dev catalog synchronization started" event=models_dev_catalog_sync outcome=started trigger=manual
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Models.dev catalog synchronization failed" checked_at_ms=1789367383371 error_code=catalog_sync_failed event=models_dev_catalog_sync outcome=failed trigger=manual
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=BAD_GATEWAY error_type="*errors.APIError" operation=sync_model_prices
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_settings
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_UNPRICED_CONFIRMATION_REQUIRED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_AUTOMATIC_DELETE_FORBIDDEN event=mutation operation=model_price_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_UNPRICED_CONFIRMATION_REQUIRED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=400
+time="2026-09-14T14:29:43+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=413
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=create_group
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_UNPRICED_CONFIRMATION_REQUIRED event=mutation operation=model_price_update outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=MODEL_PRICE_REFERENCED event=mutation operation=model_price_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=409
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=model_price_delete outcome=succeeded peer_ip=192.0.2.1 resource_locator="model-price:1" resource_type=model_price status_code=200
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+--- FAIL: TestEnsureInitialStateDoesNotLogExpectedMarkerMissAsError (0.09s)
+    bootstrap_test.go:141: expected marker miss was logged as an error: "\r\n2026/09/14 14:29:43 \x1b[31;1mD:/code/Claude code program/gpt-load/internal/control/donation_catalog.go:74 \x1b[35;1mrecord not found\n\x1b[0m\x1b[33m[0.000ms] \x1b[34;1m[rows:0]\x1b[0m SELECT * FROM `donation_identities` WHERE id = ? LIMIT 1\n"
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=model_price_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="model-price:999" resource_type=model_price status_code=404
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_group_settings
+time="2026-09-14T14:29:43+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=create_access_key
+time="2026-09-14T14:29:43+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:43+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_access_key
+time="2026-09-14T14:29:44+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:44+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:44+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=delete_access_key
+time="2026-09-14T14:29:44+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_model_price
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:999" resource_type=group status_code=404
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_group_settings
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DATABASE_ERROR event=mutation operation=group_settings_update outcome=failed peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=500
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_group_models
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=reveal_access_key
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=reset_model_price
+time="2026-09-14T14:29:44+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=list_groups
+time="2026-09-14T14:29:44+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_update_models outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=delete_model_price
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_credential_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CREDENTIAL_STATE event=mutation operation=group_credential_restore outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=409
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_credentials_batch outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credentials" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_credential_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:unknown" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=NOT_FOUND event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:999" resource_type=group status_code=404
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=GROUP_IN_USE event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=409
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=GROUP_IN_USE event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=409
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=GROUP_IN_USE event=mutation operation=group_delete outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=409
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_delete outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=list_group_options
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Creating channel group with a private or local host" host=127.0.0.1
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=delete_group
+time="2026-09-14T14:29:44+08:00" level=warning msg="Subscription credential refresh failed" channel=codex classification=outcome_unknown credential_stage_id=a5a3a852-dbd6-4316-a233-f73b5b132c1f duration_ms=1 event=subscription.credential_refresh_failed stage=ready_stage
+--- FAIL: TestDonationCatalogAllowsEmptyGroupAndPreservesInventoryHistory (0.11s)
+    donation_catalog_test.go:44: disabled target error = Donation target is unavailable
+time="2026-09-14T14:29:44+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=update_group_credential
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DONATION_UNAVAILABLE error_type="*errors.APIError" operation=donation_auth
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=donation_batch_create outcome=rejected peer_ip= resource_locator=new resource_type=donation_batch status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=donation_batch_create outcome=rejected peer_ip= resource_locator=new resource_type=donation_batch status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=donation_batch_create outcome=rejected peer_ip= resource_locator=new resource_type=donation_batch status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=donation_batch_create outcome=rejected peer_ip= resource_locator=new resource_type=donation_batch status_code=413
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=409
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_settings_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=200
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:44+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:44+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=delete_group_credential
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:44+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=group_settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1" resource_type=group status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="Subscription credential refresh failed" channel=codex classification=retryable credential_stage_id=ce95b81a-501f-463a-ac10-ce22955c376b duration_ms=0 event=subscription.credential_refresh_failed http_status=429 oauth_error_code=rate_limit_exceeded stage=ready_stage
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=group_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=group status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="Subscription credential refresh failed" channel=codex classification=retryable duration_ms=0 event=subscription.credential_refresh_failed http_status=503 oauth_error_code=temporarily_unavailable stage=transient_import
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:e82bd4de-43b0-43d0-a769-ec8ef7c24521" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_authorize outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:9e8e76d5-7706-489a-a5d2-aa2bfbe7fece" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=AUTHORIZATION_STATE_INVALID event=mutation operation=credential_stage_oauth_callback outcome=rejected peer_ip=192.0.2.1 resource_locator="credential-stage:aeba7c85-9204-487b-ad9c-40de578cc1bf" resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_oauth_callback outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:e63610c0-7bda-4669-abd8-1016c2c08ce6" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=AUTHORIZATION_STATE_INVALID event=mutation operation=credential_stage_oauth_callback outcome=rejected peer_ip=192.0.2.1 resource_locator="credential-stage:e63610c0-7bda-4669-abd8-1016c2c08ce6" resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_authorize outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:6309c8c6-85d8-4508-91d3-486c5c72830a" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="OAuth callback listener is unavailable; manual callback remains available" error="port is already in use" event=oauth.callback_start_failed
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_authorize outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:1e374fb2-5aab-41ab-a549-1e548d3233b6" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_device_poll outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:6309c8c6-85d8-4508-91d3-486c5c72830a" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_authorize outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:2c82ed0e-bb1d-4605-baa2-e2513723fbff" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:91610e1d-1891-489f-9334-6cc81a8de60d" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_authorize outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:9c9b0899-6a36-4a4b-82a3-f61342405778" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_cancel outcome=succeeded peer_ip=192.0.2.1 resource_locator="credential-stage:9c9b0899-6a36-4a4b-82a3-f61342405778" resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Reset credit was consumed but the credential observation could not be refreshed" credential_id=1 group_id=1
+time="2026-09-14T14:29:45+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=import_group_credentials
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Reset credit was consumed but the credential observation could not be refreshed" credential_id=1 group_id=1
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=failed protocol=openai-completions reason=invalid_credential
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=temporary-restore-model outcome=passed protocol=openai-embeddings reason=
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-embeddings reason=
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=explicit-probe-model outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=2 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=group_credential_reset_credit_consume outcome=rejected peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=428
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_reset_credit_consume outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_reset_credit_consume outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_observation_refresh outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=group_credential_observation_refresh outcome=succeeded peer_ip=192.0.2.1 resource_locator="group:1/credential:1" resource_type=group_credential status_code=200
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=5 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=6 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=3 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=8 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=1 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=4 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=2 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=9 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=OAUTH_FILE_INVALID event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=413
+time="2026-09-14T14:29:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=settings_update outcome=rejected peer_ip=192.0.2.1 resource_locator="settings:global" resource_type=settings status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=REQUEST_TOO_LARGE event=mutation operation=credential_stage_import outcome=rejected peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=413
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:45+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=ACCESS_KEY_ADMIN_CONFLICT event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=home_statistics
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-completions stage=conditional_recover
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=1 group_id=1 protocol=openai-completions stage=decrypt
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=2 group_id=1 protocol=openai-completions stage=probe
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=1 group_id=9 protocol= stage=missing_group
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=2 group_id=1 protocol= stage=missing_target_or_model
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=3 group_id=2 protocol= stage=missing_target_or_model
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=4 group_id=3 protocol=gemini stage=missing_executor
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=8 event=credential_recovered group_id=1 protocol=gemini
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*errors.errorString" operation=home_statistics
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Validation failed" credential_id=7 group_id=1 protocol=openai-embeddings stage=probe
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-embeddings
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Credential recovered" credential_id=7 event=credential_recovered group_id=1 protocol=openai-completions
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=home_statistics
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="config snapshot published" event=startup.config_snapshot_publish revision=1
+time="2026-09-14T14:29:46+08:00" level=info msg="credential registry loaded" credentials=0 event=startup.credential_registry_load
+time="2026-09-14T14:29:46+08:00" level=info msg="config snapshot published" event=startup.config_snapshot_publish revision=1
+time="2026-09-14T14:29:46+08:00" level=info msg="credential registry loaded" credentials=0 event=startup.credential_registry_load
+time="2026-09-14T14:29:46+08:00" level=info msg="config snapshot published" event=startup.config_snapshot_publish revision=1
+time="2026-09-14T14:29:46+08:00" level=info msg="credential registry loaded" credentials=0 event=startup.credential_registry_load
+time="2026-09-14T14:29:46+08:00" level=info msg="config snapshot published" event=startup.config_snapshot_publish revision=1
+time="2026-09-14T14:29:46+08:00" level=info msg="credential registry loaded" credentials=0 event=startup.credential_registry_load
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*errors.errorString" operation=usage
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*errors.errorString" operation=usage
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=DATABASE_ERROR error_type="*errors.APIError" operation=usage
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*errors.errorString" operation=usage
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:2" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_OPERATION_INCOMPLETE error_type="*errors.APIError" operation=update_access_key
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=CONTROL_OPERATION_INCOMPLETE event=mutation operation=access_key_update outcome=incomplete peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=503
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_CUSTOM_ACCESS_KEY event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=ACCESS_KEY_ADMIN_CONFLICT event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=428
+time="2026-09-14T14:29:46+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:46+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_cost_limits_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_cost_limits_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_cost_limits_reset outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:46+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=VALIDATION_FAILED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.23 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.23 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.22 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.22 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.21 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.21 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.31 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.31 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.30 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.30 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.20 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.20 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.21 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.21 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.22 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.22 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.23 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.23 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.1 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.10 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Authentication failed" event=auth_failed peer_ip=192.0.2.10 reason=invalid_access_key total=1
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Peer locked out" event=auth_locked peer_ip=192.0.2.10 retry_after_seconds=1800
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=authenticate_peer
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_cost_limits_reset outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+
+2026/09/14 14:29:47 [34;1mD:/code/Claude code program/gpt-load/internal/control/home_test.go:340
+[0m[35m[warn] [0mremoving callback `test:hold-home-after-group-count` from D:/code/Claude code program/gpt-load/internal/control/home_test.go:340
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_update outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_update outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=INTERNAL_SERVER_ERROR error_type="*fmt.wrapError" operation=inspect_route
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REUSED event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=DUPLICATE_RESOURCE event=mutation operation=access_key_create outcome=rejected peer_ip=192.0.2.1 resource_locator=new resource_type=access_key status_code=409
+time="2026-09-14T14:29:47+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:47+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-14T14:29:47+08:00" level=error msg="[CONTROL] Operation failed" error_code=CONTROL_OPERATION_INCOMPLETE error_type="*errors.APIError" operation=rotate_access_key
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=CONTROL_OPERATION_INCOMPLETE event=mutation operation=access_key_rotate outcome=incomplete peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=503
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_rotate outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=IDEMPOTENCY_KEY_REQUIRED event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=428
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_IDEMPOTENCY_KEY event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=INVALID_JSON event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=warning msg="[CONTROL] Mutation completed" error_code=BAD_REQUEST event=mutation operation=access_key_rotate outcome=rejected peer_ip=192.0.2.1 resource_locator="access-key:unknown" resource_type=access_key status_code=400
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=access_key_create outcome=succeeded peer_ip=192.0.2.1 resource_locator="access-key:1" resource_type=access_key status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=2 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=2 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=2 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=3 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Credential probe completed" credential_id=1 event=credential_probe_completed group_id=1 latency_ms=0 model=gpt-4o outcome=passed protocol=openai-completions reason=
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:47+08:00" level=info msg="[CONTROL] Mutation completed" error_code= event=mutation operation=credential_stage_import outcome=succeeded peer_ip=192.0.2.1 resource_locator=batch resource_type=credential_stage status_code=200
+time="2026-09-14T14:29:49+08:00" level=warning msg="Subscription credential refresh failed" channel=codex classification=outcome_unknown duration_ms=1999 event=subscription.credential_refresh_failed stage=transient_import
+FAIL
+FAIL	gpt-load/internal/control	14.431s
+ok  	gpt-load/internal/platform/config	0.803s
+ok  	gpt-load/internal/platform/httproute	0.131s
+time="2026-09-14T14:29:35+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:35+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+
+2026/09/14 14:29:36 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mviolates foreign key constraint
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules (access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (999, 'total', 1, 0, 1, 1, 1)
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:36+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_credential_status (275)
+[0m[33m[2.299ms] [34;1m[rows:0][0m INSERT INTO `credentials` (`group_id`,`data`,`fingerprint`,`identity_fingerprint`,`secret_version`,`auth_state`,`auth_error_code`,`status`,`weight_manual`,`proxy_config`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[0.563ms] [34;1m[rows:0][0m INSERT INTO `groups` (`price_multiplier_micros`,`name`,`channel_id`,`connection_type`,`params`,`models`,`weight_manual`,`validation_protocol`,`validation_model`,`overrides`,`proxy_config`,`enabled`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[2.246ms] [34;1m[rows:0][0m INSERT INTO `credentials` (`group_id`,`data`,`fingerprint`,`identity_fingerprint`,`secret_version`,`auth_state`,`auth_error_code`,`status`,`weight_manual`,`proxy_config`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[1.099ms] [34;1m[rows:0][0m INSERT INTO `model_prices` (`channel_id`,`model_id`,`input_price_nano_usd_per_million_tokens`,`output_price_nano_usd_per_million_tokens`,`cache_read_price_nano_usd_per_million_tokens`,`cache_write_price_nano_usd_per_million_tokens`,`context_price_tiers`,`mode_price_schedules`,`is_manual`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[0.536ms] [34;1m[rows:0][0m INSERT INTO `access_keys` (`price_multiplier_micros`,`name`,`key_value`,`key_hash`,`key_prefix`,`key_suffix`,`status`,`filters`,`rpm_limit`,`daily_cost_limit_nano_usd`,`monthly_cost_limit_nano_usd`,`expires_at_ms`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO `usage_stats` (`bucket_start_ms`,`access_key_id`,`channel_id`,`group_id`,`credential_id`,`model`,`request_count`,`success_count`,`failure_count`,`uncached_input_tokens`,`output_tokens`,`cache_read_tokens`,`cache_write_5m_tokens`,`cache_write_1h_tokens`,`cache_write_unknown_tokens`,`estimated_cost_nano_usd`,`usage_missing_count`,`partial_count`,`unpriced_request_count`,`pricing_partial_count`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_rule_limit (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+			(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (?, 'total', 0, 0, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_rule_period (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+			(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (?, 'total', 1, 60, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_rule_period (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+			(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (?, 'periodic', 1, 59, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_rule_period (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+			(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (?, 'periodic', 1, 31536001, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_rule_period (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+			(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms) VALUES (?, 'unknown', 1, 0, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_state_used (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_states
+			(rule_id, rule_revision, used_nano_usd, window_started_at_ms, window_ends_at_ms,
+			 window_generation, snapshot_version, updated_at_ms) VALUES (?, 1, -1, NULL, NULL, 0, 1, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_state_window (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_states
+			(rule_id, rule_revision, used_nano_usd, window_started_at_ms, window_ends_at_ms,
+			 window_generation, snapshot_version, updated_at_ms) VALUES (?, 1, 0, 100, NULL, 1, 1, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_state_window (275)
+[0m[33m[0.384ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_states
+			(rule_id, rule_revision, used_nano_usd, window_started_at_ms, window_ends_at_ms,
+			 window_generation, snapshot_version, updated_at_ms) VALUES (?, 1, 0, 100, 100, 1, 1, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_state_revision (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_states
+			(rule_id, rule_revision, used_nano_usd, window_started_at_ms, window_ends_at_ms,
+			 window_generation, snapshot_version, updated_at_ms) VALUES (?, 0, 0, NULL, NULL, 0, 1, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_ak_cost_state_version (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_states
+			(rule_id, rule_revision, used_nano_usd, window_started_at_ms, window_ends_at_ms,
+			 window_generation, snapshot_version, updated_at_ms) VALUES (?, 1, 0, NULL, NULL, 0, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+		(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms)
+		VALUES (?, 'total', 2000000000, 0, 1, 0, 0)
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO access_key_cost_limit_rules
+		(access_key_id, kind, limit_nano_usd, period_seconds, rule_revision, created_at_ms, updated_at_ms)
+		VALUES (?, 'periodic', 600000000, 18000, 1, 0, 0)
+--- FAIL: TestAutoMigrateCreatesUsageJournalAndMigrationLedger (1.14s)
+    db_test.go:676: schema_migrations IDs = [0001_initial 0002_access_key_cost_limits 0003_remove_observation_fresh_until 0004_usage_stats_group_activity_index 0005_proxy_config 0006_error_decision 0007_access_key_lifecycle 0008_remove_inject_usage_options 0009_price_multipliers 0010_model_cooldown 0011_custom_access_keys 0012_access_key_mask_prefix 0013_validation_protocol 0014_affinity_kind 0015_donation_intake], want [0001_initial 0002_access_key_cost_limits 0003_remove_observation_fresh_until 0004_usage_stats_group_activity_index 0005_proxy_config 0006_error_decision 0007_access_key_lifecycle 0008_remove_inject_usage_options 0009_price_multipliers 0010_model_cooldown 0011_custom_access_keys 0012_access_key_mask_prefix 0013_validation_protocol 0014_affinity_kind]
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+
+2026/09/14 14:29:38 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_status (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m INSERT INTO `access_keys` (`price_multiplier_micros`,`name`,`key_value`,`key_hash`,`key_prefix`,`key_suffix`,`status`,`filters`,`rpm_limit`,`daily_cost_limit_nano_usd`,`monthly_cost_limit_nano_usd`,`expires_at_ms`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id`
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+time="2026-09-14T14:29:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=sqlite database_source=external
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.key_prefix (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.526ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.key_prefix (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.656ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: groups.price_multiplier_micros (1299)
+[0m[33m[0.647ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:39 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.price_multiplier_micros (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.key_prefix (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_prefix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_prefix`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[1.447ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: groups.price_multiplier_micros (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.price_multiplier_micros (1299)
+[0m[33m[0.529ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_group_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: groups.price_multiplier_micros (1299)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `groups` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_price_multiplier (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: NOT NULL constraint failed: access_keys.price_multiplier_micros (1299)
+[0m[33m[0.585ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `price_multiplier_micros`=? WHERE id = 1
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.548ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_cooldown (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[1.093ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `effect`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.535ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_cooldown (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.543ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `effect`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.520ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_cooldown (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `effect`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_cooldown (275)
+[0m[33m[0.886ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `cooldown_until_ms`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_request_log_attempt_effect (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `request_log_attempts` SET `effect`=? WHERE request_id = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+
+2026/09/14 14:29:40 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mconstraint failed: CHECK constraint failed: chk_access_key_suffix (275)
+[0m[33m[0.000ms] [34;1m[rows:0][0m UPDATE `access_keys` SET `key_suffix`=?,`updated_at_ms`=? WHERE `id` = ?
+FAIL
+FAIL	gpt-load/internal/storage	5.908s
+ok  	gpt-load/internal/storage/dbtx	0.129s
+ok  	gpt-load/internal/storage/migrations	3.481s
+ok  	gpt-load/internal/storage/models	0.419s
+FAIL

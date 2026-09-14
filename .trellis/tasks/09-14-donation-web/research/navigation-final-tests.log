@@ -1,0 +1,10 @@
+$ vitest run src/components/layout/__tests__/donation-navigation.test.tsx "--maxWorkers=1"
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  22:18:26
+   Duration  19.36s (transform 3.47s, setup 397ms, import 16.83s, tests 689ms, environment 1.21s)
+

@@ -1,0 +1,28 @@
+{
+  "id": "donation-intake",
+  "name": "donation-intake",
+  "title": "gpt-load 捐献接收与校验接口",
+  "description": "提供受限分组目录、多行 key 暂存校验、幂等接收、逐项回执和长期来源记录。",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "0401lucky",
+  "assignee": "0401lucky",
+  "createdAt": "2026-09-14",
+  "completedAt": null,
+  "branch": "feat/key-donation-rewards",
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": "59a2d958506f86e3d8c80fa4512c705dd8d050d1",
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": "09-14-key-donation-rewards",
+  "relatedFiles": [],
+  "notes": "本地实现、独立复核、真实数据库与完整make check已完成；代码已提交，用户已授权随父任务统一归档。",
+  "meta": {
+    "target_repo": "D:/code/Claude code program/gpt-load"
+  }
+}

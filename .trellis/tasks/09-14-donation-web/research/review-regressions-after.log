@@ -1,0 +1,10 @@
+$ vitest run src/features/donations/__tests__/submission-recovery.test.tsx src/features/donations/__tests__/management.test.tsx "--maxWorkers=2" -t "old POST|UTF-8"
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+
+ Test Files  2 passed (2)
+      Tests  4 passed | 5 skipped (9)
+   Start at  21:49:50
+   Duration  18.59s (transform 3.87s, setup 820ms, import 22.28s, tests 1.63s, environment 2.55s)
+

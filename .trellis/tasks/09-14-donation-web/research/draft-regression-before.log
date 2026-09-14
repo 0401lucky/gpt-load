@@ -1,0 +1,47 @@
+$ vitest run src/features/donations/__tests__/submission-recovery.test.tsx "--maxWorkers=1" -t "next unsent draft"
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+stderr | src/features/donations/__tests__/submission-recovery.test.tsx > preserves the next unsent draft when a previously confirmed batch receives another GET update
+Base UI: A component that acts as a button expected a non-<button> because the `nativeButton` prop is false. Rendering a <button> keeps native behavior while Base UI applies non-native attributes and handlers, which can add unintended extra attributes (such as `role` or `aria-disabled`). Use a non-<button> in the `render` prop, or set `nativeButton` to `true`.
+    at Button (D:/code/Claude code program/new-api/web/src/components/ui/button.tsx:65:57)
+    at InputGroupButton (D:/code/Claude code program/new-api/web/src/components/ui/input-group.tsx:91:57)
+    at ComboboxInput (D:/code/Claude code program/new-api/web/src/components/ui/combobox.tsx:284:80)
+    at OptionCombobox (D:/code/Claude code program/new-api/web/src/components/ui/combobox.tsx:123:63)
+    at Combobox (D:/code/Claude code program/new-api/web/src/components/ui/combobox.tsx:60:88)
+    at Object.render (D:/code/Claude code program/new-api/web/src/features/donations/components/submission-form.tsx:151:160)
+    at Controller (file:///D:/code/Claude%20code%20program/new-api/web/node_modules/react-hook-form/dist/index.esm.mjs:603:37)
+    at Object.render (D:/code/Claude code program/new-api/web/src/features/donations/components/submission-form.tsx:151:58)
+    at Controller (file:///D:/code/Claude%20code%20program/new-api/web/node_modules/react-hook-form/dist/index.esm.mjs:603:37)
+    at FormField (D:/code/Claude code program/new-api/web/src/components/ui/form.tsx:113:61)
+    at DonationSubmissionForm (D:/code/Claude code program/new-api/web/src/features/donations/components/submission-form.tsx:142:56)
+
+ ❯ src/features/donations/__tests__/submission-recovery.test.tsx (4 tests | 1 failed | 3 skipped) 960ms
+   × preserves the next unsent draft when a previously confirmed batch receives another GET update 955ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/donations/__tests__/submission-recovery.test.tsx > preserves the next unsent draft when a previously confirmed batch receives another GET update
+Error: expect(element).toHaveValue(next-unsent-private-key)
+
+Expected the element to have value:
+  next-unsent-private-key
+Received:
+
+ ❯ src/features/donations/__tests__/submission-recovery.test.tsx:56:45
+     54|   await user.type(screen.getByLabelText('API keys'), 'next-unsent-priv…
+     55|   view.rerender(<DonationSubmissionForm {...props} resume={null} obser…
+     56|   expect(screen.getByLabelText('API keys')).toHaveValue('next-unsent-p…
+       |                                             ^
+     57|   view.unmount(); client.clear()
+     58| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 skipped (4)
+   Start at  22:15:57
+   Duration  8.98s (transform 394ms, setup 394ms, import 6.20s, tests 960ms, environment 1.20s)
+
+error: script "test" exited with code 1

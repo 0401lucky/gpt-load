@@ -1,0 +1,172 @@
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 1 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 2 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 3 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 4 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 5 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 6 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 7 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 8 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 9 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 10 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 11 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 12 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+
+2026/09/14 15:31:53 [31;1mD:/code/Claude code program/new-api/model/temporary_quota.go:98 [35;1mSQL logic error: no such table: checkins (1)
+[0m[33m[0.000ms] [34;1m[rows:-][0m SELECT COALESCE(SUM(quota_remaining), 0) FROM `checkins` WHERE user_id = 13 AND quota_type = "temporary" AND quota_remaining > 0 AND quota_expires_at > 1789371113
+--- FAIL: TestFixedPriceBillingDatabaseMatrix (0.02s)
+    --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite (0.02s)
+        text_quota_test.go:74: database: 3.50.4
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc000127080), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/zero_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0001276e0), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/zero_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/stream_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc000127b78), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/stream_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/audio_zero_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006fe258), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/audio_zero_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/audio_missing_usage_charges_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006fe708), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/audio_missing_usage_charges_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/token_reservation_refunds_to_fixed_price (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006fecc0), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/token_reservation_refunds_to_fixed_price
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/fixed_reservation_settles_token_fallback (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006ff158), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/fixed_reservation_settles_token_fallback
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_uses_estimated_token_fallback (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006ff5f0), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/missing_usage_uses_estimated_token_fallback
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/evaluation_error_retains_fixed_reservation_metadata (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0006ffc38), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/evaluation_error_retains_fixed_reservation_metadata
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/explicit_zero_remains_free (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc000730300), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/explicit_zero_remains_free
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/multipliers_and_separate_tool_surcharge (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc0007308d0), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/multipliers_and_separate_tool_surcharge
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/failed_request_refunds_exactly_once (0.00s)
+            text_quota_test.go:146: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:146
+                	Error:      	Expected nil, but got: &types.NewAPIError{Err:(*sqlite.Error)(0xc000730d68), RelayError:interface {}(nil), skipRetry:true, recordErrorLog:(*bool)(nil), errorType:"new_api_error", errorCode:"query_data_error", StatusCode:500, Metadata:json.RawMessage(nil)}
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/failed_request_refunds_exactly_once
+        --- FAIL: TestFixedPriceBillingDatabaseMatrix/sqlite/insufficient_wallet_never_reserves_tokens (0.00s)
+            text_quota_test.go:144: 
+                	Error Trace:	D:/code/Claude code program/new-api/service/text_quota_test.go:144
+                	Error:      	Not equal: 
+                	            	expected: "insufficient_user_quota"
+                	            	actual  : "query_data_error"
+                	            	
+                	            	Diff:
+                	            	--- Expected
+                	            	+++ Actual
+                	            	@@ -1,2 +1,2 @@
+                	            	-(types.ErrorCode) (len=23) "insufficient_user_quota"
+                	            	+(types.ErrorCode) (len=16) "query_data_error"
+                	            	 
+                	Test:       	TestFixedPriceBillingDatabaseMatrix/sqlite/insufficient_wallet_never_reserves_tokens
+FAIL
+FAIL	github.com/QuantumNous/new-api/service	0.187s
+FAIL

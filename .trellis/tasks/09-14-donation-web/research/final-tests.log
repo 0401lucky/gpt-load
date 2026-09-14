@@ -1,0 +1,22 @@
+$ vitest run src/features/donations/__tests__ src/components/layout/__tests__/donation-navigation.test.tsx "--maxWorkers=2"
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  5 passed (5)
+      Tests  24 passed (24)
+   Start at  22:24:23
+   Duration  35.96s (transform 6.40s, setup 2.00s, import 49.53s, tests 10.85s, environment 7.03s)
+

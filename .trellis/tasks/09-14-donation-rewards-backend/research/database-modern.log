@@ -1,0 +1,94 @@
+=== RUN   TestDonationDatabase
+=== RUN   TestDonationDatabase/sqlite
+=== RUN   TestDonationDatabase/sqlite/upgrade_false
+[SYS] 2026/09/14 - 15:21:31 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 15:21:31 | SQL_DSN not set, using SQLite as database 
+    donation_test.go:172: real database sqlite version=3.50.4 upgrade=false prefix=dv_7e657999_
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/sqlite/upgrade_false/rollback_limits_and_account_pause
+
+2026/09/14 15:21:31 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/sqlite/upgrade_true
+[SYS] 2026/09/14 - 15:21:31 | SQL_DSN not set, using SQLite as database 
+[SYS] 2026/09/14 - 15:21:31 | SQL_DSN not set, using SQLite as database 
+    donation_test.go:172: real database sqlite version=3.50.4 upgrade=true prefix=dv_4391841f_
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/sqlite/upgrade_true/rollback_limits_and_account_pause
+
+2026/09/14 15:21:31 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/mysql
+=== RUN   TestDonationDatabase/mysql/upgrade_false
+[SYS] 2026/09/14 - 15:21:31 | using MySQL as database 
+[SYS] 2026/09/14 - 15:21:31 | using MySQL as database 
+    donation_test.go:172: real database mysql version=8.4.11 upgrade=false prefix=dv_a91be36c_
+=== RUN   TestDonationDatabase/mysql/upgrade_false/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/mysql/upgrade_false/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/mysql/upgrade_false/rollback_limits_and_account_pause
+
+2026/09/14 15:21:32 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/mysql/upgrade_true
+[SYS] 2026/09/14 - 15:21:32 | using MySQL as database 
+[SYS] 2026/09/14 - 15:21:32 | using MySQL as database 
+    donation_test.go:172: real database mysql version=8.4.11 upgrade=true prefix=dv_4d65d484_
+=== RUN   TestDonationDatabase/mysql/upgrade_true/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/mysql/upgrade_true/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/mysql/upgrade_true/rollback_limits_and_account_pause
+
+2026/09/14 15:21:33 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/postgres
+=== RUN   TestDonationDatabase/postgres/upgrade_false
+[SYS] 2026/09/14 - 15:21:33 | using PostgreSQL as database 
+[SYS] 2026/09/14 - 15:21:33 | using PostgreSQL as database 
+    donation_test.go:172: real database postgres version=PostgreSQL 17.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit upgrade=false prefix=dv_fc6d0e1b_
+=== RUN   TestDonationDatabase/postgres/upgrade_false/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/postgres/upgrade_false/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/postgres/upgrade_false/rollback_limits_and_account_pause
+
+2026/09/14 15:21:35 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+=== RUN   TestDonationDatabase/postgres/upgrade_true
+[SYS] 2026/09/14 - 15:21:35 | using PostgreSQL as database 
+[SYS] 2026/09/14 - 15:21:35 | using PostgreSQL as database 
+    donation_test.go:172: real database postgres version=PostgreSQL 17.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit upgrade=true prefix=dv_b06f51f3_
+=== RUN   TestDonationDatabase/postgres/upgrade_true/mixed_lines_and_frozen_rewards
+=== RUN   TestDonationDatabase/postgres/upgrade_true/cross_connection_ownership_and_ledger
+=== RUN   TestDonationDatabase/postgres/upgrade_true/rollback_limits_and_account_pause
+
+2026/09/14 15:21:37 [34;1mD:/code/Claude code program/new-api/model/donation_test.go:338
+[0m[35m[warn] [0mremoving callback `donation_test_rollback` from D:/code/Claude code program/new-api/model/donation_test.go:338
+--- PASS: TestDonationDatabase (6.13s)
+    --- PASS: TestDonationDatabase/sqlite (0.37s)
+        --- PASS: TestDonationDatabase/sqlite/upgrade_false (0.18s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/mixed_lines_and_frozen_rewards (0.02s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/cross_connection_ownership_and_ledger (0.02s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_false/rollback_limits_and_account_pause (0.02s)
+        --- PASS: TestDonationDatabase/sqlite/upgrade_true (0.20s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/mixed_lines_and_frozen_rewards (0.02s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/cross_connection_ownership_and_ledger (0.03s)
+            --- PASS: TestDonationDatabase/sqlite/upgrade_true/rollback_limits_and_account_pause (0.03s)
+    --- PASS: TestDonationDatabase/mysql (2.13s)
+        --- PASS: TestDonationDatabase/mysql/upgrade_false (1.15s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_false/mixed_lines_and_frozen_rewards (0.19s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_false/cross_connection_ownership_and_ledger (0.13s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_false/rollback_limits_and_account_pause (0.19s)
+        --- PASS: TestDonationDatabase/mysql/upgrade_true (0.98s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_true/mixed_lines_and_frozen_rewards (0.18s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_true/cross_connection_ownership_and_ledger (0.13s)
+            --- PASS: TestDonationDatabase/mysql/upgrade_true/rollback_limits_and_account_pause (0.21s)
+    --- PASS: TestDonationDatabase/postgres (3.63s)
+        --- PASS: TestDonationDatabase/postgres/upgrade_false (2.11s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_false/mixed_lines_and_frozen_rewards (0.12s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_false/cross_connection_ownership_and_ledger (0.09s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_false/rollback_limits_and_account_pause (0.11s)
+        --- PASS: TestDonationDatabase/postgres/upgrade_true (1.52s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_true/mixed_lines_and_frozen_rewards (0.09s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_true/cross_connection_ownership_and_ledger (0.10s)
+            --- PASS: TestDonationDatabase/postgres/upgrade_true/rollback_limits_and_account_pause (0.11s)
+PASS
+ok  	github.com/QuantumNous/new-api/model	6.424s

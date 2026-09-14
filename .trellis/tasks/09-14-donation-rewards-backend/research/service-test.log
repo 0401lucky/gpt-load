@@ -1,0 +1,26 @@
+=== RUN   TestDonationServiceDurableRecovery
+--- PASS: TestDonationServiceDurableRecovery (0.48s)
+=== RUN   TestDonationUncertainAndRejectedRequests
+--- PASS: TestDonationUncertainAndRejectedRequests (0.37s)
+=== RUN   TestDonationClientBoundaries
+=== RUN   TestDonationClientBoundaries/http://10.0.0.1
+=== RUN   TestDonationClientBoundaries/http://example.com
+=== RUN   TestDonationClientBoundaries/https://user:password@example.com
+=== RUN   TestDonationClientBoundaries/https://example.com?token=x
+=== RUN   TestDonationClientBoundaries/https://example.com#x
+=== RUN   TestDonationClientBoundaries/https://example.com/token
+=== RUN   TestDonationClientBoundaries/ftp://example.com
+=== RUN   TestDonationClientBoundaries/_https://example.com
+=== RUN   TestDonationClientBoundaries/https://example.com\secret
+--- PASS: TestDonationClientBoundaries (0.01s)
+    --- PASS: TestDonationClientBoundaries/http://10.0.0.1 (0.00s)
+    --- PASS: TestDonationClientBoundaries/http://example.com (0.00s)
+    --- PASS: TestDonationClientBoundaries/https://user:password@example.com (0.00s)
+    --- PASS: TestDonationClientBoundaries/https://example.com?token=x (0.00s)
+    --- PASS: TestDonationClientBoundaries/https://example.com#x (0.00s)
+    --- PASS: TestDonationClientBoundaries/https://example.com/token (0.00s)
+    --- PASS: TestDonationClientBoundaries/ftp://example.com (0.00s)
+    --- PASS: TestDonationClientBoundaries/_https://example.com (0.00s)
+    --- PASS: TestDonationClientBoundaries/https://example.com\secret (0.00s)
+PASS
+ok  	github.com/QuantumNous/new-api/service	1.080s

@@ -1,0 +1,6 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Go 测试与 make check 门禁"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"接收事务、唯一性和历史生命周期"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"路由鉴权与依赖边界复核"}
+{"file":".trellis/tasks/09-14-key-donation-rewards/research/integration-contract.md","reason":"两端接口、数据唯一性、身份与恢复状态的权威契约"}
+{"file":".trellis/tasks/09-14-key-donation-rewards/research/codebase-findings.md","reason":"已核实能力、文件锚点和产品决定，避免重复实现或误判已有接口"}
+{"file": ".trellis/spec/backend/donation-integration.md", "reason": "捐献接口、受限鉴权、长期去重和恢复的具体代码契约"}

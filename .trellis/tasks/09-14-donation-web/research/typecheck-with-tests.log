@@ -1,0 +1,43 @@
+$ tsgo -b
+src/features/donations/__tests__/management.test.tsx(92,52): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(97,52): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(99,52): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(114,72): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(117,62): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(139,64): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/management.test.tsx(141,72): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/session-requests.test.ts(35,28): error TS2550: Property 'withResolvers' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2024' or later.
+src/features/donations/__tests__/session-requests.test.ts(52,28): error TS2550: Property 'withResolvers' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2024' or later.
+src/features/donations/__tests__/submission.test.tsx(82,69): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/submission.test.tsx(114,69): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/submission.test.tsx(136,69): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/submission.test.tsx(196,27): error TS2550: Property 'withResolvers' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2024' or later.
+src/features/donations/__tests__/submission.test.tsx(203,69): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+src/features/donations/__tests__/submission.test.tsx(210,51): error TS2345: Argument of type 'InternalAxiosRequestConfig<any> | undefined' is not assignable to parameter of type 'InternalAxiosRequestConfig<any>'.
+  Type 'undefined' is not assignable to type 'InternalAxiosRequestConfig<any>'.
+src/features/donations/__tests__/submission.test.tsx(223,83): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
+error: script "typecheck" exited with code 1

@@ -1,0 +1,22 @@
+$ vitest run src/features/donations/__tests__ "--maxWorkers=2"
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  3 passed (3)
+      Tests  16 passed (16)
+   Start at  17:29:31
+   Duration  142.25s (transform 8.40s, setup 2.78s, import 258.38s, tests 8.51s, environment 10.78s)
+

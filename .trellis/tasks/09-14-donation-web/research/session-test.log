@@ -1,0 +1,10 @@
+$ vitest run src/features/donations/__tests__/session-requests.test.ts
+
+ RUN  v4.1.10 D:/code/Claude code program/new-api/web
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  17:17:28
+   Duration  45.08s (transform 282ms, setup 8.57s, import 8.85s, tests 171ms, environment 26.30s)
+

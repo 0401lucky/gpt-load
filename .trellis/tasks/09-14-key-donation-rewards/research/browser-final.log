@@ -1,0 +1,7 @@
+=== RUN   TestDonationBrowserFixture
+    donation_integration_test.go:577: Donation browser fixture ready; private metadata: C:\Users\lucky0401\AppData\Local\Temp\donation-browser-final-167a933f382a46d1b966977b7cb90e69\metadata.json
+    donation_integration_test.go:604: Donation browser fixture rate-limited key is now available
+    donation_integration_test.go:595: Donation browser fixture stop file received
+--- PASS: TestDonationBrowserFixture (2305.78s)
+PASS
+ok  	github.com/QuantumNous/new-api/controller	2306.032s
