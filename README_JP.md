@@ -224,6 +224,7 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10` | MySQL と PostgreSQL の最大オープン接続数。正の整数である必要があります。SQLite は常に単一接続を使用します。 |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5` | MySQL と PostgreSQL の最大アイドル接続数。正の整数かつ `DATABASE_MAX_OPEN_CONNECTIONS` 以下である必要があります。SQLite は常に単一接続を使用します。 |
 | `AUTH_KEY` | 空、`${DATA_DIR}/auth.key` を読み込むか生成 | 管理画面と `/api` 管理 API の Bearer キー。データプレーンの AccessKey とは異なります。 |
+| `DONATION_INTEGRATION_TOKEN` | 空、寄付連携を無効化 | `/integrations/donations/v1` 専用の 32–256 バイトの可視 ASCII Bearer シークレット。管理キーや AccessKey と異なる値を使用し、変更後に再起動してください。 |
 | `ENCRYPTION_KEY` | 空、`${DATA_DIR}/encryption.key` を読み込むか生成 | チャネル認証情報を暗号化します。変更または紛失すると既存の認証情報を復号できないため、データベースと一緒にバックアップしてください。 |
 | `HTTP_PROXY` | 空 | HTTP アップストリームリクエストの環境プロキシ。 |
 | `HTTPS_PROXY` | 空 | HTTPS アップストリームリクエストの環境プロキシ。 |
@@ -237,6 +238,10 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 </details>
 
 ## 本番運用の注意事項
+
+寄付受付は Gemini AI Studio などの通常の API キーに対応し、既存グループのチャネルと検証設定を使用します。制限付き連携 API で機能確認、グループ一覧、暗号化したバッチの保存、項目別受領結果、元のバッチ・項目 ID による再試行を提供します。リクエストの成功は保存完了を示し、`accepted` の項目だけが提出されたキーの検証と認証情報・ランタイム更新を完了しています。コミュニティ認証、活動設定、永続クォータ報酬は new-api が管理します。
+
+1 リクエストは最大 100 項目、キーごとに 4096 バイト、JSON 全体で 1 MiB です。自動検証は最大 5 回で、専用の再試行操作は保持期間中にキーを再送せず処理を再開できます。未受領項目の一時暗号文は 7 日後に削除されます。取得済みキーの識別情報と元の受領記録はグループや認証情報の削除、連携トークンの変更後も保持されるため、暗号化キーとデータベースを一緒にバックアップしてください。`DONATION_INTEGRATION_TOKEN` を空にすると受付とワーカーを停止し、履歴を保持します。
 
 - 既定では `127.0.0.1` のみを待ち受けます。リモートアクセスが必要な場合は、管理されたネットワークまたは TLS 対応のリバースプロキシ経由で公開し、ACL とファイアウォールを設定してください。
 - `AUTH_KEY` と `ENCRYPTION_KEY` は厳重に管理し、実際のキーをリポジトリ、ログ、スクリーンショット、公開 Issue に含めないでください。

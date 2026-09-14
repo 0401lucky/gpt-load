@@ -16,6 +16,8 @@
 | 新增用户可见文案、加翻译 key | [i18n-guidelines.md](./i18n-guidelines.md) |
 | 碰 GORM / SQLite / 迁移 / 事务 / 模型 | [database-guidelines.md](./database-guidelines.md) |
 | 写测试、提交前自查、改代码风格 | [quality-guidelines.md](./quality-guidelines.md) |
+| 捐献集成、暂存探测、全局接收去重或长期回执 | [donation-integration.md](./donation-integration.md) |
+| 维护 new-api 与 gpt-load 捐献的跨仓库调用契约 | [donation-caller-contract.md](./donation-caller-contract.md) |
 
 **跨层改动**（同时涉及 handler + service + DB，或前后端）额外读 `.trellis/spec/guides/cross-layer-thinking-guide.md`。
 

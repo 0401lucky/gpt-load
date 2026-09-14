@@ -29,6 +29,8 @@ type operationRecoveryRuntime interface {
 	RunOperationRecovery(context.Context)
 }
 
+type donationRecoveryRuntime interface{ RunDonationRecovery(context.Context) }
+
 type catalogSyncRuntime interface {
 	Run(context.Context)
 }
@@ -66,6 +68,7 @@ type Runtime struct {
 	requestLogCleaner  RequestLogCleaner
 	stageCleaner       credentialStageCleaner
 	operationRecovery  operationRecoveryRuntime
+	donationRecovery   donationRecoveryRuntime
 	catalogSync        catalogSyncRuntime
 	oauthCallback      *OAuthCallbackManager
 	manager            *state.Manager
@@ -92,6 +95,7 @@ func NewRuntime(
 		requestLogCleaner:  requestLogCleaner,
 		stageCleaner:       operationRecovery,
 		operationRecovery:  operationRecovery,
+		donationRecovery:   operationRecovery,
 		catalogSync:        catalogSync,
 		manager:            manager,
 		validationInterval: defaultValidationInterval,
@@ -151,6 +155,13 @@ func (runtime *Runtime) Run(ctx context.Context) {
 		go func() {
 			defer wait.Done()
 			runtime.catalogSync.Run(ctx)
+		}()
+	}
+	if runtime.donationRecovery != nil {
+		wait.Add(1)
+		go func() {
+			defer wait.Done()
+			runtime.donationRecovery.RunDonationRecovery(ctx)
 		}()
 	}
 	if runtime.oauthCallback != nil {

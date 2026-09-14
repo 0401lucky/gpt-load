@@ -80,6 +80,8 @@ if err := query.Select(credentialRequestLogUsageSelect).Find(&row).Error; err !=
 - 长 SELECT 抽成包级常量（如上 `credentialRequestLogUsageSelect`）。
 - `Pluck` / `Count` / `CreateInBatches` / `Clauses(clause.OnConflict{DoNothing: true})` 都在实际使用（`internal/requestlog/worker.go`）。
 
+**不要用 upsert 的 RowsAffected 判定本次是否首次插入**：`internal/storage/database.go` 的 MySQL DSN 会强制 `clientFoundRows=true`，`ON DUPLICATE KEY UPDATE id=id` 的无变化匹配也可能返回 1。需要区分首次创建/幂等重放时，参照 `ReceiveDonationBatch` / `RetryDonationBatch`：普通 INSERT，唯一冲突让当前事务回滚，再用新读取比较原始持久摘要。PostgreSQL 唯一冲突会使当前事务失效，不能在同一失败事务中继续查询原行。详见 [捐献集成契约](./donation-integration.md)。
+
 **事务统一走 `dbtx.Run`，不要用裸 `db.Transaction`**（后者只出现在 storage 迁移内部）：
 
 ```go
@@ -109,7 +111,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0014
+    // ... 至 ID0015
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -120,7 +122,7 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 
 - ID 必须匹配 `^(\d{4})_[a-z0-9]+(?:_[a-z0-9]+)*$`，且编号必须等于数组下标 —— `validateMigrationRegistry` 会自我校验，三个函数指针都不能为 nil。
 - 每个迁移导出：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`。
-- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`。
+- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_donation_intake.go`。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
 方言分支（改迁移时最容易踩的地方）：

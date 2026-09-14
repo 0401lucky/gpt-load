@@ -261,6 +261,9 @@ func (s *Service) prepareAccessKeyCredential(plaintext string) (generatedAccessK
 	if !validAccessKeyPlaintext(plaintext) {
 		return generatedAccessKeyCredential{}, app_errors.ErrInvalidCustomAccessKey
 	}
+	if s.donationTokenFingerprint != "" && s.encryption.Hash(plaintext) == s.donationTokenFingerprint {
+		return generatedAccessKeyCredential{}, app_errors.ErrInvalidCustomAccessKey
+	}
 	ciphertext, err := s.encryption.Encrypt(plaintext)
 	if err != nil {
 		return generatedAccessKeyCredential{}, fmt.Errorf("encrypt access key: %w", err)

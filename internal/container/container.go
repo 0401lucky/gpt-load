@@ -325,6 +325,7 @@ func newHTTPRegistry(
 	return httproute.NewRegistry(
 		app.HTTPModule(),
 		controlServer.HTTPModule(),
+		controlServer.DonationHTTPModule(),
 		gatewayHandler.HTTPModule(),
 		webUIServer.HTTPModule(),
 	)

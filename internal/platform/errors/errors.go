@@ -23,6 +23,10 @@ func (e *APIError) Error() string {
 
 // Predefined API errors
 var (
+	ErrDonationUnavailable                    = &APIError{HTTPStatus: http.StatusServiceUnavailable, Code: "DONATION_UNAVAILABLE", Message: "Donation integration is unavailable"}
+	ErrDonationTargetUnavailable              = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TARGET_UNAVAILABLE", Message: "Donation target is unavailable"}
+	ErrDonationTargetChanged                  = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TARGET_CHANGED", Message: "Donation target configuration changed"}
+	ErrDonationNotFound                       = &APIError{HTTPStatus: http.StatusNotFound, Code: "DONATION_NOT_FOUND", Message: "Donation batch not found"}
 	ErrBadRequest                             = &APIError{HTTPStatus: http.StatusBadRequest, Code: "BAD_REQUEST", Message: "Invalid request parameters"}
 	ErrInvalidJSON                            = &APIError{HTTPStatus: http.StatusBadRequest, Code: "INVALID_JSON", Message: "Invalid JSON format"}
 	ErrRequestTooLarge                        = &APIError{HTTPStatus: http.StatusRequestEntityTooLarge, Code: "REQUEST_TOO_LARGE", Message: "Request body is too large"}

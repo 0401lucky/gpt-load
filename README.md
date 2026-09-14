@@ -224,6 +224,7 @@ At startup, the application reads `.env` in the current directory; existing proc
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10` | Maximum open connections for MySQL and PostgreSQL, positive integer. SQLite always uses one connection. |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5` | Maximum idle connections for MySQL and PostgreSQL, positive integer and no greater than `DATABASE_MAX_OPEN_CONNECTIONS`. SQLite always uses one connection. |
 | `AUTH_KEY` | Empty, reads or generates `${DATA_DIR}/auth.key` | Bearer key for the management UI and `/api` management API, not a data-plane AccessKey. |
+| `DONATION_INTEGRATION_TOKEN` | Empty, integration disabled | Dedicated 32–256 byte visible-ASCII Bearer secret for `/integrations/donations/v1`. Must differ from the management key and all AccessKeys; restart after changing it. |
 | `ENCRYPTION_KEY` | Empty, reads or generates `${DATA_DIR}/encryption.key` | Encrypts channel credentials; changing or losing it makes existing credentials undecryptable, so back it up with the database. |
 | `HTTP_PROXY` | Empty | Environment proxy for HTTP upstream requests. |
 | `HTTPS_PROXY` | Empty | Environment proxy for HTTPS upstream requests. |
@@ -237,6 +238,10 @@ Environment proxies apply only when no proxy is specified on the credential, gro
 </details>
 
 ## Production considerations
+
+Donation intake supports ordinary API keys, including Gemini AI Studio, using an existing group's channel and validation configuration. Its restricted integration API provides capabilities, group options, encrypted batch staging, per-item receipts, and retries by the original batch/item identifiers. A successful request only confirms durable staging; only an `accepted` item has passed its own key probe and completed credential/runtime publication. new-api owns community identity, activities, and permanent rewards.
+
+Each request accepts up to 100 items, 4096 bytes per key, and a 1 MiB JSON body. Automatic probes have five attempts; a dedicated retry action can resume retained staging without resending keys. Unaccepted staging ciphertext expires after seven days. Acquisition fingerprints and original receipts remain after credential/group deletion and token rotation; back up the database and encryption key together. Clearing `DONATION_INTEGRATION_TOKEN` disables intake and its worker while retaining history.
 
 - The service listens on `127.0.0.1` only by default. For remote access, expose it through a controlled network or a TLS reverse proxy, and configure ACLs and firewall rules.
 - Manage `AUTH_KEY` and `ENCRYPTION_KEY` carefully. Never commit real keys to a repository, log, screenshot, or public issue.

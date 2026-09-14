@@ -26,6 +26,21 @@ func (s *Service) EnsureInitialState(ctx context.Context) error {
 
 	var priceTable *pricing.Table
 	err := s.withControlTransaction(ctx, func(tx *gorm.DB) error {
+		if s.donationTokenFingerprint != "" {
+			var count int64
+			if err := tx.Model(&models.AccessKey{}).Where("key_hash = ?", s.donationTokenFingerprint).Count(&count).Error; err != nil {
+				return app_errors.ParseDBError(err)
+			}
+			if count != 0 {
+				return app_errors.ErrDonationUnavailable
+			}
+		}
+		if _, err := s.ensureDonationIdentity(tx); err != nil {
+			return err
+		}
+		if err := s.backfillDonationInventory(tx); err != nil {
+			return err
+		}
 		nowMS := s.now().UnixMilli()
 		if err := tx.Model(&models.Credential{}).
 			Where("auth_state = ?", models.CredentialAuthStateRefreshing).

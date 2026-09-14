@@ -115,6 +115,7 @@ type Config struct {
 	DatabasePool              DatabasePoolConfig
 	EncryptionKey             string
 	AuthKey                   string
+	DonationIntegrationToken  string
 	AuthKeyMetadata           SecretMetadata
 	EncryptionKeyMetadata     SecretMetadata
 	Log                       LogConfig
@@ -211,8 +212,12 @@ func Load() (*Config, error) {
 
 	explicitAuthKey := os.Getenv("AUTH_KEY")
 	explicitEncryptionKey := os.Getenv("ENCRYPTION_KEY")
+	donationIntegrationToken := os.Getenv("DONATION_INTEGRATION_TOKEN")
 	authKey, err := authkey.Resolve(explicitAuthKey, dataDir)
 	if err != nil {
+		return nil, err
+	}
+	if err := validateDonationIntegrationToken(donationIntegrationToken, authKey); err != nil {
 		return nil, err
 	}
 
@@ -257,16 +262,33 @@ func Load() (*Config, error) {
 			MaxOpenConnections: databaseMaxOpenConnections,
 			MaxIdleConnections: databaseMaxIdleConnections,
 		},
-		EncryptionKey:         explicitEncryptionKey,
-		AuthKey:               authKey,
-		AuthKeyMetadata:       authKeyMetadata,
-		EncryptionKeyMetadata: encryptionKeyMetadata,
+		EncryptionKey:            explicitEncryptionKey,
+		AuthKey:                  authKey,
+		DonationIntegrationToken: donationIntegrationToken,
+		AuthKeyMetadata:          authKeyMetadata,
+		EncryptionKeyMetadata:    encryptionKeyMetadata,
 		Log: LogConfig{
 			Level:  valueOrDefault("LOG_LEVEL", "info"),
 			Format: logFormat,
 		},
 		ModelsDevAutoSyncOverride: modelsDevAutoSyncOverride,
 	}, nil
+}
+
+// Empty leaves the integration disabled; no management key fallback is allowed.
+func validateDonationIntegrationToken(value, authKey string) error {
+	if value == "" {
+		return nil
+	}
+	if len(value) < 32 || len(value) > 256 || value == authKey {
+		return fmt.Errorf("DONATION_INTEGRATION_TOKEN must be a distinct 32-256 byte secret")
+	}
+	for _, character := range []byte(value) {
+		if character < 33 || character > 126 {
+			return fmt.Errorf("DONATION_INTEGRATION_TOKEN must contain only visible ASCII characters")
+		}
+	}
+	return nil
 }
 
 // ParseDatabaseDSN parses the single DATABASE_DSN configuration format. Bare

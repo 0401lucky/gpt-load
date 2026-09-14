@@ -142,8 +142,8 @@ func (s *Server) HTTPModule() httproute.Module {
 规则：
 
 - 路由名 = `<owner>.<resource>.<verb>`；**路径不写前缀**，`Prefix` 由 registry 拼接。
-- **Owner 与 Auth 是绑定的**，`validateOwnerAuth` 会拒绝不匹配：`OwnerControl`→`AuthControl`、`OwnerData`→`AuthAccessKey`、`OwnerSystem`/`OwnerWeb`→`AuthNone`。
-- 四个模块在 `container.go` 的 `newHTTPRegistry` 汇总：`app`（system）、`controlServer`、`gatewayHandler`（data）、`webUIServer`（web）。
+- **Owner 与 Auth 是绑定的**，`validateOwnerAuth` 会拒绝不匹配：`OwnerControl`→`AuthControl`、`OwnerData`→`AuthAccessKey`、`OwnerDonation`→`AuthDonation`、`OwnerSystem`/`OwnerWeb`→`AuthNone`。
+- 五个模块在 `container.go` 的 `newHTTPRegistry` 汇总：`app`（system）、`controlServer.HTTPModule()`（control）、`controlServer.DonationHTTPModule()`（donation）、`gatewayHandler`（data）、`webUIServer`（web）。捐献模块的受限鉴权与长期回执契约见 [donation-integration.md](./donation-integration.md)。
 - **数据面不变量**：所有 data 路由的 `Handlers` 只有一个 `handler.Handle`，endpoint 差异全部塞进 `Prepare` 与 `PathValidator`；endpoint 目录声明在 `gateway/router.go` 的 `dataPlaneEndpointCatalog()`。
 - **全局 fallback 只允许一个**（`multiple global fallbacks are not allowed`），目前唯一使用者是 webui 的 SPA（`webui/http_routes.go:54`）。
 - handler 命名固定 `handleXxx`。

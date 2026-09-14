@@ -16,6 +16,25 @@ const (
 	controlMethodNotAllowedMessageID = "route.method_not_allowed"
 )
 
+// DonationHTTPModule grants only the dedicated intake contract, never /api access.
+func (s *Server) DonationHTTPModule() httproute.Module {
+	return httproute.Module{
+		Name: "donation", Owner: httproute.OwnerDonation, Auth: httproute.AuthDonation,
+		Prefix: "/integrations/donations/v1", NamespacePrefixes: []string{"/integrations/donations"},
+		BeforeAuth: gin.HandlersChain{i18n.Middleware()}, Authenticate: s.authenticateDonation(),
+		NotFound: controlRouteNotFound, MethodNotAllowed: controlMethodNotAllowed,
+		Routes: []httproute.Route{
+			controlRoute("donation.capabilities.get", http.MethodGet, "/capabilities", s.handleDonationCapabilities),
+			controlRoute("donation.groups.list", http.MethodGet, "/groups", s.handleDonationGroups),
+			controlRoute("donation.batches.create", http.MethodPost, "/batches",
+				s.auditMutation(newMutationDescriptor("donation_batch_create", "donation_batch", staticMutationLocator("new"))), s.handleDonationBatchCreate),
+			controlRoute("donation.batches.get", http.MethodGet, "/batches/:batch_id", s.handleDonationBatchGet),
+			controlRoute("donation.batches.retry", http.MethodPost, "/batches/:batch_id/retry",
+				s.auditMutation(newMutationDescriptor("donation_batch_retry", "donation_batch", staticMutationLocator("retry"))), s.handleDonationBatchRetry),
+		},
+	}
+}
+
 var (
 	controlRouteNotFoundError = &app_errors.APIError{
 		HTTPStatus: http.StatusNotFound,

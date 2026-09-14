@@ -34,16 +34,18 @@ type ReleaseUpdateChecker interface {
 }
 
 type Server struct {
-	authDigest        [sha256.Size]byte
-	service           *Service
-	systemInfo        systemInfoResponse
-	authFailures      *authFailureLimiter
-	compareDigest     func([]byte, []byte) int
-	logger            *logrus.Logger
-	authFailureEvents *utils.RateLimitedEventCounter
-	startedAt         time.Time
-	now               func() time.Time
-	releaseChecker    ReleaseUpdateChecker
+	authDigest         [sha256.Size]byte
+	donationAuthDigest [sha256.Size]byte
+	donationsEnabled   bool
+	service            *Service
+	systemInfo         systemInfoResponse
+	authFailures       *authFailureLimiter
+	compareDigest      func([]byte, []byte) int
+	logger             *logrus.Logger
+	authFailureEvents  *utils.RateLimitedEventCounter
+	startedAt          time.Time
+	now                func() time.Time
+	releaseChecker     ReleaseUpdateChecker
 }
 
 const maxControlJSONBodyBytes int64 = 32 << 20
@@ -58,14 +60,16 @@ func NewServer(cfg *config.Config, service *Service) *Server {
 		service.oauthCallback.configureForServerHost(cfg.Server.Host)
 	}
 	return &Server{
-		authDigest:    sha256.Sum256([]byte(cfg.AuthKey)),
-		service:       service,
-		systemInfo:    newSystemInfoResponse(cfg),
-		authFailures:  newAuthFailureLimiter(),
-		compareDigest: subtle.ConstantTimeCompare,
-		logger:        logrus.StandardLogger(),
-		startedAt:     now().UTC(),
-		now:           now,
+		authDigest:         sha256.Sum256([]byte(cfg.AuthKey)),
+		donationAuthDigest: sha256.Sum256([]byte(cfg.DonationIntegrationToken)),
+		donationsEnabled:   cfg.DonationIntegrationToken != "" && cfg.DonationIntegrationToken != cfg.AuthKey,
+		service:            service,
+		systemInfo:         newSystemInfoResponse(cfg),
+		authFailures:       newAuthFailureLimiter(),
+		compareDigest:      subtle.ConstantTimeCompare,
+		logger:             logrus.StandardLogger(),
+		startedAt:          now().UTC(),
+		now:                now,
 		authFailureEvents: utils.NewRateLimitedEventCounter(
 			time.Minute,
 			time.Now,
@@ -1187,6 +1191,18 @@ func serviceErrorMessageID(
 	apiErr *app_errors.APIError,
 ) string {
 	switch apiErr.Code {
+	case app_errors.ErrUnauthorized.Code:
+		return "auth.invalid_key"
+	case app_errors.ErrForbidden.Code:
+		return "auth.forbidden"
+	case app_errors.ErrDonationUnavailable.Code:
+		return "donation.unavailable"
+	case app_errors.ErrDonationTargetChanged.Code:
+		return "donation.target_changed"
+	case app_errors.ErrDonationTargetUnavailable.Code:
+		return "donation.target_unavailable"
+	case app_errors.ErrDonationNotFound.Code:
+		return "donation.not_found"
 	case app_errors.ErrIdempotencyKeyRequired.Code:
 		return "idempotency.required"
 	case app_errors.ErrInvalidIdempotencyKey.Code:

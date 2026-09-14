@@ -84,11 +84,14 @@ type Service struct {
 		*models.ControlOperation,
 		operationStage,
 	) error
-	operationRecoveryWake chan struct{}
-	writeMu               sync.RWMutex
-	observationMu         sync.Mutex
-	observationFlights    map[observationFlightKey]*observationFlight
-	observationSemaphore  chan struct{}
+	operationRecoveryWake    chan struct{}
+	donationRecoveryWake     chan struct{}
+	donationsEnabled         bool
+	donationTokenFingerprint string
+	writeMu                  sync.RWMutex
+	observationMu            sync.Mutex
+	observationFlights       map[observationFlightKey]*observationFlight
+	observationSemaphore     chan struct{}
 }
 
 type credentialRuntimeRetirer interface {
@@ -249,11 +252,16 @@ func NewService(
 		},
 		now:                   time.Now,
 		operationRecoveryWake: make(chan struct{}, 1),
+		donationRecoveryWake:  make(chan struct{}, 1),
 		observationFlights:    make(map[observationFlightKey]*observationFlight),
 		observationSemaphore:  make(chan struct{}, 1),
 	}
 	if cfg != nil {
 		service.environmentProxy = outboundproxy.Environment()
+		service.donationsEnabled = cfg.DonationIntegrationToken != ""
+		if service.donationsEnabled && encryptionService != nil {
+			service.donationTokenFingerprint = encryptionService.Hash(cfg.DonationIntegrationToken)
+		}
 	}
 	if subscriptionCredentials != nil {
 		service.prepareSubscriptionCredential = subscriptionCredentials.PrepareForControl

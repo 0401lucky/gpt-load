@@ -2,6 +2,10 @@ package locales
 
 // MessagesJaJP contains Japanese control-plane translations.
 var MessagesJaJP = map[string]string{
+	"donation.not_found":                         "寄付バッチが見つかりません",
+	"donation.target_changed":                    "対象グループの設定が変更されました。グループ選択を更新してください。",
+	"donation.target_unavailable":                "選択したグループは現在寄付を受け付けられません。",
+	"donation.unavailable":                       "寄付連携は現在利用できません。",
 	"access_key.custom_invalid":                  "空白や制御文字を含まない、256 文字以内の表示可能な ASCII 文字を使用してください。",
 	"access_key.admin_conflict":                  "管理者キーをアクセスキーとして使用することはできません。",
 	"access_key.exists":                          "このアクセスキーは既に存在します。別のキーを使用してください。",

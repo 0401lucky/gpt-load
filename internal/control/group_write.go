@@ -414,9 +414,12 @@ func (s *Service) persistCredentials(
 		Find(&existingRows).Error; err != nil {
 		return 0, 0, app_errors.ParseDBError(err)
 	}
-	existingByFingerprint := make(map[string]struct{}, len(existingRows))
+	existingByFingerprint := make(map[string]models.Credential, len(existingRows))
 	for _, row := range existingRows {
-		existingByFingerprint[row.Fingerprint] = struct{}{}
+		existingByFingerprint[row.Fingerprint] = row
+	}
+	if _, err := s.lockInventoryDonationResources(tx, normalized.candidates); err != nil {
+		return 0, 0, err
 	}
 
 	nowMS, err := epochms.FromTime(s.now())
@@ -429,7 +432,11 @@ func (s *Service) persistCredentials(
 	added := 0
 	duplicated := normalized.duplicateLines
 	for _, candidate := range normalized.candidates {
-		if _, exists := existingByFingerprint[candidate.fingerprint]; exists {
+		resourceFingerprint := s.donationCanonicalFingerprint(candidate.canonical)
+		if row, exists := existingByFingerprint[candidate.fingerprint]; exists {
+			if err := s.markDonationInventory(tx, resourceFingerprint, row); err != nil {
+				return 0, 0, err
+			}
 			duplicated++
 			continue
 		}
@@ -446,7 +453,10 @@ func (s *Service) persistCredentials(
 		if err := tx.Create(&row).Error; err != nil {
 			return 0, 0, app_errors.ParseDBError(err)
 		}
-		existingByFingerprint[candidate.fingerprint] = struct{}{}
+		if err := s.markDonationInventory(tx, resourceFingerprint, row); err != nil {
+			return 0, 0, err
+		}
+		existingByFingerprint[candidate.fingerprint] = row
 		added++
 	}
 	return added, duplicated, nil

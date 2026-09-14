@@ -224,6 +224,7 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10`                                        | MySQL 和 PostgreSQL 的最大打开连接数，必须为正整数；SQLite 始终使用单连接。                                                                              |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5`                                         | MySQL 和 PostgreSQL 的最大空闲连接数，必须为正整数且不大于 `DATABASE_MAX_OPEN_CONNECTIONS`；SQLite 始终使用单连接。                                      |
 | `AUTH_KEY`                      | 空，读取或生成 `${DATA_DIR}/auth.key`       | 管理界面和 `/api` 管理接口的 Bearer 密钥，不是数据面 AccessKey。                                                                                         |
+| `DONATION_INTEGRATION_TOKEN` | 空，关闭捐献集成 | `/integrations/donations/v1` 专用的 32–256 字节可见 ASCII Bearer 密钥，须与管理密钥和所有 AccessKey 不同；修改后重启。 |
 | `ENCRYPTION_KEY`                | 空，读取或生成 `${DATA_DIR}/encryption.key` | 用于加密渠道凭据；更换或丢失后无法解密已有凭据，必须与数据库一起备份。                                                                                   |
 | `HTTP_PROXY`                    | 空                                          | HTTP 上游请求的环境代理。                                                                                                                                |
 | `HTTPS_PROXY`                   | 空                                          | HTTPS 上游请求的环境代理。                                                                                                                               |
@@ -237,6 +238,10 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 </details>
 
 ## 生产使用注意事项
+
+捐献接收支持 Gemini AI Studio 等普通 API key，复用已有分组的渠道与验证配置。受限集成接口提供能力查询、分组目录、加密批次暂存、逐项回执和按原批次/明细标识重试。请求成功仅表示暂存已持久化；只有 `accepted` 项才已使用该 key 通过探测并完成凭据与运行时更新。社区身份、活动与永久额度奖励由 new-api 负责。
+
+单次请求最多 100 项、每个 key 最多 4096 字节、JSON 报文最多 1 MiB。自动探测最多五次；专用重试动作可在保留期内继续处理，无需再次传 key。未接收项目的暂存密文七天后清理；资源指纹及原回执长期保留，不随凭据/分组删除或集成 token 轮换而消失，数据库须与加密密钥共同备份。清空 `DONATION_INTEGRATION_TOKEN` 可关闭接收入口与 worker，保留历史记录。
 
 - 默认只监听 `127.0.0.1`。需要远程访问时，应通过受控网络或带 TLS 的反向代理暴露，并配置 ACL 与防火墙。
 - 妥善管理 `AUTH_KEY` 与 `ENCRYPTION_KEY`，不要把真实密钥提交到仓库、日志、截图或公开 Issue。

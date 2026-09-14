@@ -96,6 +96,9 @@ func (s *Server) authenticate() gin.HandlerFunc {
 		collision := adminMatches && accessKeyMatch.HashMatched
 		credentialValid := formatValid && !collision &&
 			(adminMatches || accessKeyMatch.PolicyAllowed)
+		if s.donationsEnabled && s.compareDigest(requestDigest[:], s.donationAuthDigest[:]) == 1 {
+			credentialValid = false
+		}
 		principal := controlPrincipal{}
 		if credentialValid {
 			if adminMatches {
