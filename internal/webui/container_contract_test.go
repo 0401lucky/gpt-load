@@ -513,9 +513,10 @@ func TestComposeProjectsHaveIndependentNamesApplicationPortsAndVolumes(t *testin
 	}
 }
 
-func TestComposeResolvesNamedVolumeContainerPathsAndMajorChannelImage(t *testing.T) {
+func TestComposeResolvesNamedVolumeContainerPathsAndForkImage(t *testing.T) {
 	t.Setenv("DATA_DIR", "/host/path/must-not-reach-container")
 	t.Setenv("DATABASE_DSN", "/host/database/must-not-reach-container.db")
+	t.Setenv("GPT_LOAD_IMAGE", "")
 
 	projectDir := t.TempDir()
 	if err := os.WriteFile(
@@ -561,8 +562,8 @@ func TestComposeResolvesNamedVolumeContainerPathsAndMajorChannelImage(t *testing
 	if !ok {
 		t.Fatal("resolved Compose lacks gpt-load service")
 	}
-	if service.Image != "ghcr.io/tbphp/gpt-load:2" {
-		t.Fatalf("resolved image = %q, want ghcr.io/tbphp/gpt-load:2", service.Image)
+	if service.Image != "ghcr.io/0401lucky/gpt-load:latest" {
+		t.Fatalf("resolved image = %q, want ghcr.io/0401lucky/gpt-load:latest", service.Image)
 	}
 	if service.Environment["DATA_DIR"] != "/app/data" {
 		t.Fatalf("resolved DATA_DIR = %q, want /app/data", service.Environment["DATA_DIR"])
@@ -594,5 +595,86 @@ func TestComposeResolvesNamedVolumeContainerPathsAndMajorChannelImage(t *testing
 			strings.Contains(volume.Target, "docker.sock") {
 			t.Fatal("resolved Compose mounts the Docker socket")
 		}
+	}
+}
+
+func TestComposeImageOverridesPreserveProjectData(t *testing.T) {
+	projectDir := t.TempDir()
+	if err := os.WriteFile(
+		filepath.Join(projectDir, "docker-compose.yml"),
+		[]byte(readRepositoryFile(t, "docker-compose.yml")),
+		0o600,
+	); err != nil {
+		t.Fatalf("write temporary Compose file: %v", err)
+	}
+
+	const imageRepository = "ghcr.io/0401lucky/gpt-load"
+	for _, testCase := range []struct {
+		name       string
+		dotEnv     string
+		shellImage string
+		wantImage  string
+	}{
+		{name: "default", wantImage: imageRepository + ":latest"},
+		{name: "empty", dotEnv: "GPT_LOAD_IMAGE=\n", wantImage: imageRepository + ":latest"},
+		{
+			name:      "commit_tag",
+			dotEnv:    "GPT_LOAD_IMAGE=" + imageRepository + ":sha-" + strings.Repeat("a", 40) + "\n",
+			wantImage: imageRepository + ":sha-" + strings.Repeat("a", 40),
+		},
+		{
+			name:       "shell_digest_overrides_dotenv",
+			dotEnv:     "GPT_LOAD_IMAGE=" + imageRepository + ":main\n",
+			shellImage: imageRepository + "@sha256:" + strings.Repeat("b", 64),
+			wantImage:  imageRepository + "@sha256:" + strings.Repeat("b", 64),
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			if err := os.WriteFile(filepath.Join(projectDir, ".env"), []byte(testCase.dotEnv), 0o600); err != nil {
+				t.Fatalf("write temporary .env: %v", err)
+			}
+			command := exec.Command(
+				"docker", "compose", "--project-name", "image-update",
+				"config", "--no-env-resolution", "--format", "json",
+			)
+			command.Dir = projectDir
+			for _, entry := range os.Environ() {
+				key, _, _ := strings.Cut(entry, "=")
+				if !strings.EqualFold(key, "GPT_LOAD_IMAGE") {
+					command.Env = append(command.Env, entry)
+				}
+			}
+			if testCase.shellImage != "" {
+				command.Env = append(command.Env, "GPT_LOAD_IMAGE="+testCase.shellImage)
+			}
+			output, err := command.CombinedOutput()
+			if err != nil {
+				t.Fatalf("docker compose config: %v\n%s", err, output)
+			}
+			var resolved struct {
+				Services map[string]struct {
+					Image   string `json:"image"`
+					Volumes []struct {
+						Source string `json:"source"`
+						Target string `json:"target"`
+					} `json:"volumes"`
+				} `json:"services"`
+				Volumes map[string]struct {
+					Name string `json:"name"`
+				} `json:"volumes"`
+			}
+			if err := json.Unmarshal(output, &resolved); err != nil {
+				t.Fatalf("decode docker compose config: %v\n%s", err, output)
+			}
+			service := resolved.Services["gpt-load"]
+			if service.Image != testCase.wantImage {
+				t.Fatalf("resolved image = %q, want %q", service.Image, testCase.wantImage)
+			}
+			if len(service.Volumes) != 1 || service.Volumes[0].Source != "gpt-load-data" ||
+				service.Volumes[0].Target != "/app/data" ||
+				resolved.Volumes["gpt-load-data"].Name != "image-update_gpt-load-data" {
+				t.Fatalf("image override changed persistent data: %#v", resolved)
+			}
+		})
 	}
 }

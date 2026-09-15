@@ -1,0 +1,14 @@
+{
+  "image": "gpt-load-ghcr-check:20260915-ef20b018",
+  "platform": "linux/amd64",
+  "user": "10001:10001",
+  "health": {
+    "status": "ok",
+    "version": "2.0.0-dev.0.g3b96cfd5a5ff"
+  },
+  "ui_status": 200,
+  "donation_protocol": "1",
+  "secret_in_logs": false,
+  "listener": "127.0.0.1:60978",
+  "temporary_data": "tmpfs"
+}

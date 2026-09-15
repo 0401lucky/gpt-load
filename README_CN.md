@@ -10,8 +10,8 @@
 
 [English](README.md) · 中文 · [日本語](README_JP.md) | [官方网站](https://www.gpt-load.com)
 
-[![Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*)](https://github.com/tbphp/gpt-load/releases)
-[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2Ftbphp%2Fgpt--load%3A2-2496ED?logo=docker&logoColor=white)](https://github.com/tbphp/gpt-load/pkgs/container/gpt-load)
+[![Upstream Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*&label=upstream%20release)](https://github.com/tbphp/gpt-load/releases)
+[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2F0401lucky%2Fgpt--load%3Alatest-2496ED?logo=docker&logoColor=white)](https://github.com/0401lucky/gpt-load/pkgs/container/gpt-load)
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](go.mod)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -66,10 +66,12 @@
 
 ### 1. 启动服务
 
-需要 Docker 与 Docker Compose。
+需要 Docker 与 Docker Compose。本 fork 默认使用由 `0401lucky/gpt-load` main 构建的 `ghcr.io/0401lucky/gpt-load:latest`。
+
+首次拉取以 GHCR 包的实际可见性为准：public 包可匿名拉取；private 包需先使用有该包访问权限的账号及具有 `read:packages` 权限的凭据执行 `docker login ghcr.io`。
 
 ```bash
-git clone --depth 1 https://github.com/tbphp/gpt-load.git
+git clone --depth 1 --branch main https://github.com/0401lucky/gpt-load.git
 cd gpt-load
 
 cp .env.example .env
@@ -173,20 +175,33 @@ postgres://user:password@db.example:5432/gpt_load?sslmode=require
 
 </details>
 
-常用运维命令：
+本 fork 的 `latest` 和 `main` 镜像标签跟随通过验证的 main 构建，支持 `linux/amd64` 与 `linux/arm64`。流水线先校验清单并分别在两种原生架构上运行镜像，再更新这两个标签。版本如 `2.0.0-dev.<run>.g<short-sha>` 表示开发构建，不是上游正式发布。
+
+更新已有 **2.x** 部署前，先一起备份数据库和 `encryption.key`。保留原部署目录、Compose 项目名（如使用过 `-p` / `COMPOSE_PROJECT_NAME`）、`.env`，以及包含 `auth.key`、`encryption.key` 的数据卷。在同一项目中拉取配置的镜像并重建服务：
 
 ```bash
-docker compose logs -f      # 查看日志
-docker compose pull && docker compose up -d   # 更新到最新 2.x 镜像
-docker compose stop         # 停止服务
+docker compose pull gpt-load
+docker compose up -d --no-deps gpt-load
 ```
 
-官方 Compose 使用 `ghcr.io/tbphp/gpt-load:2`。GA 前，`2` 跟随已验证的 2.0 Beta 和 RC；GA 后只跟随稳定的 2.x。镜像精确标签会去掉 Git tag 的 `v` 前缀（例如 `2.0.0-beta.25`），`2.0-beta` 则保留为 2.0 Beta 通道；`latest` 继续留在 1.x。
+这些命令会保留原数据卷；`docker compose down -v` 会删除数据卷。更新镜像时不要重新生成身份或加密密钥。可用 `docker compose logs -f` 查看日志，或用 `docker compose stop` 停止服务。
+
+如需固定构建，在原 `.env` 中将 `GPT_LOAD_IMAGE` 设置为以下**其中一项**，用成功的 [Main images 运行记录](https://github.com/0401lucky/gpt-load/actions/workflows/ghcr-main.yml) 中已发布的值替换占位符，然后执行相同的 pull/up 命令：
+
+```dotenv
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load:sha-<full-40-character-commit>
+# 或固定不可变的多架构 digest：
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load@sha256:<64-hex-digest>
+```
+
+提交标签标识源码提交，同一提交重建时可能刷新；digest 则固定具体镜像。将 `GPT_LOAD_IMAGE` 留空即可重新跟随 `latest`。旧镜像不会降级数据库结构，回退前须确认数据兼容性。
+
+**上游发布：** `ghcr.io/tbphp/gpt-load:2` 和下方原生二进制来自上游，可能不含本 fork 的新增功能。GA 前，上游 `2` 跟随已验证的 2.0 Beta 和 RC；GA 后只跟随稳定的 2.x。镜像精确标签会去掉 Git tag 的 `v` 前缀（例如 `2.0.0-beta.25`），`2.0-beta` 则保留为 2.0 Beta 通道；上游 `ghcr.io/tbphp/gpt-load:latest` 继续留在 1.x。
 
 <details>
 <summary>使用原生二进制</summary>
 
-从 [GitHub Releases](https://github.com/tbphp/gpt-load/releases) 下载对应平台的文件，建议先用随附的 `SHA256SUMS` 校验：
+从[上游 GitHub Releases](https://github.com/tbphp/gpt-load/releases) 下载对应平台的文件，建议先用随附的 `SHA256SUMS` 校验：
 
 ```bash
 chmod +x ./gpt-load-linux-amd64
@@ -211,6 +226,7 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 
 | 变量                            | 默认值                                      | 说明                                                                                                                                                     |
 | ------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GPT_LOAD_IMAGE` | 空，使用 `ghcr.io/0401lucky/gpt-load:latest` | 仅用于 Compose；可用包含提交标签或 digest 的完整镜像引用固定构建。 |
 | `HOST`                          | `127.0.0.1`                                 | Native 模式的监听地址，也是 Compose 主端口和 OAuth 回调端口的默认宿主机发布地址；Compose 容器内部固定监听 `0.0.0.0`。                                    |
 | `PORT`                          | `3001`                                      | HTTP 服务端口，必须为 `1–65535`；Compose 同时用于容器端口、宿主机发布端口和健康检查。                                                                    |
 | `BIND_ADDRESS`                  | 空，继承 `HOST`                             | 仅用于 Compose，单独覆盖主服务端口的宿主机发布地址，不改变 OAuth 回调端口。                                                                              |
@@ -219,7 +235,7 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 | `CONTAINER_STOP_GRACE_PERIOD`   | `15s`                                       | Compose 强制停止容器前的等待时间，使用 Docker duration，建议大于 `GRACEFUL_SHUTDOWN_TIMEOUT`。                                                           |
 | `READ_TIMEOUT`                  | `60`                                        | HTTP 请求读取超时，正整数，单位秒。                                                                                                                      |
 | `IDLE_TIMEOUT`                  | `120`                                       | HTTP keep-alive 空闲连接超时，正整数，单位秒。                                                                                                           |
-| `DATA_DIR`                      | `./data`                                    | 托管数据库、`auth.key`、`encryption.key` 和运行状态文件的目录；官方 Compose 固定为 `/app/data`，Windows Setup 服务固定为 `%ProgramData%\GPT-Load\data`。 |
+| `DATA_DIR`                      | `./data`                                    | 托管数据库、`auth.key`、`encryption.key` 和运行状态文件的目录；本仓库 Compose 固定为 `/app/data`，Windows Setup 服务固定为 `%ProgramData%\GPT-Load\data`。 |
 | `DATABASE_DSN`                  | 空，使用 `${DATA_DIR}/gpt-load.db`          | 空值使用应用托管的 SQLite；非空值支持 SQLite 路径或 URL、MySQL URL、PostgreSQL URL，并视为运维方管理的外部数据库。容器内文件路径必须位于已挂载目录。     |
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10`                                        | MySQL 和 PostgreSQL 的最大打开连接数，必须为正整数；SQLite 始终使用单连接。                                                                              |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5`                                         | MySQL 和 PostgreSQL 的最大空闲连接数，必须为正整数且不大于 `DATABASE_MAX_OPEN_CONNECTIONS`；SQLite 始终使用单连接。                                      |

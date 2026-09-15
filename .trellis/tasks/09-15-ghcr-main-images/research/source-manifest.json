@@ -1,0 +1,16 @@
+{
+  "base_commit": "85811f21e80175fd5d5360b2ccf2059aa6133add",
+  "files": {
+    ".env.example": "406f3adbe0507198791e7e4d76e0f0fac825e11da90cbe4142a504dc349b3e11",
+    ".github/scripts/main-promote-image-channels.sh": "b857a93f7a3f7d109b0a3bc8e0c3632cd804c98c877beb2c5fc46e57d5d53a6e",
+    ".github/workflows/ghcr-main.yml": "b3e5a2f93d02b26085c7cff5318d03bb91c14eb7226c71dd1e5a61b982b7d4ec",
+    "README.md": "e25feec9f861f82cbd4172599efa4532013d7887193087c2b397bad442bbb97b",
+    "README_CN.md": "bbe2e0a7d2c9477b0f6b4b2d7e489cb4f2e7992108af98a3a50ca0fef8dedfa9",
+    "README_JP.md": "2666647c33ef0658b30cf6c7c0b23d4b6676b97bc739402cea1098e83a91e2a7",
+    "docker-compose.yml": "4a19064e1d8eda5e25c9c6fb8f817824b4caaab613cde18955465381c68cf5b4",
+    "internal/webui/container_contract_test.go": "b6190cd803f93ac3129f851b48704a53ef3e7c771d78002ea8eb39b61bbeff63",
+    "internal/webui/workflow_main_images_test.go": "c3d118d5be6cc638cffdb8adb4f355e470c727d0309bc44c024e1ea25114ea59",
+    ".trellis/spec/backend/container-publishing.md": "3f50168538d12ae781041bbbfe912c0a433ccfb88b3c61dcba24abd6ad1d2f34",
+    ".trellis/spec/backend/index.md": "93e5d8304b9bff79a7ea94d974d75013ec39a5f4d72769fadc1d38e24c72e280"
+  }
+}

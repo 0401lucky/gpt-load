@@ -1,0 +1,439 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.21kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+#2 DONE 1.7s
+
+#3 [internal] load metadata for docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc
+#4 DONE 7.4s
+
+#3 [internal] load metadata for docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+#3 DONE 7.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 421B 0.0s done
+#5 DONE 0.0s
+
+#6 [web-builder 1/8] FROM docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+#6 resolve docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd 0.0s done
+#6 DONE 0.2s
+
+#7 [runtime 1/8] FROM docker.io/library/alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+#7 resolve docker.io/library/alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b 0.0s done
+#7 CACHED
+
+#8 [runtime 2/8] WORKDIR /app
+#8 DONE 0.1s
+
+#9 [go-builder  1/10] FROM docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc
+#9 resolve docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc 0.0s done
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 0B / 71.06MB 0.2s
+#9 sha256:9584d272670215911272bd01cfeb6fcf7905e88db580dee6ef03cbd266023c62 0B / 245.07kB 0.2s
+#9 sha256:9c6c2428769b344d266b2057dcc18f4705c7fb2f24d894d56c6a629802395ce2 0B / 127B 0.2s
+#9 sha256:9584d272670215911272bd01cfeb6fcf7905e88db580dee6ef03cbd266023c62 245.07kB / 245.07kB 0.8s done
+#9 extracting sha256:9584d272670215911272bd01cfeb6fcf7905e88db580dee6ef03cbd266023c62
+#9 sha256:9c6c2428769b344d266b2057dcc18f4705c7fb2f24d894d56c6a629802395ce2 127B / 127B 0.6s done
+#9 extracting sha256:9584d272670215911272bd01cfeb6fcf7905e88db580dee6ef03cbd266023c62 0.1s done
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 4.19MB / 71.06MB 2.6s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 9.44MB / 71.06MB 3.3s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 13.63MB / 71.06MB 3.8s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 17.83MB / 71.06MB 4.1s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 22.02MB / 71.06MB 4.4s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 26.21MB / 71.06MB 4.7s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 31.46MB / 71.06MB 5.0s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 37.75MB / 71.06MB 5.3s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 42.99MB / 71.06MB 5.6s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 48.23MB / 71.06MB 5.9s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 53.48MB / 71.06MB 6.2s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 58.24MB / 71.06MB 6.5s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 62.91MB / 71.06MB 6.8s
+#9 ...
+
+#10 [internal] load build context
+#10 transferring context: 10.85MB 7.2s
+#10 ...
+
+#9 [go-builder  1/10] FROM docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 69.21MB / 71.06MB 7.1s
+#9 sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 71.06MB / 71.06MB 7.2s done
+#9 extracting sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f
+#9 ...
+
+#10 [internal] load build context
+#10 transferring context: 12.21MB 8.0s done
+#10 DONE 8.0s
+
+#6 [web-builder 1/8] FROM docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+#6 sha256:21af007bacf625b557dda6dbce062088808612be54a955980b3d8efb8ea7d082 448B / 448B 1.3s done
+#6 sha256:57eb903fc7a4b0006b1253f877823b15c51433ccd41a20392812682211c46a6c 1.26MB / 1.26MB 1.6s done
+#6 sha256:7e2a5e2761f53b694faaee16c5ad1e400cb41224f693337aac52e74bee3b2f65 52.52MB / 52.52MB 7.8s done
+#6 extracting sha256:7e2a5e2761f53b694faaee16c5ad1e400cb41224f693337aac52e74bee3b2f65
+#6 extracting sha256:7e2a5e2761f53b694faaee16c5ad1e400cb41224f693337aac52e74bee3b2f65 1.2s done
+#6 DONE 9.3s
+
+#11 [runtime 3/8] RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0     && apk add --no-cache ca-certificates tzdata     && update-ca-certificates     && addgroup -S -g 10001 gpt-load     && adduser -S -D -H -u 10001 -G gpt-load gpt-load     && mkdir -p /app/data     && chown 10001:10001 /app/data     && chmod 0700 /app/data
+#11 2.877 (1/2) Upgrading libcrypto3 (3.5.7-r0 -> 3.5.8-r0)
+#11 5.498 (2/2) Upgrading libssl3 (3.5.7-r0 -> 3.5.8-r0)
+#11 5.733 OK: 8200 KiB in 16 packages
+#11 ...
+
+#6 [web-builder 1/8] FROM docker.io/library/node:24.18.0-alpine3.24@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+#6 extracting sha256:57eb903fc7a4b0006b1253f877823b15c51433ccd41a20392812682211c46a6c 0.0s done
+#6 extracting sha256:21af007bacf625b557dda6dbce062088808612be54a955980b3d8efb8ea7d082 0.0s done
+#6 DONE 9.3s
+
+#12 [web-builder 2/8] WORKDIR /build
+#12 DONE 0.3s
+
+#9 [go-builder  1/10] FROM docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc
+#9 extracting sha256:daee4590c9478cfdac9f40a88759297738e75fbef28baa5b8ea3c56a8f9bb19f 3.5s done
+#9 DONE 11.1s
+
+#13 [web-builder 3/8] RUN corepack enable     && corepack install --global pnpm@11.17.0
+#13 0.416 Installing pnpm@11.17.0...
+#13 ...
+
+#9 [go-builder  1/10] FROM docker.io/library/golang:1.27.0-alpine3.24@sha256:4c9fe60190a2a3350ddc51de80d0224b8a6698d12bdfc999fee45ea9d6c46dbc
+#9 extracting sha256:9c6c2428769b344d266b2057dcc18f4705c7fb2f24d894d56c6a629802395ce2 0.0s done
+#9 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0.0s done
+#9 DONE 11.1s
+
+#14 [go-builder  2/10] WORKDIR /build
+#14 DONE 0.2s
+
+#11 [runtime 3/8] RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0     && apk add --no-cache ca-certificates tzdata     && update-ca-certificates     && addgroup -S -g 10001 gpt-load     && adduser -S -D -H -u 10001 -G gpt-load gpt-load     && mkdir -p /app/data     && chown 10001:10001 /app/data     && chmod 0700 /app/data
+#11 ...
+
+#15 [go-builder  3/10] COPY go.mod go.sum ./
+#15 DONE 0.0s
+
+#16 [go-builder  4/10] COPY third_party/cpaembedded/go.mod third_party/cpaembedded/go.sum ./third_party/cpaembedded/
+#16 DONE 0.0s
+
+#17 [go-builder  5/10] RUN go mod download
+#17 ...
+
+#11 [runtime 3/8] RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0     && apk add --no-cache ca-certificates tzdata     && update-ca-certificates     && addgroup -S -g 10001 gpt-load     && adduser -S -D -H -u 10001 -G gpt-load gpt-load     && mkdir -p /app/data     && chown 10001:10001 /app/data     && chmod 0700 /app/data
+#11 11.70 (1/2) Installing ca-certificates (20260611-r0)
+#11 11.86 (2/2) Installing tzdata (2026c-r0)
+#11 12.04 Executing busybox-1.37.0-r31.trigger
+#11 12.05 Executing ca-certificates-20260611-r0.trigger
+#11 12.08 OK: 8841 KiB in 18 packages
+#11 DONE 12.2s
+
+#18 [runtime 4/8] COPY LICENSE THIRD_PARTY_NOTICES.md /app/licenses/
+#18 DONE 0.0s
+
+#19 [runtime 5/8] COPY LICENSES/Apache-2.0.txt /app/licenses/Apache-2.0.txt
+#19 DONE 0.0s
+
+#20 [runtime 6/8] COPY LICENSES/Inno-Setup.txt /app/licenses/Inno-Setup.txt
+#20 DONE 0.0s
+
+#17 [go-builder  5/10] RUN go mod download
+#17 ...
+
+#21 [runtime 7/8] COPY LICENSES/MIT.txt /app/licenses/MIT.txt
+#21 DONE 0.0s
+
+#22 [runtime 8/8] COPY LICENSES/MPL-2.0.txt /app/licenses/MPL-2.0.txt
+#22 DONE 0.0s
+
+#17 [go-builder  5/10] RUN go mod download
+#17 ...
+
+#13 [web-builder 3/8] RUN corepack enable     && corepack install --global pnpm@11.17.0
+#13 DONE 5.1s
+
+#23 [web-builder 4/8] COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./web/
+#23 DONE 0.0s
+
+#24 [web-builder 5/8] RUN pnpm --dir web install --frozen-lockfile
+#24 1.133 ? Verifying lockfile against supply-chain policies (279 entries)...
+#24 1.144 Lockfile is up to date, resolution step is skipped
+#24 1.322 Progress: resolved 1, reused 0, downloaded 0, added 0
+#24 1.530 Packages: +233
+#24 1.530 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#24 2.346 Progress: resolved 233, reused 0, downloaded 0, added 0
+#24 3.346 Progress: resolved 233, reused 0, downloaded 98, added 98
+#24 4.356 Progress: resolved 233, reused 0, downloaded 179, added 179
+#24 5.366 Progress: resolved 233, reused 0, downloaded 230, added 230
+#24 5.636 
+#24 5.636    ╭──────────────────────────────────────────────╮
+#24 5.636    │                                              │
+#24 5.636    │     Update available! 11.17.0 → 12.4.1.      │
+#24 5.636    │     Changelog: https://pnpm.io/v/12.4.1      │
+#24 5.636    │   To update, run: corepack use pnpm@12.4.1   │
+#24 5.636    │                                              │
+#24 5.636    ╰──────────────────────────────────────────────╯
+#24 5.636 
+#24 5.956 Progress: resolved 233, reused 0, downloaded 233, added 233, done
+#24 6.835 ✓ Lockfile passes supply-chain policies (279 entries in 5.7s)
+#24 6.842 .../node_modules/vue-demi postinstall$ node -e "try{require('./scripts/postinstall.js')}catch(e){}"
+#24 6.955 .../node_modules/vue-demi postinstall: Done
+#24 7.003 
+#24 7.003 dependencies:
+#24 7.003 + @lucide/vue 1.39.0
+#24 7.003 + @tanstack/vue-query 5.102.8
+#24 7.003 + reka-ui 2.10.4
+#24 7.003 + vue 3.5.42
+#24 7.003 + vue-i18n 11.4.10
+#24 7.003 + vue-router 5.3.1
+#24 7.003 
+#24 7.003 devDependencies:
+#24 7.003 + @tailwindcss/vite 4.3.3
+#24 7.003 + @types/node 24.13.3
+#24 7.003 + @vitejs/plugin-vue 6.0.8
+#24 7.003 + @vue/eslint-config-typescript 14.9.0
+#24 7.003 + eslint 10.9.1
+#24 7.003 + eslint-config-prettier 10.1.8
+#24 7.003 + eslint-plugin-vue 10.10.0
+#24 7.003 + prettier 3.9.6
+#24 7.003 + tailwindcss 4.3.3
+#24 7.003 + typescript 6.0.3
+#24 7.003 + vite 8.2.2
+#24 7.003 + vue-tsc 3.3.11
+#24 7.003 
+#24 7.065 Done in 6.7s using pnpm v11.17.0
+#24 DONE 7.4s
+
+#17 [go-builder  5/10] RUN go mod download
+#17 ...
+
+#25 [web-builder 6/8] COPY internal/webui/page_routes.json ./internal/webui/page_routes.json
+#25 DONE 0.2s
+
+#17 [go-builder  5/10] RUN go mod download
+#17 ...
+
+#26 [web-builder 7/8] COPY web ./web
+#26 DONE 0.1s
+
+#27 [web-builder 8/8] RUN pnpm --dir web run build
+#27 0.764 $ pnpm run type-check && vite build
+#27 1.278 $ vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json
+#27 21.09 vite v8.2.2 building client environment for production...
+#27 21.18 transforming...
+#27 ...
+
+#17 [go-builder  5/10] RUN go mod download
+#17 DONE 32.8s
+
+#28 [go-builder  6/10] COPY *.go ./
+#28 DONE 0.2s
+
+#27 [web-builder 8/8] RUN pnpm --dir web run build
+#27 ...
+
+#29 [go-builder  7/10] COPY internal ./internal
+#29 DONE 0.2s
+
+#27 [web-builder 8/8] RUN pnpm --dir web run build
+#27 ...
+
+#30 [go-builder  8/10] COPY third_party/cpaembedded ./third_party/cpaembedded
+#30 DONE 0.0s
+
+#27 [web-builder 8/8] RUN pnpm --dir web run build
+#27 24.08 ✓ 3125 modules transformed.
+#27 24.32 rendering chunks...
+#27 24.47 computing gzip size...
+#27 24.48 ../internal/webui/dist/index.html                                          1.29 kB │ gzip:  0.50 kB
+#27 24.48 ../internal/webui/dist/.vite/manifest.json                                47.00 kB │ gzip:  5.24 kB
+#27 24.48 ../internal/webui/dist/assets/AppDateTime-DQmOMnx9.css                     0.09 kB │ gzip:  0.10 kB
+#27 24.48 ../internal/webui/dist/assets/ImportView-Ddf34dRa.css                      0.40 kB │ gzip:  0.20 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeyCostLimitWindowTime-B9Ks9jkr.css    0.45 kB │ gzip:  0.22 kB
+#27 24.48 ../internal/webui/dist/assets/CopyFallbackDialog-BUZ2AO8G.css              0.52 kB │ gzip:  0.25 kB
+#27 24.48 ../internal/webui/dist/assets/AppTypedConfirmation-DQXKBo3S.css            0.52 kB │ gzip:  0.28 kB
+#27 24.48 ../internal/webui/dist/assets/AppRelativeTime-D6o8ZF7D.css                 0.55 kB │ gzip:  0.24 kB
+#27 24.48 ../internal/webui/dist/assets/ChannelIcon-Dts49KAZ.css                     0.58 kB │ gzip:  0.31 kB
+#27 24.48 ../internal/webui/dist/assets/CopyButton-CPcYLXPM.css                      0.71 kB │ gzip:  0.33 kB
+#27 24.48 ../internal/webui/dist/assets/AsyncRefreshIndicator--n1_h4Pb.css           0.86 kB │ gzip:  0.40 kB
+#27 24.48 ../internal/webui/dist/assets/PageHeader-2C7l7TdK.css                      1.04 kB │ gzip:  0.40 kB
+#27 24.48 ../internal/webui/dist/assets/PageFrame-BztpRjn4.css                       1.05 kB │ gzip:  0.39 kB
+#27 24.48 ../internal/webui/dist/assets/AppSwitch-BhlWIjtM.css                       1.09 kB │ gzip:  0.44 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeySelect-BfqYZYlw.css                 1.17 kB │ gzip:  0.47 kB
+#27 24.48 ../internal/webui/dist/assets/AppSearchInput-BY6t9sl4.css                  1.28 kB │ gzip:  0.48 kB
+#27 24.48 ../internal/webui/dist/assets/StatusBadge-D7Dg7siu.css                     1.29 kB │ gzip:  0.33 kB
+#27 24.48 ../internal/webui/dist/assets/CollectionFilterBar-C_yjDCuF.css             1.41 kB │ gzip:  0.49 kB
+#27 24.48 ../internal/webui/dist/assets/PaginationBar-D-F4VCg-.css                   1.44 kB │ gzip:  0.50 kB
+#27 24.48 ../internal/webui/dist/assets/EmptyState-CNxuiP7H.css                      1.47 kB │ gzip:  0.48 kB
+#27 24.48 ../internal/webui/dist/assets/CredentialHealthBar-CiPg3r_Z.css             1.60 kB │ gzip:  0.48 kB
+#27 24.48 ../internal/webui/dist/assets/LedgerRecordList-D3NtQTHs.css                1.81 kB │ gzip:  0.60 kB
+#27 24.48 ../internal/webui/dist/assets/DisclosurePanel-BAzIuGpC.css                 1.87 kB │ gzip:  0.60 kB
+#27 24.48 ../internal/webui/dist/assets/StickySaveBar-B_msQcK7.css                   2.04 kB │ gzip:  0.54 kB
+#27 24.48 ../internal/webui/dist/assets/AppTextInput-BFDumzEh.css                    2.07 kB │ gzip:  0.57 kB
+#27 24.48 ../internal/webui/dist/assets/AppTabs-DsA_ORsa.css                         2.10 kB │ gzip:  0.65 kB
+#27 24.48 ../internal/webui/dist/assets/CredentialTextarea-4Pr-qotX.css              2.15 kB │ gzip:  0.68 kB
+#27 24.48 ../internal/webui/dist/assets/CopyChip-C-doobJ8.css                        2.16 kB │ gzip:  0.73 kB
+#27 24.48 ../internal/webui/dist/assets/DataTable-Bp1gV-TI.css                       2.26 kB │ gzip:  0.66 kB
+#27 24.48 ../internal/webui/dist/assets/FormField-Bdd_aWZd.css                       2.28 kB │ gzip:  0.68 kB
+#27 24.48 ../internal/webui/dist/assets/AppSelect-ClDiyUbh.css                       2.46 kB │ gzip:  0.78 kB
+#27 24.48 ../internal/webui/dist/assets/NotFoundView-D88t0pMf.css                    2.95 kB │ gzip:  0.81 kB
+#27 24.48 ../internal/webui/dist/assets/SegmentedControl-BgxK--4F.css                3.17 kB │ gzip:  0.70 kB
+#27 24.48 ../internal/webui/dist/assets/ExistingGroupImport-Cos5VsZ6.css             3.19 kB │ gzip:  0.84 kB
+#27 24.48 ../internal/webui/dist/assets/GroupsView-VgXa0HtA.css                      3.98 kB │ gzip:  1.07 kB
+#27 24.48 ../internal/webui/dist/assets/AppDrawer-D-182e2l.css                       4.03 kB │ gzip:  1.16 kB
+#27 24.48 ../internal/webui/dist/assets/CollectionStatusSummary-BpzgZ-bt.css         4.04 kB │ gzip:  0.98 kB
+#27 24.48 ../internal/webui/dist/assets/AppButton-CyNskqgP.css                       4.54 kB │ gzip:  1.00 kB
+#27 24.48 ../internal/webui/dist/assets/LoginView-Cz-6AnCf.css                       4.63 kB │ gzip:  1.12 kB
+#27 24.48 ../internal/webui/dist/assets/SkeletonSurface-CLNhBT8z.css                 5.43 kB │ gzip:  1.27 kB
+#27 24.48 ../internal/webui/dist/assets/SettingsView-Mjq_-Go9.css                    9.78 kB │ gzip:  1.59 kB
+#27 24.48 ../internal/webui/dist/assets/use-section-navigation-CbFV3-hQ.css         12.63 kB │ gzip:  2.07 kB
+#27 24.48 ../internal/webui/dist/assets/NewGroupImport-BpXeTmxz.css                 12.89 kB │ gzip:  2.23 kB
+#27 24.48 ../internal/webui/dist/assets/InspectorTab-Do9XqHjp.css                   14.29 kB │ gzip:  2.42 kB
+#27 24.48 ../internal/webui/dist/assets/LogsTab-B-YDpafv.css                        15.93 kB │ gzip:  2.87 kB
+#27 24.48 ../internal/webui/dist/assets/UsageTab-DtI_PfHI.css                       16.83 kB │ gzip:  3.02 kB
+#27 24.48 ../internal/webui/dist/assets/upstream-base-url-gJFiIkaf.css              18.37 kB │ gzip:  3.09 kB
+#27 24.48 ../internal/webui/dist/assets/ModelsView-C0AoWwIA.css                     18.48 kB │ gzip:  2.98 kB
+#27 24.48 ../internal/webui/dist/assets/MonitorView-DCjkNOWA.css                    20.71 kB │ gzip:  3.63 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeysView-CxnqUCI8.css                 25.17 kB │ gzip:  4.30 kB
+#27 24.48 ../internal/webui/dist/assets/HomeView-CILuQH4Q.css                       32.90 kB │ gzip:  5.19 kB
+#27 24.48 ../internal/webui/dist/assets/index-CFF_3NIw.css                          44.04 kB │ gzip:  9.00 kB
+#27 24.48 ../internal/webui/dist/assets/GroupDetailView-BrvkUhey.css                59.30 kB │ gzip:  8.68 kB
+#27 24.48 ../internal/webui/dist/assets/types-BBqWE0x0.js                            0.05 kB │ gzip:  0.07 kB
+#27 24.48 ../internal/webui/dist/assets/quota-progress-BI5Tbhja.js                   0.08 kB │ gzip:  0.10 kB
+#27 24.48 ../internal/webui/dist/assets/chevron-right-DSrOIZmj.js                    0.12 kB │ gzip:  0.13 kB
+#27 24.48 ../internal/webui/dist/assets/useFormControl-nqTse8Sj.js                   0.13 kB │ gzip:  0.13 kB
+#27 24.48 ../internal/webui/dist/assets/plus-BoxmAr1J.js                             0.14 kB │ gzip:  0.14 kB
+#27 24.48 ../internal/webui/dist/assets/arrow-right-C47UKSv-.js                      0.15 kB │ gzip:  0.15 kB
+#27 24.48 ../internal/webui/dist/assets/gauge-g0ojzMVn.js                            0.16 kB │ gzip:  0.16 kB
+#27 24.48 ../internal/webui/dist/assets/getActiveElement-DWEoD8ZB.js                 0.18 kB │ gzip:  0.13 kB
+#27 24.48 ../internal/webui/dist/assets/use-debounced-action-BPoqkk4J.js             0.21 kB │ gzip:  0.17 kB
+#27 24.48 ../internal/webui/dist/assets/route-D4hLJXFu.js                            0.24 kB │ gzip:  0.19 kB
+#27 24.48 ../internal/webui/dist/assets/use-abort-controller-pool-BRqhpnFh.js        0.25 kB │ gzip:  0.19 kB
+#27 24.48 ../internal/webui/dist/assets/zap-C9UNYZIR.js                              0.26 kB │ gzip:  0.20 kB
+#27 24.48 ../internal/webui/dist/assets/trash-2-mNSOu-cm.js                          0.31 kB │ gzip:  0.20 kB
+#27 24.48 ../internal/webui/dist/assets/use-visible-refetch-CakSfucJ.js              0.32 kB │ gzip:  0.22 kB
+#27 24.48 ../internal/webui/dist/assets/utils-C-K5yyuV.js                            0.39 kB │ gzip:  0.30 kB
+#27 24.48 ../internal/webui/dist/assets/layers-DyaW0HAO.js                           0.41 kB │ gzip:  0.23 kB
+#27 24.48 ../internal/webui/dist/assets/uuid-tgTjfN53.js                             0.44 kB │ gzip:  0.29 kB
+#27 24.48 ../internal/webui/dist/assets/use-transient-flag-AiCklClQ.js               0.47 kB │ gzip:  0.32 kB
+#27 24.48 ../internal/webui/dist/assets/PageHeader-CYKJFVBX.js                       0.52 kB │ gzip:  0.35 kB
+#27 24.48 ../internal/webui/dist/assets/protocols-D4_4WDR2.js                        0.52 kB │ gzip:  0.20 kB
+#27 24.48 ../internal/webui/dist/assets/eye-D-zsbbFt.js                              0.62 kB │ gzip:  0.33 kB
+#27 24.48 ../internal/webui/dist/assets/AppDateTime-BSUYvCUB.js                      0.72 kB │ gzip:  0.43 kB
+#27 24.48 ../internal/webui/dist/assets/CollectionFilterBar-Bpnoyh5z.js              0.74 kB │ gzip:  0.44 kB
+#27 24.48 ../internal/webui/dist/assets/PageFrame-ISqQjh_r.js                        0.77 kB │ gzip:  0.40 kB
+#27 24.48 ../internal/webui/dist/assets/EmptyState-BMkxGoX9.js                       0.78 kB │ gzip:  0.45 kB
+#27 24.48 ../internal/webui/dist/assets/async-surface-DR8-T4cB.js                    0.78 kB │ gzip:  0.46 kB
+#27 24.48 ../internal/webui/dist/assets/AppTypedConfirmation-iCWlUts0.js             0.91 kB │ gzip:  0.55 kB
+#27 24.48 ../internal/webui/dist/assets/DisclosurePanel-CQPHHluA.js                  0.95 kB │ gzip:  0.50 kB
+#27 24.48 ../internal/webui/dist/assets/route-query-v2C5Zu61.js                      0.96 kB │ gzip:  0.46 kB
+#27 24.48 ../internal/webui/dist/assets/LedgerRecordList-4oQyctw_.js                 0.98 kB │ gzip:  0.58 kB
+#27 24.48 ../internal/webui/dist/assets/system-update-CITsUiDf.js                    1.23 kB │ gzip:  0.70 kB
+#27 24.48 ../internal/webui/dist/assets/CopyButton-2gcZz7k_.js                       1.38 kB │ gzip:  0.74 kB
+#27 24.48 ../internal/webui/dist/assets/AppRelativeTime-CAj8uk_D.js                  1.44 kB │ gzip:  0.69 kB
+#27 24.48 ../internal/webui/dist/assets/DataTable-CxFpFUe8.js                        1.45 kB │ gzip:  0.77 kB
+#27 24.48 ../internal/webui/dist/assets/invalidation-ZDen4B1T.js                     1.54 kB │ gzip:  0.51 kB
+#27 24.48 ../internal/webui/dist/assets/NotFoundView-DJfZuje6.js                     1.59 kB │ gzip:  0.83 kB
+#27 24.48 ../internal/webui/dist/assets/AppSearchInput-DlKmuocj.js                   1.75 kB │ gzip:  0.92 kB
+#27 24.48 ../internal/webui/dist/assets/OverflowTooltip-vDYPCr8a.js                  1.75 kB │ gzip:  0.91 kB
+#27 24.48 ../internal/webui/dist/assets/proxy-MBXyx2T-.js                            1.75 kB │ gzip:  0.81 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeyCostLimitWindowTime-DOpN3uN2.js     1.79 kB │ gzip:  0.87 kB
+#27 24.48 ../internal/webui/dist/assets/mutation-outcome-0Oux6mYK.js                 1.81 kB │ gzip:  0.73 kB
+#27 24.48 ../internal/webui/dist/assets/errors-DV91iJde.js                           1.93 kB │ gzip:  1.00 kB
+#27 24.48 ../internal/webui/dist/assets/SegmentedControl-wtmPK2Id.js                 1.93 kB │ gzip:  0.97 kB
+#27 24.48 ../internal/webui/dist/assets/CollectionStatusSummary-DCPE0b_Z.js          1.96 kB │ gzip:  0.82 kB
+#27 24.48 ../internal/webui/dist/assets/AppDrawer-xRduRSUb.js                        2.02 kB │ gzip:  0.90 kB
+#27 24.48 ../internal/webui/dist/assets/FormField-Cmt3NZO5.js                        2.14 kB │ gzip:  0.88 kB
+#27 24.48 ../internal/webui/dist/assets/AppTextInput-BdHM3JkC.js                     2.16 kB │ gzip:  1.03 kB
+#27 24.48 ../internal/webui/dist/assets/model-prices-CwwF6lcN.js                     2.23 kB │ gzip:  1.26 kB
+#27 24.48 ../internal/webui/dist/assets/CopyChip-wOA-3wIK.js                         2.29 kB │ gzip:  1.12 kB
+#27 24.48 ../internal/webui/dist/assets/model-prices-B_BrjuoZ.js                     2.34 kB │ gzip:  1.07 kB
+#27 24.48 ../internal/webui/dist/assets/StickySaveBar-BrjVleXM.js                    2.64 kB │ gzip:  1.20 kB
+#27 24.48 ../internal/webui/dist/assets/PaginationBar-Cv3corYm.js                    2.67 kB │ gzip:  1.13 kB
+#27 24.48 ../internal/webui/dist/assets/StatusBadge-CSGdCg8F.js                      2.67 kB │ gzip:  1.17 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeySelect-C2dLFlSx.js                  2.71 kB │ gzip:  1.31 kB
+#27 24.48 ../internal/webui/dist/assets/AppTabs-JZOBpKUF.js                          2.74 kB │ gzip:  1.31 kB
+#27 24.48 ../internal/webui/dist/assets/model-prices-hS2X0slX.js                     2.90 kB │ gzip:  1.34 kB
+#27 24.48 ../internal/webui/dist/assets/CredentialHealthBar-B0VCfZ1U.js              3.04 kB │ gzip:  1.00 kB
+#27 24.48 ../internal/webui/dist/assets/CopyFallbackDialog-Dt_NPP2c.js               3.50 kB │ gzip:  1.67 kB
+#27 24.48 ../internal/webui/dist/assets/models-Ac7_FsKY.js                           4.03 kB │ gzip:  1.93 kB
+#27 24.48 ../internal/webui/dist/assets/models-YO08748o.js                           4.04 kB │ gzip:  1.59 kB
+#27 24.48 ../internal/webui/dist/assets/models-D2OGihSe.js                           5.06 kB │ gzip:  2.16 kB
+#27 24.48 ../internal/webui/dist/assets/AppSwitch-BFyyddxM.js                        5.10 kB │ gzip:  1.86 kB
+#27 24.48 ../internal/webui/dist/assets/providers-DSyJrH3n.js                        5.40 kB │ gzip:  2.20 kB
+#27 24.48 ../internal/webui/dist/assets/CredentialTextarea-BS4F8e8l.js               5.67 kB │ gzip:  2.14 kB
+#27 24.48 ../internal/webui/dist/assets/devtools-CN5uWJaH-V4kxwlxk.js                5.69 kB │ gzip:  2.57 kB
+#27 24.48 ../internal/webui/dist/assets/health-BcTGROOj.js                           5.72 kB │ gzip:  1.83 kB
+#27 24.48 ../internal/webui/dist/assets/format-CdUoD8td.js                           6.20 kB │ gzip:  2.36 kB
+#27 24.48 ../internal/webui/dist/assets/settings-C2XYkHXa.js                         6.77 kB │ gzip:  3.39 kB
+#27 24.48 ../internal/webui/dist/assets/LoginView-BX8S7joq.js                        7.13 kB │ gzip:  2.66 kB
+#27 24.48 ../internal/webui/dist/assets/access-keys-CjayoGSD.js                      7.19 kB │ gzip:  2.66 kB
+#27 24.48 ../internal/webui/dist/assets/TabsTrigger-YKI-IedU.js                      7.36 kB │ gzip:  2.57 kB
+#27 24.48 ../internal/webui/dist/assets/settings-CDueVcFL.js                         7.49 kB │ gzip:  2.98 kB
+#27 24.48 ../internal/webui/dist/assets/SkeletonSurface-Dh2Xf8QW.js                  7.73 kB │ gzip:  2.87 kB
+#27 24.48 ../internal/webui/dist/assets/ImportView-DvmpNxng.js                       8.28 kB │ gzip:  3.40 kB
+#27 24.48 ../internal/webui/dist/assets/ExistingGroupImport-DcOSOIsl.js              9.00 kB │ gzip:  3.35 kB
+#27 24.48 ../internal/webui/dist/assets/DialogTrigger-BUY5mzNL.js                    9.04 kB │ gzip:  2.39 kB
+#27 24.48 ../internal/webui/dist/assets/settings-D7crsCdI.js                         9.39 kB │ gzip:  3.78 kB
+#27 24.48 ../internal/webui/dist/assets/AsyncRefreshIndicator-B9XrWZKa.js           10.87 kB │ gzip:  4.13 kB
+#27 24.48 ../internal/webui/dist/assets/access-keys-CUW0nXEc.js                     12.55 kB │ gzip:  5.28 kB
+#27 24.48 ../internal/webui/dist/assets/access-keys-CXj6KwkL.js                     13.08 kB │ gzip:  4.74 kB
+#27 24.48 ../internal/webui/dist/assets/groups-D2C8DHve.js                          14.11 kB │ gzip:  3.97 kB
+#27 24.48 ../internal/webui/dist/assets/import-DjL0CKQm.js                          14.72 kB │ gzip:  6.03 kB
+#27 24.48 ../internal/webui/dist/assets/GroupsView-BjQNZl5F.js                      15.25 kB │ gzip:  4.85 kB
+#27 24.48 ../internal/webui/dist/assets/core-BlTbLUnw.js                            15.65 kB │ gzip:  7.18 kB
+#27 24.48 ../internal/webui/dist/assets/import-COjk4sgU.js                          16.14 kB │ gzip:  5.49 kB
+#27 24.48 ../internal/webui/dist/assets/core-IH5zjEAW.js                            16.53 kB │ gzip:  6.38 kB
+#27 24.48 ../internal/webui/dist/assets/access-keys-of0qtVLq.js                     16.86 kB │ gzip:  5.63 kB
+#27 24.48 ../internal/webui/dist/assets/use-section-navigation-CSpGT0Cm.js          17.94 kB │ gzip:  5.27 kB
+#27 24.48 ../internal/webui/dist/assets/credentials-DQa83Srj.js                     18.63 kB │ gzip:  5.67 kB
+#27 24.48 ../internal/webui/dist/assets/import-BH_vHmjj.js                          20.80 kB │ gzip:  6.62 kB
+#27 24.48 ../internal/webui/dist/assets/core-BlILt3J-.js                            21.28 kB │ gzip:  7.65 kB
+#27 24.48 ../internal/webui/dist/assets/client-context-D4lba5Ek.js                  23.17 kB │ gzip:  8.30 kB
+#27 24.48 ../internal/webui/dist/assets/group-CL5eMhuB.js                           24.49 kB │ gzip:  9.39 kB
+#27 24.48 ../internal/webui/dist/assets/group-BaNp0xBy.js                           26.27 kB │ gzip:  8.69 kB
+#27 24.48 ../internal/webui/dist/assets/AppSelect-Do38G74z.js                       26.34 kB │ gzip:  8.42 kB
+#27 24.48 ../internal/webui/dist/assets/InspectorTab-B1EOEcLT.js                    29.22 kB │ gzip:  7.76 kB
+#27 24.48 ../internal/webui/dist/assets/monitor-DFCqaYtn.js                         31.07 kB │ gzip: 10.69 kB
+#27 24.48 ../internal/webui/dist/assets/monitor-BUEYcv04.js                         32.89 kB │ gzip:  9.86 kB
+#27 24.48 ../internal/webui/dist/assets/group-Y1N5f1ey.js                           34.88 kB │ gzip: 10.32 kB
+#27 24.48 ../internal/webui/dist/assets/monitor-CU_89DZQ.js                         40.87 kB │ gzip: 11.52 kB
+#27 24.48 ../internal/webui/dist/assets/NewGroupImport-DL_kWrFa.js                  44.89 kB │ gzip: 12.59 kB
+#27 24.48 ../internal/webui/dist/assets/upstream-base-url-wbzNF9nI.js               46.70 kB │ gzip: 13.80 kB
+#27 24.48 ../internal/webui/dist/assets/AppButton-DMqE4uzV.js                       48.30 kB │ gzip: 16.36 kB
+#27 24.48 ../internal/webui/dist/assets/MonitorView-B0bnMH-q.js                     52.94 kB │ gzip: 14.91 kB
+#27 24.48 ../internal/webui/dist/assets/UsageTab-cHzzeX6Z.js                        53.61 kB │ gzip: 14.13 kB
+#27 24.48 ../internal/webui/dist/assets/ChannelIcon-CjnNOVvi.js                     55.05 kB │ gzip: 19.22 kB
+#27 24.48 ../internal/webui/dist/assets/SettingsView-fBSUX_Le.js                    55.70 kB │ gzip: 13.03 kB
+#27 24.48 ../internal/webui/dist/assets/ModelsView-DLiR-hrG.js                      55.91 kB │ gzip: 15.61 kB
+#27 24.48 ../internal/webui/dist/assets/HomeView-C_QMMPYO.js                        65.25 kB │ gzip: 19.12 kB
+#27 24.48 ../internal/webui/dist/assets/LogsTab-BU6eRGN_.js                         74.67 kB │ gzip: 18.50 kB
+#27 24.48 ../internal/webui/dist/assets/AccessKeysView-DyIGFDtH.js                  90.31 kB │ gzip: 24.02 kB
+#27 24.48 ../internal/webui/dist/assets/index-qrP8xH07.js                           97.21 kB │ gzip: 31.90 kB
+#27 24.48 ../internal/webui/dist/assets/GroupDetailView-Cn4ITTp3.js                169.68 kB │ gzip: 42.06 kB
+#27 24.48 ../internal/webui/dist/assets/Primitive-BNT-mqpw.js                      180.25 kB │ gzip: 65.52 kB
+#27 24.48 
+#27 24.48 ✓ built in 3.39s
+#27 DONE 24.6s
+
+#31 [go-builder  9/10] COPY --from=web-builder /build/internal/webui/dist ./internal/webui/dist
+#31 DONE 0.1s
+
+#32 [go-builder 10/10] RUN GOOS=linux GOARCH=amd64 go build     -ldflags "-s -w -X gpt-load/internal/platform/version.Version=2.0.0-dev.0.g3b96cfd5a5ff"     -o gpt-load
+#32 DONE 75.1s
+
+#33 [source-build 1/1] COPY --from=go-builder /build/gpt-load .
+#33 DONE 0.5s
+
+#34 exporting to image
+#34 exporting layers
+#34 exporting layers 4.9s done
+#34 exporting manifest sha256:c1c81c43dc92cf0f112113f40aac2cdcb69a89093f6490c167d720619dbc467a 0.0s done
+#34 exporting config sha256:be660db4febf95a023b04f92f7f0444cb7261a6fd6b71852586a0420cb2fb94b 0.0s done
+#34 exporting attestation manifest sha256:f34aa98d16e9472c8ca693518850ef5150e6913c4e8c0d9de35bf6e26c07ffda 0.0s done
+#34 exporting manifest list sha256:a006db02694329ecde765bdbaae45833ceea702d826e5e70f003bb8d35995ffa 0.0s done
+#34 naming to docker.io/library/gpt-load-ghcr-check:20260915-ef20b018 0.0s done
+#34 unpacking to docker.io/library/gpt-load-ghcr-check:20260915-ef20b018
+#34 unpacking to docker.io/library/gpt-load-ghcr-check:20260915-ef20b018 0.8s done
+#34 DONE 5.9s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/5stbilwwozu74wopvc52ypaqb

@@ -10,8 +10,8 @@ API keys, subscription accounts, traffic scheduling, failure handling, request l
 
 English · [中文](README_CN.md) · [日本語](README_JP.md) | [Official Website](https://www.gpt-load.com)
 
-[![Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*)](https://github.com/tbphp/gpt-load/releases)
-[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2Ftbphp%2Fgpt--load%3A2-2496ED?logo=docker&logoColor=white)](https://github.com/tbphp/gpt-load/pkgs/container/gpt-load)
+[![Upstream Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*&label=upstream%20release)](https://github.com/tbphp/gpt-load/releases)
+[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2F0401lucky%2Fgpt--load%3Alatest-2496ED?logo=docker&logoColor=white)](https://github.com/0401lucky/gpt-load/pkgs/container/gpt-load)
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](go.mod)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -66,10 +66,12 @@ Your application only needs one base URL and one AccessKey. Providers, accounts,
 
 ### 1. Start the service
 
-Requires Docker and Docker Compose.
+Requires Docker and Docker Compose. This fork defaults to `ghcr.io/0401lucky/gpt-load:latest`, built from `0401lucky/gpt-load` main.
+
+On first use, check the actual GHCR package visibility: public packages allow anonymous pulls; private packages require `docker login ghcr.io` first, using an account with access to the package and a credential with `read:packages` permission.
 
 ```bash
-git clone --depth 1 https://github.com/tbphp/gpt-load.git
+git clone --depth 1 --branch main https://github.com/0401lucky/gpt-load.git
 cd gpt-load
 
 cp .env.example .env
@@ -173,20 +175,33 @@ postgres://user:password@db.example:5432/gpt_load?sslmode=require
 
 </details>
 
-Common operations:
+The fork's `latest` and `main` image tags follow verified main builds for `linux/amd64` and `linux/arm64`. The workflow checks the manifest and runs the image on both native architectures before updating these tags. Versions such as `2.0.0-dev.<run>.g<short-sha>` identify development builds, not upstream releases.
+
+Before updating an existing **2.x** deployment, back up the database and `encryption.key` together. Keep the same deployment directory, Compose project name (`-p` / `COMPOSE_PROJECT_NAME`, if used), `.env`, and data volume containing `auth.key` and `encryption.key`. Pull the configured image and recreate the service in that project:
 
 ```bash
-docker compose logs -f      # view logs
-docker compose pull && docker compose up -d   # update to the latest 2.x image
-docker compose stop         # stop the service
+docker compose pull gpt-load
+docker compose up -d --no-deps gpt-load
 ```
 
-The official Compose file uses `ghcr.io/tbphp/gpt-load:2`. Before GA, `2` tracks verified 2.0 Beta and RC releases; after GA, it tracks stable 2.x releases only. Exact image tags omit the Git tag's `v` prefix (for example, `2.0.0-beta.25`), while `2.0-beta` remains the 2.0 Beta channel. `latest` remains on 1.x.
+These commands retain the existing data volume; `docker compose down -v` deletes it. Do not generate replacement keys during an image update. Use `docker compose logs -f` to view logs or `docker compose stop` to stop the service.
+
+To pin a build, set `GPT_LOAD_IMAGE` in the existing `.env` to **one** of the following, replacing the placeholder with a published value from a successful [Main images run](https://github.com/0401lucky/gpt-load/actions/workflows/ghcr-main.yml), then run the same pull/up commands:
+
+```dotenv
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load:sha-<full-40-character-commit>
+# Or pin the immutable multi-platform digest:
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load@sha256:<64-hex-digest>
+```
+
+Commit tags identify the source commit and can be refreshed when that commit is rebuilt; a digest fixes the exact image. Leave `GPT_LOAD_IMAGE` empty to follow `latest` again. An older image does not downgrade the database schema; check data compatibility before rolling back.
+
+**Upstream releases:** `ghcr.io/tbphp/gpt-load:2` and the native binaries linked below follow upstream and may not include this fork's additions. Before GA, upstream `2` tracks verified 2.0 Beta and RC releases; after GA, it tracks stable 2.x releases only. Exact image tags omit the Git tag's `v` prefix (for example, `2.0.0-beta.25`), while `2.0-beta` remains the 2.0 Beta channel. Upstream `ghcr.io/tbphp/gpt-load:latest` remains on 1.x.
 
 <details>
 <summary>Using a native binary</summary>
 
-Download the build for your platform from [GitHub Releases](https://github.com/tbphp/gpt-load/releases), and verify it against the bundled `SHA256SUMS` first:
+Download the build for your platform from [upstream GitHub Releases](https://github.com/tbphp/gpt-load/releases), and verify it against the bundled `SHA256SUMS` first:
 
 ```bash
 chmod +x ./gpt-load-linux-amd64
@@ -211,6 +226,7 @@ At startup, the application reads `.env` in the current directory; existing proc
 
 | Variable | Default | Description |
 | --- | --- | --- |
+| `GPT_LOAD_IMAGE` | Empty, uses `ghcr.io/0401lucky/gpt-load:latest` | Compose only; use a full image reference with a commit tag or digest to pin a build. |
 | `HOST` | `127.0.0.1` | Native listening address, and the default host address for Compose's main port and OAuth callback ports; Compose always listens on `0.0.0.0` inside the container. |
 | `PORT` | `3001` | HTTP service port, must be `1–65535`; Compose also uses it for the container port, host publishing, and health check. |
 | `BIND_ADDRESS` | Empty, inherits `HOST` | Compose only; overrides the host publishing address for the main service port without changing OAuth callback ports. |
@@ -219,7 +235,7 @@ At startup, the application reads `.env` in the current directory; existing proc
 | `CONTAINER_STOP_GRACE_PERIOD` | `15s` | Docker duration to wait before Compose force-stops the container; should be longer than `GRACEFUL_SHUTDOWN_TIMEOUT`. |
 | `READ_TIMEOUT` | `60` | HTTP request read timeout, positive integer in seconds. |
 | `IDLE_TIMEOUT` | `120` | HTTP keep-alive idle connection timeout, positive integer in seconds. |
-| `DATA_DIR` | `./data` | Directory for the managed database, `auth.key`, `encryption.key`, and runtime state; official Compose uses `/app/data`, while the Windows Setup service uses `%ProgramData%\GPT-Load\data`. |
+| `DATA_DIR` | `./data` | Directory for the managed database, `auth.key`, `encryption.key`, and runtime state; this Compose file uses `/app/data`, while the Windows Setup service uses `%ProgramData%\GPT-Load\data`. |
 | `DATABASE_DSN` | Empty, uses `${DATA_DIR}/gpt-load.db` | Empty uses application-managed SQLite; non-empty values support SQLite paths or URLs, MySQL URLs, and PostgreSQL URLs, and are treated as operator-managed external databases. Container file paths must be inside a mounted directory. |
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10` | Maximum open connections for MySQL and PostgreSQL, positive integer. SQLite always uses one connection. |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5` | Maximum idle connections for MySQL and PostgreSQL, positive integer and no greater than `DATABASE_MAX_OPEN_CONNECTIONS`. SQLite always uses one connection. |

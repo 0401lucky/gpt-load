@@ -1,0 +1,322 @@
+corepack pnpm@11.17.0 --dir web install --frozen-lockfile
+✓ Lockfile passes supply-chain policies (verified 10h ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +233
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 233, reused 62, downloaded 0, added 0
+Progress: resolved 233, reused 156, downloaded 0, added 0
+Progress: resolved 233, reused 226, downloaded 0, added 1
+Progress: resolved 233, reused 230, downloaded 0, added 11
+Progress: resolved 233, reused 231, downloaded 0, added 22
+Progress: resolved 233, reused 231, downloaded 0, added 25
+Progress: resolved 233, reused 231, downloaded 0, added 34
+Progress: resolved 233, reused 231, downloaded 0, added 47
+Progress: resolved 233, reused 231, downloaded 0, added 67
+Progress: resolved 233, reused 232, downloaded 0, added 93
+Progress: resolved 233, reused 232, downloaded 0, added 123
+Progress: resolved 233, reused 233, downloaded 0, added 162
+Progress: resolved 233, reused 233, downloaded 0, added 189
+Progress: resolved 233, reused 233, downloaded 0, added 207
+Progress: resolved 233, reused 233, downloaded 0, added 219
+Progress: resolved 233, reused 233, downloaded 0, added 224
+Progress: resolved 233, reused 233, downloaded 0, added 225
+Progress: resolved 233, reused 233, downloaded 0, added 226
+Progress: resolved 233, reused 233, downloaded 0, added 227
+Progress: resolved 233, reused 233, downloaded 0, added 230
+Progress: resolved 233, reused 233, downloaded 0, added 231
+Progress: resolved 233, reused 233, downloaded 0, added 232
+Progress: resolved 233, reused 233, downloaded 0, added 233
+Progress: resolved 233, reused 233, downloaded 0, added 233, done
+
+dependencies:
++ @lucide/vue 1.39.0
++ @tanstack/vue-query 5.102.8
++ reka-ui 2.10.4
++ vue 3.5.42
++ vue-i18n 11.4.10
++ vue-router 5.3.1
+
+devDependencies:
++ @tailwindcss/vite 4.3.3
++ @types/node 24.13.3
++ @vitejs/plugin-vue 6.0.8
++ @vue/eslint-config-typescript 14.9.0
++ eslint 10.9.1
++ eslint-config-prettier 10.1.8
++ eslint-plugin-vue 10.10.0
++ prettier 3.9.6
++ tailwindcss 4.3.3
++ typescript 6.0.3
++ vite 8.2.2
++ vue-tsc 3.3.11
+
+Done in 47.6s using pnpm v11.17.0
+go mod tidy -diff
+go vet ./...
+corepack pnpm@11.17.0 --dir web run lint
+$ eslint . --max-warnings=0
+corepack pnpm@11.17.0 --dir web run format
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+corepack pnpm@11.17.0 --dir web run build
+$ pnpm run type-check && vite build
+$ vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json
+[36mvite v8.2.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 3125 modules transformed.
+rendering chunks...
+computing gzip size...
+../internal/webui/dist/index.html                                          1.29 kB │ gzip:  0.50 kB
+../internal/webui/dist/.vite/manifest.json                                47.00 kB │ gzip:  5.24 kB
+../internal/webui/dist/assets/AppDateTime-DQmOMnx9.css                     0.09 kB │ gzip:  0.10 kB
+../internal/webui/dist/assets/ImportView-Ddf34dRa.css                      0.40 kB │ gzip:  0.20 kB
+../internal/webui/dist/assets/AccessKeyCostLimitWindowTime-B9Ks9jkr.css    0.45 kB │ gzip:  0.22 kB
+../internal/webui/dist/assets/CopyFallbackDialog-BUZ2AO8G.css              0.52 kB │ gzip:  0.25 kB
+../internal/webui/dist/assets/AppTypedConfirmation-DQXKBo3S.css            0.52 kB │ gzip:  0.28 kB
+../internal/webui/dist/assets/AppRelativeTime-D6o8ZF7D.css                 0.55 kB │ gzip:  0.24 kB
+../internal/webui/dist/assets/ChannelIcon-Dts49KAZ.css                     0.58 kB │ gzip:  0.31 kB
+../internal/webui/dist/assets/CopyButton-CPcYLXPM.css                      0.71 kB │ gzip:  0.33 kB
+../internal/webui/dist/assets/AsyncRefreshIndicator--n1_h4Pb.css           0.86 kB │ gzip:  0.40 kB
+../internal/webui/dist/assets/PageHeader-2C7l7TdK.css                      1.04 kB │ gzip:  0.40 kB
+../internal/webui/dist/assets/PageFrame-BztpRjn4.css                       1.05 kB │ gzip:  0.39 kB
+../internal/webui/dist/assets/AppSwitch-BhlWIjtM.css                       1.09 kB │ gzip:  0.44 kB
+../internal/webui/dist/assets/AccessKeySelect-BfqYZYlw.css                 1.17 kB │ gzip:  0.47 kB
+../internal/webui/dist/assets/AppSearchInput-BY6t9sl4.css                  1.28 kB │ gzip:  0.48 kB
+../internal/webui/dist/assets/StatusBadge-D7Dg7siu.css                     1.29 kB │ gzip:  0.33 kB
+../internal/webui/dist/assets/CollectionFilterBar-C_yjDCuF.css             1.41 kB │ gzip:  0.49 kB
+../internal/webui/dist/assets/PaginationBar-D-F4VCg-.css                   1.44 kB │ gzip:  0.50 kB
+../internal/webui/dist/assets/EmptyState-CNxuiP7H.css                      1.47 kB │ gzip:  0.48 kB
+../internal/webui/dist/assets/CredentialHealthBar-CiPg3r_Z.css             1.60 kB │ gzip:  0.48 kB
+../internal/webui/dist/assets/LedgerRecordList-D3NtQTHs.css                1.81 kB │ gzip:  0.60 kB
+../internal/webui/dist/assets/DisclosurePanel-BAzIuGpC.css                 1.87 kB │ gzip:  0.60 kB
+../internal/webui/dist/assets/StickySaveBar-B_msQcK7.css                   2.04 kB │ gzip:  0.54 kB
+../internal/webui/dist/assets/AppTextInput-BFDumzEh.css                    2.07 kB │ gzip:  0.57 kB
+../internal/webui/dist/assets/AppTabs-DsA_ORsa.css                         2.10 kB │ gzip:  0.65 kB
+../internal/webui/dist/assets/CredentialTextarea-4Pr-qotX.css              2.15 kB │ gzip:  0.68 kB
+../internal/webui/dist/assets/CopyChip-C-doobJ8.css                        2.16 kB │ gzip:  0.73 kB
+../internal/webui/dist/assets/DataTable-Bp1gV-TI.css                       2.26 kB │ gzip:  0.66 kB
+../internal/webui/dist/assets/FormField-Bdd_aWZd.css                       2.28 kB │ gzip:  0.68 kB
+../internal/webui/dist/assets/AppSelect-ClDiyUbh.css                       2.46 kB │ gzip:  0.78 kB
+../internal/webui/dist/assets/NotFoundView-D88t0pMf.css                    2.95 kB │ gzip:  0.81 kB
+../internal/webui/dist/assets/SegmentedControl-BgxK--4F.css                3.17 kB │ gzip:  0.70 kB
+../internal/webui/dist/assets/ExistingGroupImport-Cos5VsZ6.css             3.19 kB │ gzip:  0.84 kB
+../internal/webui/dist/assets/GroupsView-VgXa0HtA.css                      3.98 kB │ gzip:  1.07 kB
+../internal/webui/dist/assets/AppDrawer-D-182e2l.css                       4.03 kB │ gzip:  1.16 kB
+../internal/webui/dist/assets/CollectionStatusSummary-BpzgZ-bt.css         4.04 kB │ gzip:  0.98 kB
+../internal/webui/dist/assets/AppButton-CyNskqgP.css                       4.54 kB │ gzip:  1.00 kB
+../internal/webui/dist/assets/LoginView-Cz-6AnCf.css                       4.63 kB │ gzip:  1.12 kB
+../internal/webui/dist/assets/SkeletonSurface-CLNhBT8z.css                 5.43 kB │ gzip:  1.27 kB
+../internal/webui/dist/assets/SettingsView-Mjq_-Go9.css                    9.78 kB │ gzip:  1.59 kB
+../internal/webui/dist/assets/use-section-navigation-CbFV3-hQ.css         12.63 kB │ gzip:  2.07 kB
+../internal/webui/dist/assets/NewGroupImport-BpXeTmxz.css                 12.89 kB │ gzip:  2.23 kB
+../internal/webui/dist/assets/InspectorTab-Do9XqHjp.css                   14.29 kB │ gzip:  2.42 kB
+../internal/webui/dist/assets/LogsTab-B-YDpafv.css                        15.93 kB │ gzip:  2.87 kB
+../internal/webui/dist/assets/UsageTab-DtI_PfHI.css                       16.83 kB │ gzip:  3.02 kB
+../internal/webui/dist/assets/upstream-base-url-gJFiIkaf.css              18.37 kB │ gzip:  3.09 kB
+../internal/webui/dist/assets/ModelsView-C0AoWwIA.css                     18.48 kB │ gzip:  2.98 kB
+../internal/webui/dist/assets/MonitorView-DCjkNOWA.css                    20.71 kB │ gzip:  3.63 kB
+../internal/webui/dist/assets/AccessKeysView-CxnqUCI8.css                 25.17 kB │ gzip:  4.30 kB
+../internal/webui/dist/assets/HomeView-CILuQH4Q.css                       32.90 kB │ gzip:  5.19 kB
+../internal/webui/dist/assets/index-CFF_3NIw.css                          44.04 kB │ gzip:  9.00 kB
+../internal/webui/dist/assets/GroupDetailView-BrvkUhey.css                59.30 kB │ gzip:  8.68 kB
+../internal/webui/dist/assets/types-BBqWE0x0.js                            0.05 kB │ gzip:  0.07 kB
+../internal/webui/dist/assets/quota-progress-BI5Tbhja.js                   0.08 kB │ gzip:  0.10 kB
+../internal/webui/dist/assets/chevron-right-DSrOIZmj.js                    0.12 kB │ gzip:  0.13 kB
+../internal/webui/dist/assets/useFormControl-nqTse8Sj.js                   0.13 kB │ gzip:  0.13 kB
+../internal/webui/dist/assets/plus-BoxmAr1J.js                             0.14 kB │ gzip:  0.14 kB
+../internal/webui/dist/assets/arrow-right-C47UKSv-.js                      0.15 kB │ gzip:  0.15 kB
+../internal/webui/dist/assets/gauge-g0ojzMVn.js                            0.16 kB │ gzip:  0.16 kB
+../internal/webui/dist/assets/getActiveElement-DWEoD8ZB.js                 0.18 kB │ gzip:  0.13 kB
+../internal/webui/dist/assets/use-debounced-action-BPoqkk4J.js             0.21 kB │ gzip:  0.17 kB
+../internal/webui/dist/assets/route-D4hLJXFu.js                            0.24 kB │ gzip:  0.19 kB
+../internal/webui/dist/assets/use-abort-controller-pool-BRqhpnFh.js        0.25 kB │ gzip:  0.19 kB
+../internal/webui/dist/assets/zap-C9UNYZIR.js                              0.26 kB │ gzip:  0.20 kB
+../internal/webui/dist/assets/trash-2-mNSOu-cm.js                          0.31 kB │ gzip:  0.20 kB
+../internal/webui/dist/assets/use-visible-refetch-CakSfucJ.js              0.32 kB │ gzip:  0.22 kB
+../internal/webui/dist/assets/utils-C-K5yyuV.js                            0.39 kB │ gzip:  0.30 kB
+../internal/webui/dist/assets/layers-DyaW0HAO.js                           0.41 kB │ gzip:  0.23 kB
+../internal/webui/dist/assets/uuid-tgTjfN53.js                             0.44 kB │ gzip:  0.29 kB
+../internal/webui/dist/assets/use-transient-flag-AiCklClQ.js               0.47 kB │ gzip:  0.32 kB
+../internal/webui/dist/assets/PageHeader-CYKJFVBX.js                       0.52 kB │ gzip:  0.35 kB
+../internal/webui/dist/assets/protocols-D4_4WDR2.js                        0.52 kB │ gzip:  0.20 kB
+../internal/webui/dist/assets/eye-D-zsbbFt.js                              0.62 kB │ gzip:  0.33 kB
+../internal/webui/dist/assets/AppDateTime-BSUYvCUB.js                      0.72 kB │ gzip:  0.43 kB
+../internal/webui/dist/assets/CollectionFilterBar-Bpnoyh5z.js              0.74 kB │ gzip:  0.44 kB
+../internal/webui/dist/assets/PageFrame-ISqQjh_r.js                        0.77 kB │ gzip:  0.40 kB
+../internal/webui/dist/assets/EmptyState-BMkxGoX9.js                       0.78 kB │ gzip:  0.45 kB
+../internal/webui/dist/assets/async-surface-DR8-T4cB.js                    0.78 kB │ gzip:  0.46 kB
+../internal/webui/dist/assets/AppTypedConfirmation-iCWlUts0.js             0.91 kB │ gzip:  0.55 kB
+../internal/webui/dist/assets/DisclosurePanel-CQPHHluA.js                  0.95 kB │ gzip:  0.50 kB
+../internal/webui/dist/assets/route-query-v2C5Zu61.js                      0.96 kB │ gzip:  0.46 kB
+../internal/webui/dist/assets/LedgerRecordList-4oQyctw_.js                 0.98 kB │ gzip:  0.58 kB
+../internal/webui/dist/assets/system-update-CITsUiDf.js                    1.23 kB │ gzip:  0.70 kB
+../internal/webui/dist/assets/CopyButton-2gcZz7k_.js                       1.38 kB │ gzip:  0.74 kB
+../internal/webui/dist/assets/AppRelativeTime-CAj8uk_D.js                  1.44 kB │ gzip:  0.69 kB
+../internal/webui/dist/assets/DataTable-CxFpFUe8.js                        1.45 kB │ gzip:  0.77 kB
+../internal/webui/dist/assets/invalidation-ZDen4B1T.js                     1.54 kB │ gzip:  0.51 kB
+../internal/webui/dist/assets/NotFoundView-DJfZuje6.js                     1.59 kB │ gzip:  0.83 kB
+../internal/webui/dist/assets/AppSearchInput-DlKmuocj.js                   1.75 kB │ gzip:  0.92 kB
+../internal/webui/dist/assets/OverflowTooltip-vDYPCr8a.js                  1.75 kB │ gzip:  0.91 kB
+../internal/webui/dist/assets/proxy-MBXyx2T-.js                            1.75 kB │ gzip:  0.81 kB
+../internal/webui/dist/assets/AccessKeyCostLimitWindowTime-DOpN3uN2.js     1.79 kB │ gzip:  0.87 kB
+../internal/webui/dist/assets/mutation-outcome-0Oux6mYK.js                 1.81 kB │ gzip:  0.73 kB
+../internal/webui/dist/assets/errors-DV91iJde.js                           1.93 kB │ gzip:  1.00 kB
+../internal/webui/dist/assets/SegmentedControl-wtmPK2Id.js                 1.93 kB │ gzip:  0.97 kB
+../internal/webui/dist/assets/CollectionStatusSummary-DCPE0b_Z.js          1.96 kB │ gzip:  0.82 kB
+../internal/webui/dist/assets/AppDrawer-xRduRSUb.js                        2.02 kB │ gzip:  0.90 kB
+../internal/webui/dist/assets/FormField-Cmt3NZO5.js                        2.14 kB │ gzip:  0.88 kB
+../internal/webui/dist/assets/AppTextInput-BdHM3JkC.js                     2.16 kB │ gzip:  1.03 kB
+../internal/webui/dist/assets/model-prices-CwwF6lcN.js                     2.23 kB │ gzip:  1.26 kB
+../internal/webui/dist/assets/CopyChip-wOA-3wIK.js                         2.29 kB │ gzip:  1.12 kB
+../internal/webui/dist/assets/model-prices-B_BrjuoZ.js                     2.34 kB │ gzip:  1.07 kB
+../internal/webui/dist/assets/StickySaveBar-BrjVleXM.js                    2.64 kB │ gzip:  1.20 kB
+../internal/webui/dist/assets/PaginationBar-Cv3corYm.js                    2.67 kB │ gzip:  1.13 kB
+../internal/webui/dist/assets/StatusBadge-CSGdCg8F.js                      2.67 kB │ gzip:  1.17 kB
+../internal/webui/dist/assets/AccessKeySelect-C2dLFlSx.js                  2.71 kB │ gzip:  1.31 kB
+../internal/webui/dist/assets/AppTabs-JZOBpKUF.js                          2.74 kB │ gzip:  1.31 kB
+../internal/webui/dist/assets/model-prices-hS2X0slX.js                     2.90 kB │ gzip:  1.34 kB
+../internal/webui/dist/assets/CredentialHealthBar-B0VCfZ1U.js              3.04 kB │ gzip:  1.00 kB
+../internal/webui/dist/assets/CopyFallbackDialog-Dt_NPP2c.js               3.50 kB │ gzip:  1.67 kB
+../internal/webui/dist/assets/models-Ac7_FsKY.js                           4.03 kB │ gzip:  1.93 kB
+../internal/webui/dist/assets/models-YO08748o.js                           4.04 kB │ gzip:  1.59 kB
+../internal/webui/dist/assets/models-D2OGihSe.js                           5.06 kB │ gzip:  2.16 kB
+../internal/webui/dist/assets/AppSwitch-BFyyddxM.js                        5.10 kB │ gzip:  1.86 kB
+../internal/webui/dist/assets/providers-DSyJrH3n.js                        5.40 kB │ gzip:  2.20 kB
+../internal/webui/dist/assets/CredentialTextarea-BS4F8e8l.js               5.67 kB │ gzip:  2.14 kB
+../internal/webui/dist/assets/devtools-CN5uWJaH-V4kxwlxk.js                5.69 kB │ gzip:  2.57 kB
+../internal/webui/dist/assets/health-BcTGROOj.js                           5.72 kB │ gzip:  1.83 kB
+../internal/webui/dist/assets/format-CdUoD8td.js                           6.20 kB │ gzip:  2.36 kB
+../internal/webui/dist/assets/settings-C2XYkHXa.js                         6.77 kB │ gzip:  3.39 kB
+../internal/webui/dist/assets/LoginView-BX8S7joq.js                        7.13 kB │ gzip:  2.66 kB
+../internal/webui/dist/assets/access-keys-CjayoGSD.js                      7.19 kB │ gzip:  2.66 kB
+../internal/webui/dist/assets/TabsTrigger-YKI-IedU.js                      7.36 kB │ gzip:  2.57 kB
+../internal/webui/dist/assets/settings-CDueVcFL.js                         7.49 kB │ gzip:  2.98 kB
+../internal/webui/dist/assets/SkeletonSurface-Dh2Xf8QW.js                  7.73 kB │ gzip:  2.87 kB
+../internal/webui/dist/assets/ImportView-DvmpNxng.js                       8.28 kB │ gzip:  3.40 kB
+../internal/webui/dist/assets/ExistingGroupImport-DcOSOIsl.js              9.00 kB │ gzip:  3.35 kB
+../internal/webui/dist/assets/DialogTrigger-BUY5mzNL.js                    9.04 kB │ gzip:  2.39 kB
+../internal/webui/dist/assets/settings-D7crsCdI.js                         9.39 kB │ gzip:  3.78 kB
+../internal/webui/dist/assets/AsyncRefreshIndicator-B9XrWZKa.js           10.87 kB │ gzip:  4.13 kB
+../internal/webui/dist/assets/access-keys-CUW0nXEc.js                     12.55 kB │ gzip:  5.28 kB
+../internal/webui/dist/assets/access-keys-CXj6KwkL.js                     13.08 kB │ gzip:  4.74 kB
+../internal/webui/dist/assets/groups-D2C8DHve.js                          14.11 kB │ gzip:  3.97 kB
+../internal/webui/dist/assets/import-DjL0CKQm.js                          14.72 kB │ gzip:  6.03 kB
+../internal/webui/dist/assets/GroupsView-BjQNZl5F.js                      15.25 kB │ gzip:  4.85 kB
+../internal/webui/dist/assets/core-BlTbLUnw.js                            15.65 kB │ gzip:  7.18 kB
+../internal/webui/dist/assets/import-COjk4sgU.js                          16.14 kB │ gzip:  5.49 kB
+../internal/webui/dist/assets/core-IH5zjEAW.js                            16.53 kB │ gzip:  6.38 kB
+../internal/webui/dist/assets/access-keys-of0qtVLq.js                     16.86 kB │ gzip:  5.63 kB
+../internal/webui/dist/assets/use-section-navigation-CSpGT0Cm.js          17.94 kB │ gzip:  5.27 kB
+../internal/webui/dist/assets/credentials-DQa83Srj.js                     18.63 kB │ gzip:  5.67 kB
+../internal/webui/dist/assets/import-BH_vHmjj.js                          20.80 kB │ gzip:  6.62 kB
+../internal/webui/dist/assets/core-BlILt3J-.js                            21.28 kB │ gzip:  7.65 kB
+../internal/webui/dist/assets/client-context-D4lba5Ek.js                  23.17 kB │ gzip:  8.30 kB
+../internal/webui/dist/assets/group-CL5eMhuB.js                           24.49 kB │ gzip:  9.39 kB
+../internal/webui/dist/assets/group-BaNp0xBy.js                           26.27 kB │ gzip:  8.69 kB
+../internal/webui/dist/assets/AppSelect-Do38G74z.js                       26.34 kB │ gzip:  8.42 kB
+../internal/webui/dist/assets/InspectorTab-B1EOEcLT.js                    29.22 kB │ gzip:  7.76 kB
+../internal/webui/dist/assets/monitor-DFCqaYtn.js                         31.07 kB │ gzip: 10.69 kB
+../internal/webui/dist/assets/monitor-BUEYcv04.js                         32.89 kB │ gzip:  9.86 kB
+../internal/webui/dist/assets/group-Y1N5f1ey.js                           34.88 kB │ gzip: 10.32 kB
+../internal/webui/dist/assets/monitor-CU_89DZQ.js                         40.87 kB │ gzip: 11.52 kB
+../internal/webui/dist/assets/NewGroupImport-DL_kWrFa.js                  44.89 kB │ gzip: 12.59 kB
+../internal/webui/dist/assets/upstream-base-url-wbzNF9nI.js               46.70 kB │ gzip: 13.80 kB
+../internal/webui/dist/assets/AppButton-DMqE4uzV.js                       48.30 kB │ gzip: 16.36 kB
+../internal/webui/dist/assets/MonitorView-B0bnMH-q.js                     52.94 kB │ gzip: 14.91 kB
+../internal/webui/dist/assets/UsageTab-cHzzeX6Z.js                        53.61 kB │ gzip: 14.13 kB
+../internal/webui/dist/assets/ChannelIcon-CjnNOVvi.js                     55.05 kB │ gzip: 19.22 kB
+../internal/webui/dist/assets/SettingsView-fBSUX_Le.js                    55.70 kB │ gzip: 13.03 kB
+../internal/webui/dist/assets/ModelsView-DLiR-hrG.js                      55.91 kB │ gzip: 15.61 kB
+../internal/webui/dist/assets/HomeView-C_QMMPYO.js                        65.25 kB │ gzip: 19.12 kB
+../internal/webui/dist/assets/LogsTab-BU6eRGN_.js                         74.67 kB │ gzip: 18.50 kB
+../internal/webui/dist/assets/AccessKeysView-DyIGFDtH.js                  90.31 kB │ gzip: 24.02 kB
+../internal/webui/dist/assets/index-qrP8xH07.js                           97.21 kB │ gzip: 31.90 kB
+../internal/webui/dist/assets/GroupDetailView-Cn4ITTp3.js                169.68 kB │ gzip: 42.06 kB
+../internal/webui/dist/assets/Primitive-BNT-mqpw.js                      180.25 kB │ gzip: 65.52 kB
+
+[32m✓ built in 23.17s[39m
+[PLUGIN_TIMINGS] Your build spent 54% of 23.1s inside plugin hooks (12.5s).
+Measured inside the callback, so queue time is excluded and time the callback itself awaited is not:
+  - vite:vue transform (23%, 5.2s, 474 calls)
+  - vite:vue buildStart (11%, 2.6s, 1 call)
+Those rows are 34% of the build; the rest of the 54% is below.
+Not measurable — 2 hooks whose calls overlap, so elapsed time covers work other calls were doing. Profile with `node --cpu-prof`:
+  - vite:asset load (30 calls)
+  - @tailwindcss/vite:generate:build transform (153 calls)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+
+go build -o gpt-load .
+go test -count=1 . ./internal/...
+ok  	gpt-load	0.027s
+ok  	gpt-load/internal/accessquota	0.018s
+ok  	gpt-load/internal/affinity	0.006s
+ok  	gpt-load/internal/app	2.853s
+ok  	gpt-load/internal/catalog	0.144s
+ok  	gpt-load/internal/channel	0.021s
+?   	gpt-load/internal/channel/modules	[no test files]
+?   	gpt-load/internal/channel/spec	[no test files]
+ok  	gpt-load/internal/connection	0.004s
+ok  	gpt-load/internal/container	2.580s
+ok  	gpt-load/internal/control	15.038s
+ok  	gpt-load/internal/dialect	0.051s
+ok  	gpt-load/internal/execution	0.005s
+ok  	gpt-load/internal/execution/bifrost	6.654s
+ok  	gpt-load/internal/execution/cpa	0.639s
+ok  	gpt-load/internal/execution/geminiimage	0.008s
+ok  	gpt-load/internal/execution/responsealias	0.007s
+ok  	gpt-load/internal/execution/wsnative	0.024s
+ok  	gpt-load/internal/gateway	14.723s
+ok  	gpt-load/internal/health	0.012s
+ok  	gpt-load/internal/httplifecycle	0.010s
+ok  	gpt-load/internal/outboundproxy	0.005s
+ok  	gpt-load/internal/parameteroverride	0.098s
+ok  	gpt-load/internal/platform/authkey	0.023s
+ok  	gpt-load/internal/platform/canonicaljson	0.006s
+ok  	gpt-load/internal/platform/config	0.094s
+ok  	gpt-load/internal/platform/contentcoding	0.029s
+ok  	gpt-load/internal/platform/encryption	0.106s
+ok  	gpt-load/internal/platform/epochms	0.008s
+ok  	gpt-load/internal/platform/errors	0.008s
+ok  	gpt-load/internal/platform/httpclient	0.024s
+ok  	gpt-load/internal/platform/httpheader	0.009s
+ok  	gpt-load/internal/platform/httproute	0.013s
+ok  	gpt-load/internal/platform/i18n	0.011s
+?   	gpt-load/internal/platform/i18n/locales	[no test files]
+ok  	gpt-load/internal/platform/redact	0.012s
+ok  	gpt-load/internal/platform/response	0.011s
+ok  	gpt-load/internal/platform/securefile	0.082s
+ok  	gpt-load/internal/platform/utils	0.007s
+ok  	gpt-load/internal/platform/version	0.004s
+ok  	gpt-load/internal/pricing	0.008s
+ok  	gpt-load/internal/protocol	0.003s
+ok  	gpt-load/internal/provideradapter	0.014s
+ok  	gpt-load/internal/ratelimit	0.003s
+?   	gpt-load/internal/reasoning	[no test files]
+ok  	gpt-load/internal/releasecheck	0.043s
+ok  	gpt-load/internal/requestlog	3.239s
+ok  	gpt-load/internal/scheduler	6.711s
+ok  	gpt-load/internal/state	0.090s
+ok  	gpt-load/internal/state/loader	0.896s
+ok  	gpt-load/internal/storage	6.328s
+ok  	gpt-load/internal/storage/dbtx	0.008s
+ok  	gpt-load/internal/storage/migrations	2.072s
+ok  	gpt-load/internal/storage/models	0.005s
+ok  	gpt-load/internal/subscription	0.574s
+ok  	gpt-load/internal/subscription/providers	15.548s
+ok  	gpt-load/internal/subscription/providers/antigravity	0.015s
+ok  	gpt-load/internal/subscription/providers/claude	0.082s
+ok  	gpt-load/internal/subscription/providers/codex	0.057s
+ok  	gpt-load/internal/subscription/providers/grok	0.017s
+ok  	gpt-load/internal/subscription/providers/importfile	0.012s
+ok  	gpt-load/internal/subscription/providers/observation	0.003s
+ok  	gpt-load/internal/subscription/runtime	0.007s
+ok  	gpt-load/internal/telemetry	0.150s
+?   	gpt-load/internal/testutil/encryptiontest	[no test files]
+ok  	gpt-load/internal/testutil/fakeupstream	0.252s
+?   	gpt-load/internal/testutil/sqlitetest	[no test files]
+ok  	gpt-load/internal/usage	0.004s
+?   	gpt-load/internal/usagecost	[no test files]
+ok  	gpt-load/internal/webui	6.598s
+git --no-pager diff --check

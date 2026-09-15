@@ -10,8 +10,8 @@ API キー、サブスクリプションアカウント、トラフィック制�
 
 [English](README.md) · [中文](README_CN.md) · 日本語 | [公式サイト](https://www.gpt-load.com)
 
-[![Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*)](https://github.com/tbphp/gpt-load/releases)
-[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2Ftbphp%2Fgpt--load%3A2-2496ED?logo=docker&logoColor=white)](https://github.com/tbphp/gpt-load/pkgs/container/gpt-load)
+[![Upstream Release](https://img.shields.io/github/v/tag/tbphp/gpt-load?filter=v2.*&label=upstream%20release)](https://github.com/tbphp/gpt-load/releases)
+[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2F0401lucky%2Fgpt--load%3Alatest-2496ED?logo=docker&logoColor=white)](https://github.com/0401lucky/gpt-load/pkgs/container/gpt-load)
 [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](go.mod)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -66,10 +66,12 @@ API キー、サブスクリプションアカウント、トラフィック制�
 
 ### 1. サービスを起動する
 
-Docker と Docker Compose が必要です。
+Docker と Docker Compose が必要です。この fork は `0401lucky/gpt-load` の main からビルドした `ghcr.io/0401lucky/gpt-load:latest` を既定で使用します。
+
+初回は GHCR パッケージの実際の公開設定を確認し、公開パッケージは匿名で取得できますが、非公開パッケージはアクセス権のあるアカウントと `read:packages` 権限のある認証情報で、先に `docker login ghcr.io` を実行してください。
 
 ```bash
-git clone --depth 1 https://github.com/tbphp/gpt-load.git
+git clone --depth 1 --branch main https://github.com/0401lucky/gpt-load.git
 cd gpt-load
 
 cp .env.example .env
@@ -173,20 +175,33 @@ postgres://user:password@db.example:5432/gpt_load?sslmode=require
 
 </details>
 
-よく使う運用コマンド：
+この fork の `latest` と `main` タグは検証済みの main ビルドを追跡し、`linux/amd64` と `linux/arm64` に対応します。ワークフローはマニフェストを検証し、両方のネイティブアーキテクチャでイメージを実行してからタグを更新します。`2.0.0-dev.<run>.g<short-sha>` のようなバージョンは開発ビルドを示し、上流の正式リリースとは区別されます。
+
+既存の **2.x** デプロイを更新する前に、データベースと `encryption.key` を一緒にバックアップしてください。元のデプロイディレクトリ、Compose プロジェクト名（指定した場合は `-p` / `COMPOSE_PROJECT_NAME`）、`.env`、`auth.key` と `encryption.key` を含むデータボリュームを維持します。同じプロジェクトで設定されたイメージを取得し、サービスを再作成します：
 
 ```bash
-docker compose logs -f      # ログを確認
-docker compose pull && docker compose up -d   # 最新の 2.x イメージへ更新
-docker compose stop         # サービスを停止
+docker compose pull gpt-load
+docker compose up -d --no-deps gpt-load
 ```
 
-公式 Compose は `ghcr.io/tbphp/gpt-load:2` を使用します。GA 前の `2` は検証済みの 2.0 Beta / RC を追跡し、GA 後は安定版 2.x のみを追跡します。イメージの完全なタグからは Git tag の `v` 接頭辞を除き（例：`2.0.0-beta.25`）、`2.0-beta` は 2.0 Beta チャネルとして残します。`latest` は引き続き 1.x を指します。
+これらのコマンドは既存のデータボリュームを保持しますが、`docker compose down -v` はボリュームを削除します。イメージ更新時に認証キーや暗号化キーを再生成しないでください。ログは `docker compose logs -f` で確認でき、サービスは `docker compose stop` で停止できます。
+
+ビルドを固定するには、既存の `.env` の `GPT_LOAD_IMAGE` を以下の**いずれか一つ**に設定します。プレースホルダーを成功した [Main images の実行記録](https://github.com/0401lucky/gpt-load/actions/workflows/ghcr-main.yml) にある公開済みの値に置き換え、同じ pull/up コマンドを実行してください：
+
+```dotenv
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load:sha-<full-40-character-commit>
+# または不変のマルチアーキテクチャ digest で固定：
+GPT_LOAD_IMAGE=ghcr.io/0401lucky/gpt-load@sha256:<64-hex-digest>
+```
+
+コミットタグはソースコミットを識別し、同じコミットの再ビルド時に更新される場合があります。digest は特定のイメージを固定します。`GPT_LOAD_IMAGE` を空にすると再び `latest` を追跡します。古いイメージはデータベーススキーマをダウングレードしないため、ロールバック前にデータの互換性を確認してください。
+
+**上流のリリース：** `ghcr.io/tbphp/gpt-load:2` と以下のネイティブバイナリは上流の成果物であり、この fork の追加機能を含まない場合があります。GA 前の上流 `2` は検証済みの 2.0 Beta / RC を追跡し、GA 後は安定版 2.x のみを追跡します。イメージの完全なタグからは Git tag の `v` 接頭辞を除き（例：`2.0.0-beta.25`）、`2.0-beta` は 2.0 Beta チャネルとして残します。上流の `ghcr.io/tbphp/gpt-load:latest` は引き続き 1.x を指します。
 
 <details>
 <summary>ネイティブバイナリを使う</summary>
 
-[GitHub Releases](https://github.com/tbphp/gpt-load/releases) からプラットフォームに合ったファイルをダウンロードし、同梱の `SHA256SUMS` で検証してから使用してください：
+[上流の GitHub Releases](https://github.com/tbphp/gpt-load/releases) からプラットフォームに合ったファイルをダウンロードし、同梱の `SHA256SUMS` で検証してから使用してください：
 
 ```bash
 chmod +x ./gpt-load-linux-amd64
@@ -211,6 +226,7 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 
 | 変数 | 既定値 | 説明 |
 | --- | --- | --- |
+| `GPT_LOAD_IMAGE` | 空、`ghcr.io/0401lucky/gpt-load:latest` を使用 | Compose のみ。コミットタグまたは digest を含む完全なイメージ参照でビルドを固定できます。 |
 | `HOST` | `127.0.0.1` | Native モードの待受アドレスであり、Compose のメインポートと OAuth コールバックポートをホストに公開する既定アドレスです。Compose コンテナ内部では常に `0.0.0.0` で待ち受けます。 |
 | `PORT` | `3001` | HTTP サービスポート。`1–65535` である必要があり、Compose はコンテナポート、ホスト公開ポート、ヘルスチェックにも使用します。 |
 | `BIND_ADDRESS` | 空、`HOST` を継承 | Compose のみ。OAuth コールバックポートを変更せず、メインサービスポートのホスト公開アドレスを上書きします。 |
@@ -219,7 +235,7 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 | `CONTAINER_STOP_GRACE_PERIOD` | `15s` | Compose がコンテナを強制停止する前に待つ Docker duration。`GRACEFUL_SHUTDOWN_TIMEOUT` より長くすることを推奨します。 |
 | `READ_TIMEOUT` | `60` | HTTP リクエストの読み取りタイムアウト。正の整数、単位は秒です。 |
 | `IDLE_TIMEOUT` | `120` | HTTP keep-alive アイドル接続のタイムアウト。正の整数、単位は秒です。 |
-| `DATA_DIR` | `./data` | 管理対象データベース、`auth.key`、`encryption.key`、実行状態ファイルのディレクトリ。公式 Compose では `/app/data`、Windows Setup サービスでは `%ProgramData%\GPT-Load\data` を使用します。 |
+| `DATA_DIR` | `./data` | 管理対象データベース、`auth.key`、`encryption.key`、実行状態ファイルのディレクトリ。このリポジトリの Compose では `/app/data`、Windows Setup サービスでは `%ProgramData%\GPT-Load\data` を使用します。 |
 | `DATABASE_DSN` | 空、`${DATA_DIR}/gpt-load.db` を使用 | 空の場合はアプリケーション管理の SQLite を使用します。空でない場合は SQLite のパスまたは URL、MySQL URL、PostgreSQL URL に対応し、運用者管理の外部データベースとして扱います。コンテナ内のファイルパスはマウント済みディレクトリ内である必要があります。 |
 | `DATABASE_MAX_OPEN_CONNECTIONS` | `10` | MySQL と PostgreSQL の最大オープン接続数。正の整数である必要があります。SQLite は常に単一接続を使用します。 |
 | `DATABASE_MAX_IDLE_CONNECTIONS` | `5` | MySQL と PostgreSQL の最大アイドル接続数。正の整数かつ `DATABASE_MAX_OPEN_CONNECTIONS` 以下である必要があります。SQLite は常に単一接続を使用します。 |

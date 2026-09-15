@@ -1,0 +1,3 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"本项目门禁和范围要求"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"独立检查复用与边界"}
+{"file":".trellis/tasks/09-15-ghcr-main-images/research/publishing-contract.md","reason":"核对实际镜像发布和服务器更新契约"}

@@ -18,6 +18,7 @@
 | 写测试、提交前自查、改代码风格 | [quality-guidelines.md](./quality-guidelines.md) |
 | 捐献集成、暂存探测、全局接收去重或长期回执 | [donation-integration.md](./donation-integration.md) |
 | 维护 new-api 与 gpt-load 捐献的跨仓库调用契约 | [donation-caller-contract.md](./donation-caller-contract.md) |
+| 本 fork 的 GHCR 主分支镜像、通道推广和 Compose 更新 | [container-publishing.md](./container-publishing.md) |
 
 **跨层改动**（同时涉及 handler + service + DB，或前后端）额外读 `.trellis/spec/guides/cross-layer-thinking-guide.md`。
 

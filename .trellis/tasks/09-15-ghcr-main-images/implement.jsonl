@@ -1,0 +1,3 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"本项目质量门禁、配置测试与三语README同步"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"复用已有Docker验证与digest脚本，避免复制发布逻辑"}
+{"file":".trellis/tasks/09-15-ghcr-main-images/research/publishing-contract.md","reason":"已核实的fork发布边界、运行验证和消费契约"}

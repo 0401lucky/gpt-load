@@ -1,0 +1,188 @@
+name: Main images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_REPOSITORY: ghcr.io/0401lucky/gpt-load
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    if: >-
+      github.repository == '0401lucky/gpt-load' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      version: ${{ steps.metadata.outputs.version }}
+    steps:
+      - name: Checkout source commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set development version
+        id: metadata
+        run: |
+          [[ "${GITHUB_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${GITHUB_RUN_NUMBER}" =~ ^[1-9][0-9]*$ ]]
+          printf 'version=2.0.0-dev.%s.g%s\n' \
+            "${GITHUB_RUN_NUMBER}" "${GITHUB_SHA:0:12}" >>"${GITHUB_OUTPUT}"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a # v4.3.0
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push commit image
+        id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          target: source-build
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.IMAGE_REPOSITORY }}:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/0401lucky/gpt-load
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.metadata.outputs.version }}
+          build-args: |
+            VERSION=${{ steps.metadata.outputs.version }}
+          cache-from: type=gha,scope=ghcr-main
+          cache-to: type=gha,scope=ghcr-main,mode=max
+
+  verify:
+    needs: build
+    if: >-
+      github.repository == '0401lucky/gpt-load' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout source commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify multi-platform manifest and labels
+        env:
+          IMAGE_DIGEST: ${{ needs.build.outputs.digest }}
+          IMAGE_VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
+          image="${IMAGE_REPOSITORY}@${IMAGE_DIGEST}"
+          test "$(bash .github/scripts/release-image-digest.sh "${image}")" = "${IMAGE_DIGEST}"
+          bash .github/scripts/release-verify-image-revision.sh "${image}" "${GITHUB_SHA}"
+          test "$(bash .github/scripts/release-image-version.sh "${image}")" = "${IMAGE_VERSION}"
+
+      - name: Run published image on native architecture
+        env:
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          RELEASE_SMOKE_SOURCE_IMAGE: ${{ env.IMAGE_REPOSITORY }}@${{ needs.build.outputs.digest }}
+          RELEASE_SMOKE_SUFFIX: main-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.arch }}
+          # 本流程验证运行行为，不执行漏洞扫描。
+          RELEASE_SMOKE_SKIP_SCAN: "true"
+        run: bash .github/scripts/release-docker-smoke.sh | tee -a "${GITHUB_STEP_SUMMARY}"
+
+  promote:
+    needs: [build, verify]
+    if: >-
+      github.repository == '0401lucky/gpt-load' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # 所有提交共享同一通道锁；旧运行在获得锁后仍须重新核对远端 main。
+    concurrency:
+      group: ghcr-main-image-channels
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout source commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Promote verified digest if main is current
+        id: promote
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERIFIED_DIGEST: ${{ needs.build.outputs.digest }}
+          IMAGE_VERSION: ${{ needs.build.outputs.version }}
+        run: bash .github/scripts/main-promote-image-channels.sh
+
+      - name: Record image reference
+        env:
+          IMAGE_DIGEST: ${{ needs.build.outputs.digest }}
+          IMAGE_VERSION: ${{ needs.build.outputs.version }}
+          PROMOTED: ${{ steps.promote.outputs.promoted }}
+        run: |
+          {
+            printf 'Verified image: `%s@%s`\n\n' "${IMAGE_REPOSITORY}" "${IMAGE_DIGEST}"
+            printf 'Commit tag: `%s:sha-%s`\n\n' "${IMAGE_REPOSITORY}" "${GITHUB_SHA}"
+            printf 'Version: `%s`\n\n' "${IMAGE_VERSION}"
+            printf 'Native runtime checks: linux/amd64 and linux/arm64. Vulnerability scan: not run.\n\n'
+            printf 'Promoted to latest/main: `%s` (false means remote main has advanced).\n' "${PROMOTED}"
+          } >>"${GITHUB_STEP_SUMMARY}"
