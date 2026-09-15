@@ -31,6 +31,16 @@ func (s *Server) DonationHTTPModule() httproute.Module {
 			controlRoute("donation.batches.get", http.MethodGet, "/batches/:batch_id", s.handleDonationBatchGet),
 			controlRoute("donation.batches.retry", http.MethodPost, "/batches/:batch_id/retry",
 				s.auditMutation(newMutationDescriptor("donation_batch_retry", "donation_batch", staticMutationLocator("retry"))), s.handleDonationBatchRetry),
+			controlRoute("donation.review.context.get", http.MethodGet, "/batches/:batch_id/items/:item_id/review-context",
+				s.handleDonationReviewContext),
+			controlRoute("donation.review.action.create", http.MethodPost, "/batches/:batch_id/items/:item_id/review-actions",
+				s.auditMutation(newMutationDescriptor("donation_review_action", "donation_review", staticMutationLocator("action"))), s.handleDonationReviewActionCreate),
+			controlRoute("donation.review.action.get", http.MethodGet, "/review-actions/:action_id",
+				s.handleDonationReviewActionGet),
+			controlRoute("donation.test.create", http.MethodPost, "/batches/:batch_id/items/:item_id/tests",
+				s.auditMutation(newMutationDescriptor("donation_test_create", "donation_test", staticMutationLocator("test"))), s.handleDonationTestCreate),
+			controlRoute("donation.test.get", http.MethodGet, "/tests/:test_id",
+				s.handleDonationTestGet),
 		},
 	}
 }

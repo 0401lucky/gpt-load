@@ -1,0 +1,377 @@
+=== RUN   TestExternalDatabaseDonationMigrationBackfillsInventory
+time="2026-09-15T14:04:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:04:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    donation_database_integration_test.go:28: external donation database: 8.4.11
+    donation_database_integration_test.go:28: external donation transaction isolation: REPEATABLE-READ
+
+2026/09/15 14:04:38 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[202.412ms] [33m[rows:0][35m ALTER TABLE `request_log_attempts` ADD CONSTRAINT `chk_request_log_attempt_retry_directive` CHECK (retry_directive IN ('','none','refresh_credential','next_candidate'))[0m
+
+2026/09/15 14:04:51 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[9169.657ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:05:04 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[8057.016ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+time="2026-09-15T14:05:09+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:05:09+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:05:09+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:05:09+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:22 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[13338.829ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+time="2026-09-15T14:05:30+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+
+2026/09/15 14:05:31 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[500.800ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_donation_1789452271922552800`[0m
+--- PASS: TestExternalDatabaseDonationMigrationBackfillsInventory (59.42s)
+=== RUN   TestExternalDatabaseDonationIntakeTransactions
+time="2026-09-15T14:05:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    donation_database_integration_test.go:121: external donation database: 8.4.11
+    donation_database_integration_test.go:121: external donation transaction isolation: REPEATABLE-READ
+
+2026/09/15 14:05:40 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[9108.662ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+time="2026-09-15T14:05:47+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/receipt_recovery_and_retained_history
+time="2026-09-15T14:05:47+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:47+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+
+2026/09/15 14:05:55 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[7988.671ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+time="2026-09-15T14:05:59+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/concurrent_batch_replay_and_item_conflict_rollback
+time="2026-09-15T14:05:59+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:59 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[5.352ms] [34;1m[rows:0][0m INSERT INTO `donation_batches` (`source_id`,`batch_id`,`request_digest`,`group_id`,`group_name`,`channel_id`,`target_revision`,`validation_mode`,`created_at_ms`) VALUES (?,?,?,?,?,?,?,?,?)
+
+2026/09/15 14:05:59 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[1.055ms] [34;1m[rows:0][0m INSERT INTO `donation_items` (`source_id`,`item_id`,`batch_id`,`position`,`group_id`,`fingerprint`,`credential_fingerprint`,`encrypted_payload`,`validation_revision`,`state`,`reason_code`,`attempts`,`lease_token`,`lease_until_ms`,`next_attempt_at_ms`,`expires_at_ms`,`effective_mode`,`item_revision`,`review_target_revision`,`entry_action_id`,`review_action_id`,`review_decision`,`reviewed_at_ms`,`credential_id`,`accepted_at_ms`,`created_at_ms`,`updated_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+2026/09/15 14:06:00 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+[0m[35m[warn] [0mremoving callback `test:external_donation_batch_missing` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+
+2026/09/15 14:06:00 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+[0m[35m[warn] [0mremoving callback `test:external_donation_batch_missing` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/retry_action_replay_preserves_consumed_budget
+time="2026-09-15T14:06:00+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:00 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[1.036ms] [34;1m[rows:0][0m INSERT INTO `donation_retries` (`source_id`,`idempotency_key`,`batch_id`,`request_digest`,`created_at_ms`) VALUES (?,?,?,?,?)
+
+2026/09/15 14:06:00 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[1.046ms] [34;1m[rows:0][0m INSERT INTO `donation_retries` (`source_id`,`idempotency_key`,`batch_id`,`request_digest`,`created_at_ms`) VALUES (?,?,?,?,?)
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/independent_connections_fence_resource_ownership
+time="2026-09-15T14:06:00+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/credential_and_receipt_transaction_rollback
+time="2026-09-15T14:06:00+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:00 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:487
+[0m[35m[warn] [0mremoving callback `test:external_donation_receipt_failure` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:487
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/management_import_preempts_reserved_donation
+time="2026-09-15T14:06:00+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:01 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[203.381ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_donation_1789452331217896100`[0m
+--- PASS: TestExternalDatabaseDonationIntakeTransactions (29.87s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/receipt_recovery_and_retained_history (12.37s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/concurrent_batch_replay_and_item_conflict_rollback (0.13s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/retry_action_replay_preserves_consumed_budget (0.32s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/independent_connections_fence_resource_ownership (0.21s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/credential_and_receipt_transaction_rollback (0.16s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/management_import_preempts_reserved_donation (0.14s)
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions
+time="2026-09-15T14:06:01+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:01+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    donation_manual_database_integration_test.go:24: external donation database: 8.4.11
+    donation_manual_database_integration_test.go:24: external donation transaction isolation: REPEATABLE-READ
+
+2026/09/15 14:06:06 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[5840.305ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+time="2026-09-15T14:06:13+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:13 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[1.615ms] [34;1m[rows:0][0m INSERT INTO `donation_review_actions` (`source_id`,`action_id`,`batch_id`,`item_id`,`kind`,`actor`,`expected_revision`,`target_revision`,`note`,`request_digest`,`outcome`,`reason_code`,`effect_revision`,`created_at_ms`,`applied_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together
+    donation_manual_database_integration_test.go:184: unrelated item reservations blocked each other before insert
+
+2026/09/15 14:06:23 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+
+2026/09/15 14:06:23 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+
+2026/09/15 14:06:23 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mcontext deadline exceeded
+[0m[33m[9978.670ms] [34;1m[rows:0][0m INSERT INTO `donation_test_attempts` (`source_id`,`test_id`,`batch_id`,`item_id`,`actor`,`start_revision`,`target_revision`,`model`,`input_digest`,`stream`,`state`,`reason_code`,`status_code`,`output_bytes`,`input_tokens`,`output_tokens`,`lease_token`,`lease_until_ms`,`started_at_ms`,`finished_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+2026/09/15 14:06:23 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mcontext deadline exceeded
+[0m[33m[9984.636ms] [34;1m[rows:0][0m SELECT * FROM `credentials` WHERE fingerprint = ? ORDER BY id ASC LIMIT ? FOR UPDATE
+[mysql] 2026/09/15 14:06:23 connection.go:49: invalid connection
+
+2026/09/15 14:06:29 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[5730.378ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:06:33 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[203.556ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_donation_1789452361074531400`[0m
+--- FAIL: TestExternalDatabaseDonationManualReviewTransactions (32.00s)
+    --- FAIL: TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together (10.05s)
+=== RUN   TestExternalDatabaseDonationManualReviewUpgrades0015History
+time="2026-09-15T14:06:33+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:33+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    donation_manual_database_integration_test.go:220: external donation database: 8.4.11
+    donation_manual_database_integration_test.go:220: external donation transaction isolation: REPEATABLE-READ
+
+2026/09/15 14:06:40 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[7080.298ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:06:54 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[7308.456ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:07:05 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6890.898ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+--- PASS: TestExternalDatabaseDonationManualReviewUpgrades0015History (35.92s)
+=== RUN   TestExternalDatabaseAccessKeyCostLimitPeriodPermutation
+time="2026-09-15T14:07:08+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:15 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6978.279ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+    external_database_integration_test.go:26: storage.AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseAccessKeyCostLimitPeriodPermutation (11.65s)
+=== RUN   TestExternalDatabaseGroupPriceReconciliation
+time="2026-09-15T14:07:20+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:29 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[9140.907ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+    external_database_integration_test.go:43: storage.AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseGroupPriceReconciliation (14.44s)
+FAIL
+FAIL	gpt-load/internal/control	183.552s
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery
+time="2026-09-15T14:04:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_00
+time="2026-09-15T14:04:31+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:04:32+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:04:42 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[9856.147ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:04:51 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[389.466ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452271924147200_00`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_01
+time="2026-09-15T14:04:51+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:04:51+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:04:56 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[4314.507ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:05:04 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[234.243ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452291711019200_01`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_02
+time="2026-09-15T14:05:04+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:04+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:09 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[4612.557ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:05:16 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[299.056ms] [33m[rows:0][35m ALTER TABLE request_log_attempts ADD COLUMN cooldown_until_ms BIGINT NULL CONSTRAINT chk_request_log_attempt_cooldown CHECK (cooldown_until_ms IS NULL OR cooldown_until_ms >= 0)[0m
+
+2026/09/15 14:05:19 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[251.258ms] [33m[rows:0][35m ALTER TABLE `donation_batches` ADD `validation_mode` varchar(16) NOT NULL DEFAULT 'auto'[0m
+
+2026/09/15 14:05:19 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[201.304ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD `effective_mode` varchar(16) NOT NULL DEFAULT 'auto'[0m
+
+2026/09/15 14:05:19 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[246.137ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD `item_revision` bigint NOT NULL DEFAULT 0[0m
+
+2026/09/15 14:05:20 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[327.004ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD `review_target_revision` varchar(64) NOT NULL DEFAULT ''[0m
+
+2026/09/15 14:05:20 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[265.878ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD `entry_action_id` varchar(36) NOT NULL DEFAULT ''[0m
+
+2026/09/15 14:05:21 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[289.167ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD `reviewed_at_ms` bigint NOT NULL DEFAULT 0[0m
+
+2026/09/15 14:05:21 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[317.528ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD CONSTRAINT `chk_donation_item_state` CHECK (state IN ('queued','validating','committing','accepted','invalid','existing','retry_pending','pending_review','rejected'))[0m
+
+2026/09/15 14:05:21 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[288.920ms] [33m[rows:0][35m ALTER TABLE `donation_items` ADD CONSTRAINT `chk_donation_item_revision` CHECK (item_revision >= 0)[0m
+
+2026/09/15 14:05:23 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[397.589ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452304724202200_02`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_03
+time="2026-09-15T14:05:23+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:23+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:30 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6937.984ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:05:40 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[229.288ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452323506576600_03`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_04
+time="2026-09-15T14:05:40+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:40+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:47 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6603.631ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:05:56 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[251.626ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452340706527400_04`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_05
+time="2026-09-15T14:05:56+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:05:56+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:05:59 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[3401.365ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:06:07 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[212.179ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452356187911500_05`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_06
+time="2026-09-15T14:06:07+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:07+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:13 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6148.788ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_07
+time="2026-09-15T14:06:22+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:22+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_08
+time="2026-09-15T14:06:29+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:30+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:32 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[2610.457ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:06:40 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[227.541ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452389988755300_08`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_09
+time="2026-09-15T14:06:40+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:40+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:47 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[6276.143ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:06:54 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[203.183ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452400504611300_09`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_10
+time="2026-09-15T14:06:54+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:06:55+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:06:58 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[3175.648ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:07:05 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[247.653ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452414898610600_10`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_11
+time="2026-09-15T14:07:05+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:07:05+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:08 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[2746.250ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_12
+time="2026-09-15T14:07:16+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:07:16+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:20 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[3906.704ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:07:30 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[299.418ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452436251943700_12`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_13
+time="2026-09-15T14:07:30+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:07:30+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:35 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[4067.007ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+
+2026/09/15 14:07:45 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[277.809ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452450208064100_13`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_14
+time="2026-09-15T14:07:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:07:46+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:07:59 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[267.394ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452465653804300_14`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_15
+time="2026-09-15T14:07:59+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:07:59+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:08:07 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[227.222ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_recovery_1789452479017165400_15`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_00
+time="2026-09-15T14:08:07+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:08:09+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:08:17 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[213.598ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_cost_recovery_1789452487888682600_00`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_01
+time="2026-09-15T14:08:17+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:08:19+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:08:26 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[207.079ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_cost_recovery_1789452497066510800_01`[0m
+=== RUN   TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_02
+time="2026-09-15T14:08:26+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:08:28+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+--- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery (245.43s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_00 (19.79s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_01 (13.01s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_02 (18.78s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_03 (17.20s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_04 (15.48s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_05 (11.06s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_06 (15.34s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_07 (7.39s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_08 (10.52s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_09 (14.39s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_10 (10.74s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_11 (10.61s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_12 (13.96s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_13 (15.45s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_14 (13.36s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/boundary_15 (8.87s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_00 (9.18s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_01 (9.11s)
+    --- PASS: TestExternalDatabaseMySQLInterruptedBaselineRecovery/access_key_cost_limits_boundary_02 (11.01s)
+=== RUN   TestExternalDatabaseIncrementalMigrations
+time="2026-09-15T14:08:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:08:37+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+--- PASS: TestExternalDatabaseIncrementalMigrations (13.90s)
+=== RUN   TestExternalDatabaseMySQLRecoversObservationFreshnessCheckDrop
+time="2026-09-15T14:08:51+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:08:51+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:09:01 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[330.430ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_cost_migration_1789452531077498000`[0m
+--- PASS: TestExternalDatabaseMySQLRecoversObservationFreshnessCheckDrop (10.17s)
+=== RUN   TestExternalDatabaseMySQLRecoversPartialErrorDecisionMigration
+time="2026-09-15T14:09:01+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:09:01+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+--- PASS: TestExternalDatabaseMySQLRecoversPartialErrorDecisionMigration (9.41s)
+=== RUN   TestExternalDatabaseConcurrentMigrations
+time="2026-09-15T14:09:10+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:09:10+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:09:14 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[3338.258ms] [33m[rows:1][35m SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)[0m
+    database_integration_test.go:57: concurrent AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseConcurrentMigrations (6.89s)
+=== RUN   TestExternalDatabaseLifecycle
+time="2026-09-15T14:09:17+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    database_integration_test.go:83: AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseLifecycle (3.43s)
+=== RUN   TestExternalDatabaseModelPriceIdentityUsesExactComparison
+time="2026-09-15T14:09:20+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    database_integration_test.go:332: AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseModelPriceIdentityUsesExactComparison (3.66s)
+=== RUN   TestExternalDatabaseReadSnapshotUsesRepeatableRead
+time="2026-09-15T14:09:24+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    database_integration_test.go:366: AutoMigrate() error = validate applied migration 0016_donation_manual_review: donation column "donation_test_attempts"."input_tokens" is missing
+--- FAIL: TestExternalDatabaseReadSnapshotUsesRepeatableRead (4.15s)
+FAIL
+FAIL	gpt-load/internal/storage	297.256s
+FAIL

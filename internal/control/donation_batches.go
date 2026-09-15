@@ -20,14 +20,35 @@ var (
 	errDonationRetryReplay = errors.New("donation retry insert collided")
 )
 
+const (
+	donationModeAuto         = "auto"
+	donationModeManualReview = "manual_review"
+)
+
+// normalizeDonationMode maps the absent and explicit auto representations onto
+// one value so an older caller keeps its exact frozen request comparator.
+func normalizeDonationMode(value string) (string, error) {
+	switch value {
+	case "", donationModeAuto:
+		return donationModeAuto, nil
+	case donationModeManualReview:
+		return donationModeManualReview, nil
+	default:
+		return "", app_errors.ErrBadRequest
+	}
+}
+
 type DonationItemRequest struct {
 	ItemID string `json:"item_id"`
 	Key    string `json:"key"`
 }
 
 type DonationBatchRequest struct {
-	BatchID        string                `json:"batch_id"`
-	GroupID        uint                  `json:"group_id"`
+	BatchID string `json:"batch_id"`
+	GroupID uint   `json:"group_id"`
+	// ValidationMode must stay omitempty: an auto request has to serialize to the
+	// same bytes the original contract produced or its HMAC summary would change.
+	ValidationMode string                `json:"validation_mode,omitempty"`
 	TargetRevision string                `json:"target_revision"`
 	Items          []DonationItemRequest `json:"items"`
 }
@@ -43,20 +64,38 @@ type DonationItemResponse struct {
 	CredentialID *uint  `json:"credential_id"`
 	AcceptedAtMS *int64 `json:"accepted_at_ms"`
 	Retryable    bool   `json:"retryable"`
+	// Manual review projection. Legacy auto items keep the zero values so an
+	// older consumer observes the same receipt it always did.
+	EffectiveMode         string `json:"effective_mode,omitempty"`
+	ItemRevision          int64  `json:"item_revision"`
+	ReviewTargetRevision  string `json:"review_target_revision,omitempty"`
+	ReviewDecision        string `json:"review_decision,omitempty"`
+	ReviewActionID        string `json:"review_action_id,omitempty"`
+	EntryActionID         string `json:"entry_action_id,omitempty"`
+	ReviewedAtMS          int64  `json:"reviewed_at_ms,omitempty"`
+	StagingExpiresAtMS    int64  `json:"staging_expires_at_ms"`
+	ManualReviewAvailable bool   `json:"manual_review_available,omitempty"`
 }
 
 type DonationBatchResponse struct {
 	BatchID        string                 `json:"batch_id"`
 	GroupID        uint                   `json:"group_id"`
 	TargetRevision string                 `json:"target_revision"`
+	ValidationMode string                 `json:"validation_mode"`
 	CreatedAtMS    int64                  `json:"created_at_ms"`
 	State          string                 `json:"state"`
 	Items          []DonationItemResponse `json:"items"`
 }
 
-func (s *Service) donationBatchDigest(request DonationBatchRequest) (string, error) {
+// donationBatchDigest keeps the frozen auto comparator byte-identical and gives
+// the manual mode its own HMAC domain. The same batch ID submitted under two
+// modes therefore collides instead of silently reusing the first result.
+func (s *Service) donationBatchDigest(request DonationBatchRequest, mode string) (string, error) {
 	// Keep secrets out of serialized comparators, including database errors.
 	copy := request
+	if mode == donationModeAuto {
+		copy.ValidationMode = ""
+	}
 	copy.Items = make([]DonationItemRequest, len(request.Items))
 	for index, item := range request.Items {
 		copy.Items[index] = DonationItemRequest{ItemID: item.ItemID,
@@ -65,6 +104,9 @@ func (s *Service) donationBatchDigest(request DonationBatchRequest) (string, err
 	encoded, err := json.Marshal(copy)
 	if err != nil {
 		return "", app_errors.ErrInternalServer
+	}
+	if mode == donationModeManualReview {
+		return s.encryption.Hash("donation-batch-manual/v1\x00" + string(encoded)), nil
 	}
 	return s.encryption.Hash("donation-batch/v1\x00" + string(encoded)), nil
 }
@@ -95,7 +137,11 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 	if err := validateDonationBatch(source, request); err != nil {
 		return DonationBatchResponse{}, err
 	}
-	digest, err := s.donationBatchDigest(request)
+	mode, err := normalizeDonationMode(request.ValidationMode)
+	if err != nil {
+		return DonationBatchResponse{}, err
+	}
+	digest, err := s.donationBatchDigest(request, mode)
 	if err != nil {
 		return DonationBatchResponse{}, err
 	}
@@ -110,7 +156,7 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 			return app_errors.ParseDBError(query.Error)
 		}
 		if query.RowsAffected != 0 {
-			if previous.RequestDigest != digest {
+			if previous.RequestDigest != digest || normalizeStoredDonationMode(previous.ValidationMode) != mode {
 				return app_errors.ErrIdempotencyKeyReused
 			}
 			return nil
@@ -119,15 +165,24 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 		if err != nil {
 			return err
 		}
-		if reason != "" {
-			return app_errors.NewAPIErrorWithData(app_errors.ErrDonationTargetUnavailable, map[string]string{"reason_code": reason})
-		}
-		if target.revision != request.TargetRevision {
-			return app_errors.ErrDonationTargetChanged
+		if mode == donationModeManualReview {
+			if target.manualReason != "" {
+				return app_errors.NewAPIErrorWithData(app_errors.ErrDonationTargetUnavailable, map[string]string{"reason_code": target.manualReason})
+			}
+			if target.manualRevision != request.TargetRevision {
+				return app_errors.ErrDonationTargetChanged
+			}
+		} else {
+			if reason != "" {
+				return app_errors.NewAPIErrorWithData(app_errors.ErrDonationTargetUnavailable, map[string]string{"reason_code": reason})
+			}
+			if target.revision != request.TargetRevision {
+				return app_errors.ErrDonationTargetChanged
+			}
 		}
 		batch := models.DonationBatch{SourceID: source, BatchID: request.BatchID, RequestDigest: digest,
 			GroupID: request.GroupID, GroupName: target.row.Name, ChannelID: target.row.ChannelID,
-			TargetRevision: request.TargetRevision, CreatedAtMS: s.donationNowMS()}
+			TargetRevision: request.TargetRevision, ValidationMode: mode, CreatedAtMS: s.donationNowMS()}
 		if err := tx.Create(&batch).Error; err != nil {
 			if app_errors.ParseDBError(err) == app_errors.ErrDuplicateResource {
 				return errDonationBatchReplay
@@ -135,20 +190,43 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 			return app_errors.ParseDBError(err)
 		}
 		seen := make(map[string]bool, len(request.Items))
+		items := make([]models.DonationItem, 0, len(request.Items))
+		fingerprints := make([]string, 0, len(request.Items))
 		for index, input := range request.Items {
-			item, err := s.stageDonationItem(source, request, input, index, channel.ID(target.row.ChannelID))
+			item, err := s.stageDonationItem(source, request, input, index, channel.ID(target.row.ChannelID), mode, target.manualRevision)
 			if err != nil {
 				return err
 			}
 			if item.Fingerprint != "" && seen[item.Fingerprint] {
 				item.State, item.ReasonCode, item.EncryptedPayload = "existing", "duplicate_item", ""
 			}
+			if item.Fingerprint != "" && !seen[item.Fingerprint] {
+				fingerprints = append(fingerprints, item.Fingerprint)
+			}
 			seen[item.Fingerprint] = true
+			items = append(items, item)
+		}
+		if mode == donationModeManualReview {
+			// Reserve pending ownership using the same stable fingerprint order as
+			// ordinary imports. A reservation is not an inventory acquisition.
+			sort.Strings(fingerprints)
+			for _, fingerprint := range fingerprints {
+				if _, err := s.lockDonationResource(tx, fingerprint); err != nil {
+					return err
+				}
+			}
+		}
+		for _, item := range items {
 			if err := tx.Create(&item).Error; err != nil {
 				if app_errors.ParseDBError(err) == app_errors.ErrDuplicateResource {
 					return app_errors.ErrIdempotencyKeyReused
 				}
 				return app_errors.ParseDBError(err)
+			}
+			if mode == donationModeManualReview && item.State == "pending_review" {
+				if err := s.reconcileDonationReviewItem(tx, &item); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
@@ -161,7 +239,7 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 		var persisted models.DonationBatch
 		if readErr := s.db.WithContext(ctx).Where("source_id = ? AND batch_id = ?", source, request.BatchID).Take(&persisted).Error; readErr != nil {
 			err = app_errors.ParseDBError(readErr)
-		} else if persisted.RequestDigest != digest {
+		} else if persisted.RequestDigest != digest || normalizeStoredDonationMode(persisted.ValidationMode) != mode {
 			err = app_errors.ErrIdempotencyKeyReused
 		} else {
 			err = nil
@@ -174,11 +252,26 @@ func (s *Service) ReceiveDonationBatch(ctx context.Context, source string, reque
 	return s.GetDonationBatch(ctx, source, request.BatchID)
 }
 
-func (s *Service) stageDonationItem(source string, batch DonationBatchRequest, input DonationItemRequest, position int, channelID channel.ID) (models.DonationItem, error) {
+// normalizeStoredDonationMode reads the zero value left by an upgraded legacy
+// row as auto. Unknown values stay unknown: corrupt manual facts must never be
+// silently interpreted as an automatic donation.
+func normalizeStoredDonationMode(value string) string {
+	if value == "" {
+		return donationModeAuto
+	}
+	return value
+}
+
+func (s *Service) stageDonationItem(source string, batch DonationBatchRequest, input DonationItemRequest, position int, channelID channel.ID, mode, manualRevision string) (models.DonationItem, error) {
 	nowMS := s.donationNowMS()
 	item := models.DonationItem{SourceID: source, ItemID: input.ItemID, BatchID: batch.BatchID,
 		Position: position, GroupID: batch.GroupID, State: "invalid", ReasonCode: "invalid_format",
-		CreatedAtMS: nowMS, UpdatedAtMS: nowMS, NextAttemptAtMS: nowMS, ExpiresAtMS: nowMS + donationStagingTTL.Milliseconds()}
+		EffectiveMode: mode, CreatedAtMS: nowMS, UpdatedAtMS: nowMS, NextAttemptAtMS: nowMS,
+		ExpiresAtMS: nowMS + donationStagingTTL.Milliseconds()}
+	if mode == donationModeManualReview {
+		item.ItemRevision = 1
+		item.ReviewTargetRevision = manualRevision
+	}
 	key := strings.TrimSpace(input.Key)
 	if key == "" || len(key) > donationMaxKeyBytes || strings.HasPrefix(key, "{") {
 		return item, nil
@@ -200,6 +293,12 @@ func (s *Service) stageDonationItem(source string, batch DonationBatchRequest, i
 	item.Fingerprint = s.encryption.Hash(donationFingerprintDomain + key)
 	item.CredentialFingerprint = candidate.fingerprint
 	item.EncryptedPayload = ciphertext
+	if mode == donationModeManualReview {
+		// A manual item only needs encrypted staging. It must never enter the
+		// automatic probe path, acquire inventory, or claim credit.
+		item.State, item.ReasonCode = "pending_review", ""
+		return item, nil
+	}
 	item.State, item.ReasonCode = "queued", ""
 	return item, nil
 }
@@ -222,14 +321,23 @@ func (s *Service) GetDonationBatch(ctx context.Context, source, batchID string) 
 			return app_errors.ParseDBError(err)
 		}
 		result = DonationBatchResponse{BatchID: batch.BatchID, GroupID: batch.GroupID,
-			TargetRevision: batch.TargetRevision, CreatedAtMS: batch.CreatedAtMS, State: "completed", Items: make([]DonationItemResponse, 0, len(rows))}
+			TargetRevision: batch.TargetRevision, ValidationMode: normalizeStoredDonationMode(batch.ValidationMode),
+			CreatedAtMS: batch.CreatedAtMS, State: "completed", Items: make([]DonationItemResponse, 0, len(rows))}
 		for _, row := range rows {
 			item := DonationItemResponse{ItemID: row.ItemID, State: row.State, ReasonCode: row.ReasonCode,
-				Retryable: row.State == "retry_pending" && row.EncryptedPayload != "" && row.ExpiresAtMS > s.donationNowMS()}
+				Retryable:     row.State == "retry_pending" && row.EncryptedPayload != "" && row.ExpiresAtMS > s.donationNowMS(),
+				EffectiveMode: normalizeStoredDonationMode(row.EffectiveMode), ItemRevision: row.ItemRevision,
+				ReviewTargetRevision: row.ReviewTargetRevision, ReviewDecision: row.ReviewDecision,
+				ReviewActionID: row.ReviewActionID, ReviewedAtMS: row.ReviewedAtMS,
+				EntryActionID:      row.EntryActionID,
+				StagingExpiresAtMS: row.ExpiresAtMS}
 			if row.State == "accepted" {
 				item.CredentialID, item.AcceptedAtMS = row.CredentialID, row.AcceptedAtMS
 			}
-			if row.State == "queued" || row.State == "validating" || row.State == "committing" || row.State == "retry_pending" {
+			// A manual item stays unfinished until an administrator decides, so a
+			// caller never reports a pending review as an already-completed batch.
+			switch row.State {
+			case "queued", "validating", "committing", "retry_pending", "pending_review":
 				result.State = "processing"
 			}
 			result.Items = append(result.Items, item)
@@ -279,7 +387,7 @@ func (s *Service) RetryDonationBatch(ctx context.Context, source, batchID, actio
 				return app_errors.ErrBadRequest
 			}
 		}
-		if err := query.Where("state = ? AND encrypted_payload <> ? AND expires_at_ms > ?", "retry_pending", "", s.donationNowMS()).
+		if err := query.Where("state = ? AND effective_mode IN ? AND encrypted_payload <> ? AND expires_at_ms > ?", "retry_pending", []string{"", donationModeAuto}, "", s.donationNowMS()).
 			Updates(map[string]any{"state": "queued", "reason_code": "", "attempts": 0,
 				"lease_token": "", "lease_until_ms": 0, "next_attempt_at_ms": s.donationNowMS(), "updated_at_ms": s.donationNowMS()}).Error; err != nil {
 			return app_errors.ParseDBError(err)

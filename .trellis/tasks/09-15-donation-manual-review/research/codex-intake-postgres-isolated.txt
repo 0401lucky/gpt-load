@@ -1,0 +1,119 @@
+=== RUN   TestExternalDatabaseDonationMigrationBackfillsInventory
+time="2026-09-15T14:15:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:15:45+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_database_integration_test.go:28: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_database_integration_test.go:28: external donation transaction isolation: read committed
+time="2026-09-15T14:16:04+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:16:04+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:16:04+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:16:04+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:07+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+--- PASS: TestExternalDatabaseDonationMigrationBackfillsInventory (22.06s)
+=== RUN   TestExternalDatabaseDonationIntakeTransactions
+time="2026-09-15T14:16:07+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:07+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_database_integration_test.go:121: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_database_integration_test.go:121: external donation transaction isolation: read committed
+time="2026-09-15T14:16:11+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/receipt_recovery_and_retained_history
+time="2026-09-15T14:16:11+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:11+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+time="2026-09-15T14:16:14+08:00" level=info msg="model prices published" event=startup.model_prices_publish
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/concurrent_batch_replay_and_item_conflict_rollback
+time="2026-09-15T14:16:14+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 14:16:15 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_batch_source" (SQLSTATE 23505)
+[0m[33m[4.577ms] [34;1m[rows:0][0m INSERT INTO "donation_batches" ("source_id","batch_id","request_digest","group_id","group_name","channel_id","target_revision","validation_mode","created_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$) RETURNING "id"
+
+2026/09/15 14:16:15 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_item_source" (SQLSTATE 23505)
+[0m[33m[2.958ms] [34;1m[rows:0][0m INSERT INTO "donation_items" ("source_id","item_id","batch_id","position","group_id","fingerprint","credential_fingerprint","encrypted_payload","validation_revision","state","reason_code","attempts","lease_token","lease_until_ms","next_attempt_at_ms","expires_at_ms","effective_mode","item_revision","review_target_revision","entry_action_id","review_action_id","review_decision","reviewed_at_ms","credential_id","accepted_at_ms","created_at_ms","updated_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$,$13$,$14$,$15$,$16$,$17$,$18$,$19$,$20$,$21$,$22$,$23$,$24$,$25$,$26$,$27$) RETURNING "id"
+
+2026/09/15 14:16:15 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+[0m[35m[warn] [0mremoving callback `test:external_donation_batch_missing` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+
+2026/09/15 14:16:15 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+[0m[35m[warn] [0mremoving callback `test:external_donation_batch_missing` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:283
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/retry_action_replay_preserves_consumed_budget
+time="2026-09-15T14:16:15+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 14:16:15 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_retry_source" (SQLSTATE 23505)
+[0m[33m[2.136ms] [34;1m[rows:0][0m INSERT INTO "donation_retries" ("source_id","idempotency_key","batch_id","request_digest","created_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$) RETURNING "id"
+
+2026/09/15 14:16:15 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_retry_source" (SQLSTATE 23505)
+[0m[33m[1.065ms] [34;1m[rows:0][0m INSERT INTO "donation_retries" ("source_id","idempotency_key","batch_id","request_digest","created_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$) RETURNING "id"
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/independent_connections_fence_resource_ownership
+time="2026-09-15T14:16:15+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/credential_and_receipt_transaction_rollback
+time="2026-09-15T14:16:15+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 14:16:15 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:487
+[0m[35m[warn] [0mremoving callback `test:external_donation_receipt_failure` from D:/code/Claude code program/gpt-load/internal/control/donation_database_integration_test.go:487
+=== RUN   TestExternalDatabaseDonationIntakeTransactions/management_import_preempts_reserved_donation
+time="2026-09-15T14:16:15+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+--- PASS: TestExternalDatabaseDonationIntakeTransactions (8.92s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/receipt_recovery_and_retained_history (3.60s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/concurrent_batch_replay_and_item_conflict_rollback (0.18s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/retry_action_replay_preserves_consumed_budget (0.38s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/independent_connections_fence_resource_ownership (0.22s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/credential_and_receipt_transaction_rollback (0.17s)
+    --- PASS: TestExternalDatabaseDonationIntakeTransactions/management_import_preempts_reserved_donation (0.18s)
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions
+time="2026-09-15T14:16:16+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:16+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_manual_database_integration_test.go:24: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_manual_database_integration_test.go:24: external donation transaction isolation: read committed
+time="2026-09-15T14:16:20+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 14:16:20 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_review_action_source" (SQLSTATE 23505)
+[0m[33m[0.534ms] [34;1m[rows:0][0m INSERT INTO "donation_review_actions" ("source_id","action_id","batch_id","item_id","kind","actor","expected_revision","target_revision","note","request_digest","outcome","reason_code","effect_revision","created_at_ms","applied_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$,$13$,$14$,$15$) RETURNING "id"
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together
+
+2026/09/15 14:16:20 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+
+2026/09/15 14:16:20 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+--- PASS: TestExternalDatabaseDonationManualReviewTransactions (7.58s)
+    --- PASS: TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together (0.06s)
+=== RUN   TestExternalDatabaseDonationManualReviewUpgrades0015History
+time="2026-09-15T14:16:23+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:23+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_manual_database_integration_test.go:220: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_manual_database_integration_test.go:220: external donation transaction isolation: read committed
+--- PASS: TestExternalDatabaseDonationManualReviewUpgrades0015History (10.71s)
+=== RUN   TestExternalDatabaseAccessKeyCostLimitPeriodPermutation
+time="2026-09-15T14:16:34+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+--- PASS: TestExternalDatabaseAccessKeyCostLimitPeriodPermutation (4.32s)
+=== RUN   TestExternalDatabaseGroupPriceReconciliation
+time="2026-09-15T14:16:38+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+--- PASS: TestExternalDatabaseGroupPriceReconciliation (2.75s)
+PASS
+ok  	gpt-load/internal/control	56.811s
+=== RUN   TestExternalDatabaseConcurrentMigrations
+time="2026-09-15T14:16:43+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T14:16:43+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+--- PASS: TestExternalDatabaseConcurrentMigrations (6.56s)
+=== RUN   TestExternalDatabaseLifecycle
+time="2026-09-15T14:16:49+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 14:16:57 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_access_key_cost_limit_rules_identity" (SQLSTATE 23505)
+[0m[33m[3.965ms] [34;1m[rows:0][0m INSERT INTO "access_key_cost_limit_rules" ("access_key_id","kind","limit_nano_usd","period_seconds","rule_revision","created_at_ms","updated_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$) RETURNING "id"
+
+2026/09/15 14:16:57 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mviolates check constraint: ERROR: new row for relation "groups" violates check constraint "chk_group_connection_type" (SQLSTATE 23514)
+[0m[33m[3.798ms] [34;1m[rows:0][0m INSERT INTO "groups" ("price_multiplier_micros","name","channel_id","connection_type","params","models","weight_manual","validation_protocol","validation_model","overrides","proxy_config","enabled","created_at_ms","updated_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$,$13$,$14$) RETURNING "id"
+
+2026/09/15 14:16:57 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mviolates check constraint: ERROR: new row for relation "credential_stages" violates check constraint "chk_credential_stage_status" (SQLSTATE 23514)
+[0m[33m[4.414ms] [34;1m[rows:0][0m INSERT INTO "credential_stages" ("id","channel_id","connection_type","authorization_method","status","encrypted_payload","payload_schema_version","safe_summary_json","identity_fingerprint","oauth_state_hash","expires_at_ms","consumed_at_ms","consumed_group_id","error_code","created_at_ms","updated_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$,$13$,$14$,$15$,$16$)
+
+2026/09/15 14:16:57 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_credentials_group_identity" (SQLSTATE 23505)
+[0m[33m[3.318ms] [34;1m[rows:0][0m INSERT INTO "credentials" ("group_id","data","fingerprint","identity_fingerprint","secret_version","auth_state","auth_error_code","status","weight_manual","proxy_config","created_at_ms","updated_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$) RETURNING "id"
+--- PASS: TestExternalDatabaseLifecycle (7.43s)
+=== RUN   TestExternalDatabaseModelPriceIdentityUsesExactComparison
+time="2026-09-15T14:16:57+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+--- PASS: TestExternalDatabaseModelPriceIdentityUsesExactComparison (3.20s)
+=== RUN   TestExternalDatabaseReadSnapshotUsesRepeatableRead
+time="2026-09-15T14:17:00+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    database_integration_test.go:369: repeatable-read setup is specific to MySQL
+--- SKIP: TestExternalDatabaseReadSnapshotUsesRepeatableRead (2.96s)
+PASS
+ok  	gpt-load/internal/storage	20.365s

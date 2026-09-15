@@ -54,12 +54,13 @@ func (s *Service) processDonationItem(ctx context.Context, id uint) error {
 	if work.item.State == "committing" {
 		return s.recoverDonationItem(ctx, id)
 	}
-	// Live credential IDs are database-generated positive signed integers. A
-	// separate high range prevents SDK per-credential caches from aliasing them.
-	if work.item.ID > ^uint(0)/2 {
+	probeID, validID := donationVirtualCredentialID(work.item.ID, false)
+	if !validID {
 		return app_errors.ErrInternalServer
 	}
-	probeID := ^uint(0) - work.item.ID
+	if err := donationVirtualCredentialRangeAvailable(s.db.WithContext(ctx)); err != nil {
+		return err
+	}
 	defer s.retireCredentialRuntime(probeID)
 	probeCtx, cancel := context.WithTimeout(ctx, donationProbeTimeout)
 	probe := newCredentialProbeExecutor(s.encryption, s.channelRegistry, s.executor)
@@ -102,6 +103,9 @@ func (s *Service) claimDonationItem(ctx context.Context, id uint) (*donationWork
 			return nil
 		}
 		if item.State != "queued" && item.State != "retry_pending" && item.State != "validating" {
+			return nil
+		}
+		if normalizeStoredDonationMode(item.EffectiveMode) != donationModeAuto {
 			return nil
 		}
 		if item.State == "validating" && item.LeaseUntilMS > nowMS {
@@ -180,13 +184,19 @@ func (s *Service) finishDonationItem(tx *gorm.DB, item *models.DonationItem, sta
 			return app_errors.ParseDBError(err)
 		}
 	}
-	if err := tx.Model(&models.DonationItem{}).Where("id = ?", item.ID).Updates(map[string]any{
+	updates := map[string]any{
 		"state": stateName, "reason_code": reason, "encrypted_payload": item.EncryptedPayload,
 		"lease_token": "", "lease_until_ms": 0, "attempts": item.Attempts,
 		"next_attempt_at_ms": item.NextAttemptAtMS, "updated_at_ms": s.donationNowMS(),
-	}).Error; err != nil {
+	}
+	if item.ItemRevision > 0 && (item.State != stateName || item.ReasonCode != reason) {
+		item.ItemRevision++
+		updates["item_revision"] = item.ItemRevision
+	}
+	if err := tx.Model(&models.DonationItem{}).Where("id = ?", item.ID).Updates(updates).Error; err != nil {
 		return app_errors.ParseDBError(err)
 	}
+	item.State, item.ReasonCode = stateName, reason
 	return nil
 }
 
@@ -334,9 +344,13 @@ func (s *Service) recoverDonationItem(ctx context.Context, id uint) error {
 			resource.CredentialID == nil || *resource.CredentialID != *item.CredentialID || resource.AcquiredAtMS == nil || *resource.AcquiredAtMS != *item.AcceptedAtMS {
 			return app_errors.ErrInternalServer
 		}
-		if err := tx.Model(&models.DonationItem{}).Where("id = ? AND state = ?", id, "committing").Updates(map[string]any{
+		updates := map[string]any{
 			"state": "accepted", "reason_code": "", "next_attempt_at_ms": 0, "updated_at_ms": s.donationNowMS(),
-		}).Error; err != nil {
+		}
+		if item.ItemRevision > 0 || normalizeStoredDonationMode(item.EffectiveMode) == donationModeManualReview {
+			updates["item_revision"] = gorm.Expr("item_revision + 1")
+		}
+		if err := tx.Model(&models.DonationItem{}).Where("id = ? AND state = ?", id, "committing").Updates(updates).Error; err != nil {
 			return app_errors.ParseDBError(err)
 		}
 		return nil
@@ -347,6 +361,31 @@ func (s *Service) RunDonationRecovery(ctx context.Context) {
 	if s == nil || !s.donationsEnabled {
 		return
 	}
+	reviewTicker := time.NewTicker(time.Minute)
+	defer reviewTicker.Stop()
+	s.runDonationRecovery(ctx, reviewTicker.C)
+}
+
+func (s *Service) runDonationRecovery(ctx context.Context, reviewTicks <-chan time.Time) {
+	// A hot batch can contain many slow automatic probes. Keep the bounded,
+	// database-only review reconciliation on its own lifetime so those network
+	// calls cannot delay expiry or abandoned test cleanup for hours.
+	reviewCtx, stopReview := context.WithCancel(ctx)
+	reviewDone := make(chan struct{})
+	go func() {
+		defer close(reviewDone)
+		for {
+			if err := s.ReconcileDonationReviews(reviewCtx); err != nil && reviewCtx.Err() == nil {
+				logServiceError("donation_review_recovery", err, app_errors.ErrInternalServer.Code)
+			}
+			select {
+			case <-reviewCtx.Done():
+				return
+			case <-reviewTicks:
+			}
+		}
+	}()
+	defer func() { stopReview(); <-reviewDone }()
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	for {

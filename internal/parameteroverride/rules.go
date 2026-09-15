@@ -3,6 +3,9 @@ package parameteroverride
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -196,6 +199,46 @@ func compileMatch(raw json.RawMessage) (compiledMatch, error) {
 
 // Empty reports whether no rule can be applied.
 func (rules Rules) Empty() bool { return len(rules.entries) == 0 }
+
+// Fingerprint returns a deterministic digest of the compiled rule set. Callers
+// that must freeze an effective configuration signature cannot serialize Rules
+// directly: every field is unexported, so JSON encoding would yield "{}" and
+// silently treat different configurations as identical.
+func (rules Rules) Fingerprint() (string, error) {
+	hasher := sha256.New()
+	var length [8]byte
+	write := func(value []byte) {
+		binary.BigEndian.PutUint64(length[:], uint64(len(value)))
+		_, _ = hasher.Write(length[:])
+		_, _ = hasher.Write(value)
+	}
+	binary.BigEndian.PutUint64(length[:], uint64(len(rules.entries)))
+	_, _ = hasher.Write(length[:])
+	for _, entry := range rules.entries {
+		write([]byte(entry.clientProtocol))
+		write([]byte(entry.model))
+		if entry.modelPrefix {
+			write([]byte{1})
+		} else {
+			write([]byte{0})
+		}
+		encoded, err := json.Marshal(entry.set)
+		if err != nil {
+			return "", fmt.Errorf("encode parameter override set: %w", err)
+		}
+		write(encoded)
+		binary.BigEndian.PutUint64(length[:], uint64(len(entry.remove)))
+		_, _ = hasher.Write(length[:])
+		for _, pointer := range entry.remove {
+			binary.BigEndian.PutUint64(length[:], uint64(len(pointer)))
+			_, _ = hasher.Write(length[:])
+			for _, segment := range pointer {
+				write([]byte(segment))
+			}
+		}
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
 
 // ValidateResponsesContinuation 用于管理面保存；不改变历史配置的 Compile 行为。
 func (rules Rules) ValidateResponsesContinuation() error {

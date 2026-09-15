@@ -1203,6 +1203,22 @@ func serviceErrorMessageID(
 		return "donation.target_unavailable"
 	case app_errors.ErrDonationNotFound.Code:
 		return "donation.not_found"
+	case app_errors.ErrDonationItemNotFound.Code:
+		return "donation.item_not_found"
+	case app_errors.ErrDonationReviewNotFound.Code:
+		return "donation.review_not_found"
+	case app_errors.ErrDonationReviewConflict.Code:
+		return "donation.review_conflict"
+	case app_errors.ErrDonationReviewUnavailable.Code:
+		return "donation.review_unavailable"
+	case app_errors.ErrDonationTestUnavailable.Code:
+		return "donation.test_unavailable"
+	case app_errors.ErrDonationTestConflict.Code:
+		return "donation.test_conflict"
+	case app_errors.ErrDonationTestBusy.Code:
+		return "donation.test_busy"
+	case app_errors.ErrDonationTestNotFound.Code:
+		return "donation.test_not_found"
 	case app_errors.ErrIdempotencyKeyRequired.Code:
 		return "idempotency.required"
 	case app_errors.ErrInvalidIdempotencyKey.Code:

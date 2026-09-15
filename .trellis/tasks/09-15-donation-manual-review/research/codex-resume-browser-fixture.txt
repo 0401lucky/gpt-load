@@ -1,0 +1,6 @@
+=== RUN   TestDonationBrowserFixture
+    donation_integration_test.go:813: Donation browser fixture ready; private metadata: C:\Users\lucky0401\AppData\Local\Temp\donation-codex-review-05f242e3363842ad99c18d03b5bcd987\browser-resume-20260915\metadata.json
+    donation_integration_test.go:831: Donation browser fixture stop file received
+--- PASS: TestDonationBrowserFixture (206.02s)
+PASS
+ok  	github.com/QuantumNous/new-api/controller	206.366s

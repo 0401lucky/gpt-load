@@ -1,0 +1,11 @@
+{"file":".trellis/spec/backend/index.md","reason":"gpt-load 后端分层与规范入口；new-api 使用其自己的 AGENTS"}
+{"file":".trellis/spec/backend/donation-integration.md","reason":"保留自动接收、全局去重、恢复屏障和长期回执；人工扩展以任务最终批准设计为准"}
+{"file":".trellis/spec/backend/donation-caller-contract.md","reason":"new-api 固定归属、可信回执与永久奖励事务的原有契约"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"gpt-load 冻结迁移、事务和三数据库约束"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"control、execution、storage 和统一集成路由的依赖边界"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"受控错误出口与禁止裸上游/数据库秘密外泄"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"操作/测试日志的结构和敏感材料保护"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"活动模式、动作、状态回执与 SSE 的统一边界"}
+{"file":".trellis/tasks/09-15-donation-manual-review/research/feasibility.md","reason":"固定 probe 与正常聊天的差异、复用入口与既有状态约束"}
+{"file":".trellis/tasks/09-15-donation-manual-review/research/implementation-context.md","reason":"两端研究的可完整注入摘要，包含动作、奖励、旧协议、调用/脱敏、恢复与迁移不变量"}
+{"file":".trellis/tasks/09-15-donation-manual-review/research/new-api-ui-and-conventions.md","reason":"new-api 独立 React/Bun/testify 约定、UI 复用及权限/会话要求"}

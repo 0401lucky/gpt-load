@@ -1,0 +1,10 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"gpt-load make check 和测试门禁；不套用到 new-api 前端"}
+{"file":".trellis/spec/backend/donation-integration.md","reason":"检查自动模式不回归、全局资源及运行时恢复；人工范围按批准设计扩展"}
+{"file":".trellis/spec/backend/donation-caller-contract.md","reason":"核对严格回执、唯一永久奖励、账号暂停与恢复"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"增量迁移、历史数据、唯一性、方言锁与失败事务"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"检查复用没有跨越 control/gateway/storage 边界"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"检查静态错误、取消语义及秘密不外泄"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"检查完整 key、token、聊天正文没有进入普通日志"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"核对协议/枚举/数据库/投影/UI/SSE 全链一致"}
+{"file":".trellis/tasks/09-15-donation-manual-review/research/implementation-context.md","reason":"完整可注入的两端契约和风险摘要；必要时按链接读取完整研究"}
+{"file":".trellis/tasks/09-15-donation-manual-review/research/new-api-ui-and-conventions.md","reason":"new-api 实际 UI/测试规则、复用证据与受影响检查"}

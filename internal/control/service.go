@@ -84,8 +84,11 @@ type Service struct {
 		*models.ControlOperation,
 		operationStage,
 	) error
-	operationRecoveryWake    chan struct{}
-	donationRecoveryWake     chan struct{}
+	operationRecoveryWake chan struct{}
+	donationRecoveryWake  chan struct{}
+	// donationTestSlots bounds concurrent administrator test calls per process.
+	// It never limits how many donations or rewards may accumulate.
+	donationTestSlots        chan struct{}
 	donationsEnabled         bool
 	donationTokenFingerprint string
 	writeMu                  sync.RWMutex
@@ -253,6 +256,7 @@ func NewService(
 		now:                   time.Now,
 		operationRecoveryWake: make(chan struct{}, 1),
 		donationRecoveryWake:  make(chan struct{}, 1),
+		donationTestSlots:     make(chan struct{}, donationMaxParallelTests),
 		observationFlights:    make(map[observationFlightKey]*observationFlight),
 		observationSemaphore:  make(chan struct{}, 1),
 	}

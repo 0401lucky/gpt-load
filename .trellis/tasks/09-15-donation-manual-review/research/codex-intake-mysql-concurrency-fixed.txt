@@ -1,0 +1,23 @@
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions
+time="2026-09-15T14:32:56+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+time="2026-09-15T14:32:57+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+    donation_manual_database_integration_test.go:24: external donation database: 8.4.11
+    donation_manual_database_integration_test.go:24: external donation transaction isolation: REPEATABLE-READ
+time="2026-09-15T14:33:05+08:00" level=info msg="Database storage is managed by the operator" database_driver=mysql database_source=external
+
+2026/09/15 14:33:05 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed
+[0m[33m[2.181ms] [34;1m[rows:0][0m INSERT INTO `donation_review_actions` (`source_id`,`action_id`,`batch_id`,`item_id`,`kind`,`actor`,`expected_revision`,`target_revision`,`note`,`request_digest`,`outcome`,`reason_code`,`effect_revision`,`created_at_ms`,`applied_at_ms`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together
+
+2026/09/15 14:33:05 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+
+2026/09/15 14:33:05 [34;1mD:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+[0m[35m[warn] [0mremoving callback `test:manual_parallel_test_insert` from D:/code/Claude code program/gpt-load/internal/control/donation_manual_database_integration_test.go:166
+
+2026/09/15 14:33:09 [32mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [33mSLOW SQL >= 200ms
+[0m[31;1m[271.292ms] [33m[rows:25][35m DROP DATABASE IF EXISTS `gpt_load_donation_1789453977080289400`[0m
+--- PASS: TestExternalDatabaseDonationManualReviewTransactions (12.85s)
+    --- PASS: TestExternalDatabaseDonationManualReviewTransactions/unrelated_items_can_reserve_together (0.11s)
+PASS
+ok  	gpt-load/internal/control	13.055s

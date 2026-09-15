@@ -1,0 +1,13 @@
+=== RUN   TestDonationIntegrationRealServices
+    donation_integration_test.go:74: starting isolated services and configuring real accounts and Gemini groups
+    donation_integration_test.go:129: checking Authorization, ownership, and server-controlled reward fields
+    donation_integration_test.go:165: checking LF/CRLF line identity, mixed outcomes, permanent credit, and explicit retry
+    donation_integration_test.go:263: checking real concurrent submissions across users, campaigns, and groups
+    donation_integration_test.go:332: dropping a real persisted receipt and restarting both services before reconciliation
+    donation_integration_test.go:366: freezing campaign rewards, pausing a disabled account, and resuming its original item
+    donation_integration_test.go:402: retaining accepted history and eligibility after credential disable/delete and group deletion
+--- PASS: TestDonationIntegrationRealServices (47.52s)
+=== RUN   TestDonationManualReviewIntegrationRealServices
+--- PASS: TestDonationManualReviewIntegrationRealServices (35.55s)
+PASS
+ok  	github.com/QuantumNous/new-api/controller	83.335s

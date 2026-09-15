@@ -27,6 +27,14 @@ var (
 	ErrDonationTargetUnavailable              = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TARGET_UNAVAILABLE", Message: "Donation target is unavailable"}
 	ErrDonationTargetChanged                  = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TARGET_CHANGED", Message: "Donation target configuration changed"}
 	ErrDonationNotFound                       = &APIError{HTTPStatus: http.StatusNotFound, Code: "DONATION_NOT_FOUND", Message: "Donation batch not found"}
+	ErrDonationItemNotFound                   = &APIError{HTTPStatus: http.StatusNotFound, Code: "DONATION_ITEM_NOT_FOUND", Message: "Donation item not found"}
+	ErrDonationReviewNotFound                 = &APIError{HTTPStatus: http.StatusNotFound, Code: "DONATION_REVIEW_NOT_FOUND", Message: "Donation review action not found"}
+	ErrDonationReviewConflict                 = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_REVIEW_CONFLICT", Message: "Donation review action conflicts with the current item"}
+	ErrDonationReviewUnavailable              = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_REVIEW_UNAVAILABLE", Message: "Donation item cannot be reviewed"}
+	ErrDonationTestUnavailable                = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TEST_UNAVAILABLE", Message: "Donation test cannot run for this item"}
+	ErrDonationTestConflict                   = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TEST_CONFLICT", Message: "Donation test conflicts with its saved identity"}
+	ErrDonationTestBusy                       = &APIError{HTTPStatus: http.StatusConflict, Code: "DONATION_TEST_BUSY", Message: "Another donation test is already running"}
+	ErrDonationTestNotFound                   = &APIError{HTTPStatus: http.StatusNotFound, Code: "DONATION_TEST_NOT_FOUND", Message: "Donation test not found"}
 	ErrBadRequest                             = &APIError{HTTPStatus: http.StatusBadRequest, Code: "BAD_REQUEST", Message: "Invalid request parameters"}
 	ErrInvalidJSON                            = &APIError{HTTPStatus: http.StatusBadRequest, Code: "INVALID_JSON", Message: "Invalid JSON format"}
 	ErrRequestTooLarge                        = &APIError{HTTPStatus: http.StatusRequestEntityTooLarge, Code: "REQUEST_TOO_LARGE", Message: "Request body is too large"}

@@ -1,0 +1,18 @@
+=== RUN   TestExternalDatabaseDonationManualReviewTransactions
+time="2026-09-15T13:46:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T13:46:39+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_manual_database_integration_test.go:21: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_manual_database_integration_test.go:21: external donation transaction isolation: read committed
+time="2026-09-15T13:46:44+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+
+2026/09/15 13:46:44 [31;1mD:/code/Claude code program/gpt-load/internal/storage/database.go:57 [35;1mduplicated key not allowed: ERROR: duplicate key value violates unique constraint "idx_donation_review_action_source" (SQLSTATE 23505)
+[0m[33m[2.318ms] [34;1m[rows:0][0m INSERT INTO "donation_review_actions" ("source_id","action_id","batch_id","item_id","kind","actor","expected_revision","target_revision","note","request_digest","outcome","reason_code","effect_revision","created_at_ms","applied_at_ms") VALUES ($1$,$2$,$3$,$4$,$5$,$6$,$7$,$8$,$9$,$10$,$11$,$12$,$13$,$14$,$15$) RETURNING "id"
+--- PASS: TestExternalDatabaseDonationManualReviewTransactions (8.50s)
+=== RUN   TestExternalDatabaseDonationManualReviewUpgrades0015History
+time="2026-09-15T13:46:48+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+time="2026-09-15T13:46:48+08:00" level=info msg="Database storage is managed by the operator" database_driver=postgres database_source=external
+    donation_manual_database_integration_test.go:142: external donation database: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+    donation_manual_database_integration_test.go:142: external donation transaction isolation: read committed
+--- PASS: TestExternalDatabaseDonationManualReviewUpgrades0015History (10.26s)
+PASS
+ok  	gpt-load/internal/control	18.994s

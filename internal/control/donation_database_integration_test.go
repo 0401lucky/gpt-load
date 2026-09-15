@@ -45,15 +45,22 @@ func TestExternalDatabaseDonationMigrationBackfillsInventory(t *testing.T) {
 		t.Fatalf("legacy inventory count = %d, want 3", len(beforeCredentials))
 	}
 
-	// 只在本测试新建的隔离库移除增量 0015，重建带库存的 0014 升级起点。
+	// 只在本测试新建的隔离库移除增量 0015、0016，重建带库存的 0014 升级起点。
 	// 其余 schema 来自真实迁移执行器，不复制历史 DDL，也不修改库存行。
-	for _, table := range migrationfiles.TableNames0015() {
+	seenTables := make(map[string]bool)
+	for _, table := range append(migrationfiles.TableNames0015(), migrationfiles.TableNames0016()...) {
+		if seenTables[table] {
+			continue
+		}
+		seenTables[table] = true
 		if err := fixture.db.Migrator().DropTable(table); err != nil {
 			t.Fatalf("prepare pre-donation schema: %v", err)
 		}
 	}
-	if err := fixture.db.Exec("DELETE FROM schema_migrations WHERE id = ?", migrationfiles.ID0015).Error; err != nil {
-		t.Fatal(err)
+	for _, id := range []string{migrationfiles.ID0015, migrationfiles.ID0016} {
+		if err := fixture.db.Exec("DELETE FROM schema_migrations WHERE id = ?", id).Error; err != nil {
+			t.Fatal(err)
+		}
 	}
 	if err := storage.AutoMigrate(fixture.db); err != nil {
 		t.Fatalf("upgrade populated inventory to donation schema: %v", err)

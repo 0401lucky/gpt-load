@@ -259,6 +259,14 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 
 单次请求最多 100 项、每个 key 最多 4096 字节、JSON 报文最多 1 MiB。自动探测最多五次；专用重试动作可在保留期内继续处理，无需再次传 key。未接收项目的暂存密文七天后清理；资源指纹及原回执长期保留，不随凭据/分组删除或集成 token 轮换而消失，数据库须与加密密钥共同备份。清空 `DONATION_INTEGRATION_TOKEN` 可关闭接收入口与 worker，保留历史记录。
 
+批次也可带 `validation_mode: "manual_review"` 提交。此时能力查询会返回 `features: ["manual_review_v1"]` 与独立的 `review_limits`，批次内每个条目只加密暂存并停留在 `pending_review`：不进入自动探测流程、不提前占用资源、也不会自行发奖。人工模式请求必须冻结分组的 `manual_target_revision`，它是对实际执行配置单独计算的 HMAC，重命名分组不会使其失效。省略该字段的旧调用方保持原 `auto` 行为，请求比对摘要逐字节不变。
+
+条目等待期间，管理员可读取 `GET /batches/:batch_id/items/:item_id/review-context`，用 `POST /batches/:batch_id/items/:item_id/tests` 针对**该条目自身的暂存 key** 发起一次真实对话调用，再用 `POST /batches/:batch_id/items/:item_id/review-actions`（`enter_review`、`approve`、`reject`）做出决定。每个动作携带调用方提供的 `action_id`，同时作为 `Idempotency-Key`，因此响应丢失时按已保存的命令对账，而不会重复执行。测试只会使用该条目的 key：不会切换到其他凭据或分组、不经过普通 Relay、也不触碰任何钱包。只有同时完成凭据正式入库与运行时发布的批准才会产生 `accepted`；测试结果本身既不自动通过也不自动拒绝。
+
+`approve` 与 `reject` 和进行中的测试互斥；超过暂存截止的条目不能通过；拒绝不要求目标分组在线。自动探测已耗尽但暂存材料仍在的条目可通过 `enter_review` 显式转审，原批次、原请求摘要、自动尝试次数、捐献人与截止时间全部保留。暂存期不续期：转审、测试与重试都沿用原七天期限。
+
+契约实现见 `internal/control/donation_*.go` 与 `internal/storage/migrations/0016_donation_manual_review.go`。
+
 - 默认只监听 `127.0.0.1`。需要远程访问时，应通过受控网络或带 TLS 的反向代理暴露，并配置 ACL 与防火墙。
 - 妥善管理 `AUTH_KEY` 与 `ENCRYPTION_KEY`，不要把真实密钥提交到仓库、日志、截图或公开 Issue。
 - 2.0 按**单应用实例**设计，多个实例之间不共享状态，不支持直接横向扩容。
