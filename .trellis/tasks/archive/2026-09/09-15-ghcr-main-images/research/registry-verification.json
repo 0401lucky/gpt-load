@@ -1,0 +1,116 @@
+{
+  "anonymous": true,
+  "tags": {
+    "sha-7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13": "sha256:0c7153b38654bd7d42dbb6789a01cd5544b772005df9555a3311de69fb512b10",
+    "latest": "sha256:0c7153b38654bd7d42dbb6789a01cd5544b772005df9555a3311de69fb512b10",
+    "main": "sha256:0c7153b38654bd7d42dbb6789a01cd5544b772005df9555a3311de69fb512b10"
+  },
+  "configs": [
+    {
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "10001:10001",
+      "revision": "7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13",
+      "version": "2.0.0-dev.1.g7a522cb7ffaf"
+    },
+    {
+      "os": "linux",
+      "architecture": "arm64",
+      "user": "10001:10001",
+      "revision": "7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13",
+      "version": "2.0.0-dev.1.g7a522cb7ffaf"
+    }
+  ],
+  "layers": [
+    {
+      "architecture": "amd64",
+      "digest": "sha256:55afa1ecc21d2bb5e5045f32dafee56272ffd89860bac26f6c32123439af26a4",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:31860ea43d47535385f45f9a82d72a272f024501234873ecbcb92571f7878167",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:d6da90ec557174fee40b09ec96373e377fe059f87145298c5a1ed13bdd87d7b3",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:2f09333acb1d31e7edb595a453a7ddc806b52d02da7b8f3b756244dfe73726e8",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:f6b628c2f846fed49c4f740789c6afafb4c4ede1322da1121fcadb49f53255e6",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:3338adba4731fb3e8c0d94d1f24392311393a1dfa5974d023cc178e90abdfc13",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:85027b7a8f0c3f7e74a10630c50615027088ac0cd25d736d687c536414e6b0e7",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:9ccb6508b74ea431a2d49a5e3863d68c9bc549198244fb3ed112ec15959edc99",
+      "status": 200
+    },
+    {
+      "architecture": "amd64",
+      "digest": "sha256:4b53a64babfcf7bd8138c083befe24183b3859e64f0548b681eb02a02936d6e3",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:5de55e5ef9c033997441461efe7ba23a986db059c0bb78b38f84ee0d72b99167",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:31860ea43d47535385f45f9a82d72a272f024501234873ecbcb92571f7878167",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:216930a7c3fbb58eb94bc476dc89e937157a68403e0b2c108180c5d8e5c8aa8b",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:38b2a8d93c41e2176a801fee1900b012403e89574bcd75ac8b3769ddb9777dff",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:6866e95626e469de53c7930e738cbe06a582db3c36f61070b2a34ae2b562c6d2",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:72cf592d949ef190cba321ce11bf719ce0c3976aea1ac96feda7a575ac2df412",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:288b763ee7d299d9ce3e0bab79701984cda894f62fb968cc832da8cb681c5d20",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:dbe46a3e243e7debc0ec43279fa4c1e3758db9539fe873e1eed7b71c8b2265aa",
+      "status": 200
+    },
+    {
+      "architecture": "arm64",
+      "digest": "sha256:9d012c781ad30db41f356d98f1656dac44f27d4d9dbb43420575de00d1faebfc",
+      "status": 200
+    }
+  ]
+}

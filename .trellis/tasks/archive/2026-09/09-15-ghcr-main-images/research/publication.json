@@ -1,0 +1,16 @@
+{
+  "repository": "0401lucky/gpt-load",
+  "workflow": "ghcr-main.yml",
+  "commit": "7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13",
+  "run_id": 34913061296,
+  "run_url": "https://github.com/0401lucky/gpt-load/actions/runs/34913061296",
+  "status": "completed",
+  "conclusion": "success",
+  "image_repository": "ghcr.io/0401lucky/gpt-load",
+  "commit_tag": "sha-7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13",
+  "platforms": ["linux/amd64", "linux/arm64"],
+  "digest": "sha256:0c7153b38654bd7d42dbb6789a01cd5544b772005df9555a3311de69fb512b10",
+  "version": "2.0.0-dev.1.g7a522cb7ffaf",
+  "anonymous_pull_verified": true,
+  "anonymous_verification": "Three tags, two native platform manifests/configs, and 18 layer HEAD requests returned HTTP 200 without user credentials."
+}

@@ -21,11 +21,13 @@
 ## Acceptance Criteria
 
 - [x] main触发和手动main触发配置正确，不允许PR或其它分支发布更新通道。
-- [ ] 两个目标平台的镜像清单及revision一致，存在提交号标签。
-- [ ] 真实容器健康、版本及应用入口验证通过后更新latest/main；构建失败不会推广通道。
+- [x] 两个目标平台的镜像清单及revision一致，存在提交号标签。
+- [x] 真实容器健康、版本及应用入口验证通过后更新latest/main；构建失败不会推广通道。
 - [x] Compose默认与覆盖配置验证通过；三语部署指引对应实际镜像。
 - [x] 定向测试和适用make check通过，独立复核完成。
-- [ ] GitHub首次实际构建/发布结果与拉取条件已核实，记录可直接给服务器使用的镜像引用。
+- [x] GitHub首次实际构建/发布结果与拉取条件已核实，记录可直接给服务器使用的镜像引用。
+
+最终证据见 [首发镜像](research/published-image.md)、[GitHub运行](research/github-run.json) 与 [匿名registry验证](research/registry-verification.json)。代码提交7a522cb7已在main，首轮build、两种原生verify和promote全部成功。
 
 ## Out of Scope
 
