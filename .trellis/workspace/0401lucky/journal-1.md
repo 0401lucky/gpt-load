@@ -84,3 +84,26 @@
 ### Next Steps
 
 - 服务器可在原Compose项目中pull并up；保留数据库与加密材料。本轮未操作服务器，main流水线未执行漏洞扫描。
+
+
+## Session 3: 合并上游 main 并重编号 donation 迁移
+<!-- trellis-session: v=2 fp=bfdce0b8945d4262 -->
+
+**Date**: 2026-09-20
+**Task**: 合并上游 main 并重编号 donation 迁移
+**Branch**: `main`
+
+### Summary
+
+合并 upstream/main 28 个提交。上游新增 0015-0017 与 fork 的 donation 迁移（原 0015/0016）编号撞车，donation 顺延为 0018/0019。因 schema_migrations 按数组下标严格比对 ID，升级路径定为「删账本两条旧记录 → 新版本重放 0015-0019」；幂等性经 PostgreSQL/MySQL/SQLite 三库演练及生产同构复刻验证，含 439 条资源与持久身份的生产库升级后数据零丢失、identity 不变。修复 operation_index_migration_test 对 len(migrations)-1 的隐式依赖（原会让两个子测试静默改测其他迁移却仍通过）。镜像已由 CI build/verify/promote 产出。生产 compose 已锁定到 locked-20260920，待按 runbook 执行升级。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b2aba7d6` | merge: 合并上游 main 至 b211e7c8，donation 迁移顺延为 0018/0019 |
+| `364988a4` | chore(spec): 同步迁移重编号并归档合并任务产物 |
+
+### Status
+
+[OK] **Completed**
