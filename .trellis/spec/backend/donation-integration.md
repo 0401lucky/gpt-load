@@ -2,7 +2,7 @@
 
 ## 1. 适用范围
 
-修改 `internal/control/donation_*.go`、普通凭据导入与捐献去重的衔接、迁移 `0015_donation_intake` / `0016_donation_manual_review`，或集成路由/配置时阅读。gpt-load 负责指定 key 校验、人工审核裁决、接收和长期回执；new-api 负责用户身份、活动与永久奖励，两者不共享数据库。
+修改 `internal/control/donation_*.go`、普通凭据导入与捐献去重的衔接、迁移 `0018_donation_intake` / `0019_donation_manual_review`，或集成路由/配置时阅读。gpt-load 负责指定 key 校验、人工审核裁决、接收和长期回执；new-api 负责用户身份、活动与永久奖励，两者不共享数据库。
 
 ## 2. 接口与数据签名
 
@@ -16,7 +16,7 @@
 | GET `/batches/:batch_id` | `GetDonationBatch`；仅当前来源的逐项回执，查询不重新排队 |
 | POST `/batches/:batch_id/retry` | `DonationRetryRequest{item_ids?:[]}`，对原暂存项执行幂等重试动作 |
 
-持久模型在 `internal/storage/models/donation.go`，冻结迁移模型在 `internal/storage/migrations/0015_donation_intake.go`：
+持久模型在 `internal/storage/models/donation.go`，冻结迁移模型在 `internal/storage/migrations/0018_donation_intake.go`：
 
 - `DonationIdentity`：独立于访问 token 的 instance/source UUID，及指纹密钥校验依据。
 - `DonationBatch`：来源 + batch_id 唯一，保存请求摘要与目标快照。
@@ -86,7 +86,7 @@
 | 依据组内另一个可用 key、格式合法或前端声明来接受捐献 | 自动路径对暂存的单一 CredentialRef 探测；人工路径绑定明确批准，真实调用只使用原 key；拒绝替换认证材料的配置 |
 | token 轮换、资源删除或日志清理时重建指纹身份 | 保留独立持久身份与长期账本；密钥丢失或不匹配时明确拒绝继续 |
 
-## 8. 人工审核与真实调用（迁移 0016）
+## 8. 人工审核与真实调用（迁移 0019）
 
 修改人工模式、审核动作或真实调用时阅读本节；调用方的完整回执与唯一奖励约束见 [donation-caller-contract.md](donation-caller-contract.md)。任务 `09-15-donation-manual-review` 的设计、线协议与审查报告保留验证证据。
 
@@ -128,10 +128,10 @@
 ### 8.4 该特性的必需验证点
 
 - `donation_manual_review_test.go`：能力协商与 auto 摘要冻结、人工暂存不发 probe/不取库存、批准恰好一次入库、拒绝清密文且不建凭据、revision/目标变化被拒、旧 `retry_exhausted` 转审保留历史、过期不可通过、只调用本条目 key 且重放不发上游、无聊天模型时不上上游、跨帧回显 key 脱敏、租约阻塞审核且废弃租约不重试。
-- `0016_donation_manual_review_test.go`：含真实旧捐献数据的升级、状态 CHECK 扩集（仍拒绝未知状态）、重复迁移幂等、冻结的 `Validate0015` 升级后仍通过。
+- `0019_donation_manual_review_test.go`：含真实旧捐献数据的升级、状态 CHECK 扩集（仍拒绝未知状态）、重复迁移幂等、冻结的 `Validate0018` 升级后仍通过。
 - `donation_review_regression_test.go`：屏障故障、运行中拒绝、结果持久失败、终态时间/revision、取消/超时、槽限额、冷队列、资源归属和虚拟 ID 边界。
 - `donation_test_integration_test.go`：OpenAI native 与 Gemini converted 的真实本地 HTTP，分别覆盖 stream/nonstream、原 key/模型/提示词、库存不接替、脱敏及重放不重测。Gemini 合成流使用真实 SDK 契约的独立 STOP + usage 尾帧，不能为错误 fixture 放宽成功条件。
-- `donation_manual_database_integration_test.go`：真实 MySQL/PostgreSQL 的 0015 历史升级、重复迁移、双连接相同动作/不同项测试并行、唯一约束和动作时间绑定。2026-09-15 已验证 SQLite、MySQL 8.4.11、PostgreSQL 15.19；证据见本任务 `research/codex-intake-review.md`，不据此宣称其他版本已实测。
+- `donation_manual_database_integration_test.go`：真实 MySQL/PostgreSQL 的 0018 历史升级、重复迁移、双连接相同动作/不同项测试并行、唯一约束和动作时间绑定。2026-09-15 已验证 SQLite、MySQL 8.4.11、PostgreSQL 15.19；证据见本任务 `research/codex-intake-review.md`，不据此宣称其他版本已实测。2026-09-20 的迁移重编号（`0015/0016` → `0018/0019`）另经三库升级演练，证据见 `09-20-merge-upstream-main/research/migration-upgrade-rehearsal.md`。
 
 ### 8.5 判断示例与防回归
 

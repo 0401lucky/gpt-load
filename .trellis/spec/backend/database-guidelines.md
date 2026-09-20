@@ -111,7 +111,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0015
+    // ... 至 ID0019
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -122,7 +122,9 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 
 - ID 必须匹配 `^(\d{4})_[a-z0-9]+(?:_[a-z0-9]+)*$`，且编号必须等于数组下标 —— `validateMigrationRegistry` 会自我校验，三个函数指针都不能为 nil。
 - 每个迁移导出：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`。
-- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_donation_intake.go`。
+- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`。
+- **账本顺序即身份**：`applyMigrationsLocked` 用数组下标逐条比对 `schema_migrations` 里的 ID，任何一条对不上就拒绝启动。因此迁移只能追加在链尾，**不得插入、重排或重编号已发布的迁移**；fork 与上游冲突时，让位于上游、把本地迁移整体顺延。
+- 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
 方言分支（改迁移时最容易踩的地方）：

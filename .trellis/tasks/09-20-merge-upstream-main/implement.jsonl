@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "迁移注册表格式、ID 必须等于数组下标、三方言执行分支（SQLite pin 连接/BEGIN IMMEDIATE、MySQL #building 恢复标记、网络库迁移锁）——本次重编号的直接规范来源"}
+{"file": ".trellis/spec/backend/donation-integration.md", "reason": "donation 领域契约、0015/0016 迁移的冻结语义与既有测试清单，重编号后须同步更新其中引用的编号"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "make check 是固定门禁，不得自行追加 race/前端测试/覆盖率要求"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "storage 与 control 包的依赖边界，改动跨包引用点前须确认未越界"}
+{"file": ".trellis/spec/backend/container-publishing.md", "reason": "GHCR 主分支镜像的 build→verify→promote 链路与滚动 tag 约定，AC7 依据"}
+{"file": ".trellis/spec/guides/index.md", "reason": "Pre-Modification Rule：改任何值/常量/字段名前先 grep 全仓库，防止漏改引用点"}
+{"file": ".trellis/spec/backend/index.md", "reason": "后端准则入口与 Pre-Development Checklist，确认改动落在哪一层该读哪些文件"}
