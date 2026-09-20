@@ -107,3 +107,29 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 4: 凭据备注字段：门禁验证、端到端实测、spec 同步与提交
+<!-- trellis-session: v=2 fp=ac153a091dc59976 -->
+
+**Date**: 2026-09-20
+**Task**: 凭据备注字段：门禁验证、端到端实测、spec 同步与提交
+**Branch**: `feat/credential-note`
+
+### Summary
+
+对 09-20-credential-note 的实现做独立验证并提交。三处高危点均正确落地：CredentialItemResponse.Note 标 json:"-"、normalizeCredentialUpdate 的「至少一字段」判定已含 Note、updates map 仅在 Note.Set 时写。门禁全绿（go build/vet、storage+control 测试、前端 type-check/lint/build）。上一会话的基线文件随临时目录丢失，改用 git archive HEAD 在仓库外取纯净副本重新取基线，失败包集合与改动后完全一致（catalog/container/gateway/platform-authkey/webui，均为既有 Windows 环境失败），无新增回归。端到端实测（真实服务 + 真实浏览器）覆盖 AC1–AC5：真实 SQLite 账本 20 条且末条为 0020、列为 VARCHAR(2048) NOT NULL DEFAULT ''；只传 note 可写入、不传不改动、空串与 null 均清空、2048/2049 rune 边界正确且被拒请求不部分改写；modern 面板保存后整页刷新仍保持；classic 页面渲染出两条凭据且控制台 0 错误。spec 更新三份：迁移导出符号按建表型/加列型分类（0005/0014/0020 均不导出 SchemaModels/TableNames/ValidateCurrent）、新增 classic/modern 共用 DTO 的 json:"-" 契约、修正 data-layer 对 assertNoSecretLikeFields 的表述。trellis-check 子代理独立核查未发现需修复缺陷。两处值得留存的发现：(1) projector.ts:141-142 中 secretLikeField.test 之后紧跟的 invalidResponse() 是无条件执行的，正则不构成放行条件 —— 白名单外任何字段都会抛错，故 json:"-" 是承重设计；(2) 本机 Git Bash 下 grep -c $'\r' 判定行尾会假阳性（返回行数），须用字节计数，经 git cat-file 确认暂存 blob 均为纯 LF。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4d721020` | feat(credentials): 为上游凭据增加可编辑备注字段 |
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- 推分支并观察 CI（本机无 make，gofmt/prettier 因 CRLF 检出假阳性；MySQL/PostgreSQL 路径本地无 DSN 只能由 database-contract 矩阵覆盖）。上线走常规 upgrade.sh：0020 追加在链尾，无需修账本、无需停机。
