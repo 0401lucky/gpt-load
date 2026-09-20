@@ -1,0 +1,9 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "迁移注册表规则（ID 必须连续等于下标、追加在链尾）、三方言执行分支、只加列型迁移的写法约束——迁移 0020 的直接规范来源"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "错误必须经 app_errors 构造、经 writeServiceError 出口；备注长度校验须返回既有 ErrValidation 而非新错误码"}
+{"file": ".trellis/spec/backend/i18n-guidelines.md", "reason": "后端三语 locales 的 key 命名与同步规则；本次原则是复用既有错误文案、不新增后端 key"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "storage / control 包的依赖边界，改动跨包引用点前须确认未越界"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "make check 是固定门禁，测试不用 testify、用 t.Cleanup、不依赖真实网络与真实库"}
+{"file": ".trellis/spec/frontend/data-layer.md", "reason": "modern 前端 API 层的响应解析与 patch 提交约定，readCredential / updateCredential 的改动依据"}
+{"file": ".trellis/spec/frontend/i18n.md", "reason": "modern 三语文案的 key 组织与同步要求"}
+{"file": ".trellis/spec/frontend/design-system.md", "reason": "表单控件与字段布局规范，备注输入框须复用 AppTextField / AppField"}
+{"file": ".trellis/tasks/09-20-credential-note/research/credential-implementation-survey.md", "reason": "完整改动清单（后端 8 处 + 前端 4 处，带行号）、WeightManual/ProxyConfig 可照搬链路、classic 白名单硬约束"}

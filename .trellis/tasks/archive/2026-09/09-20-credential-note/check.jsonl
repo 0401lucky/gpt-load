@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "Quality Check 清单：make check、依赖边界、i18n 三语同步、迁移配套、日志规范、测试风格、改动聚焦"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "验收 AC6 的判定标准；测试写法与提交前自查项"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "前端 type-check / lint / build 门禁与组件写法要求"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "校验迁移注册表 ID 与下标严格对齐、只加列语义正确、既有行未被改写"}
+{"file": ".trellis/tasks/09-20-credential-note/research/credential-implementation-survey.md", "reason": "核对 §4 的关键约束是否被遵守，尤其是「经典响应不得含 note」这条 AC5 核心证据"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "本次横跨 storage 迁移层、control 接口层与 modern 前端，需跨层一致性检查"}
