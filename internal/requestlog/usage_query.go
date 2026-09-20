@@ -38,6 +38,10 @@ func (service *Service) QueryUsage(ctx context.Context, input UsageQuery) (Usage
 		Operation:      "usage read transaction",
 	}, func(connection *gorm.DB) error {
 		scope := usageWindowScope(connection, input)
+		// 5 分钟趋势不能由小时汇总还原；总览、趋势与分布共用请求明细来源。
+		if bucketWidthMS == UsageFiveMinuteBucketMS {
+			scope = usageRequestLogScope(connection, input)
+		}
 		if err := validateUsageIntegrity(scope, 0); err != nil {
 			return err
 		}
@@ -124,13 +128,16 @@ func queryUsageDistributions(
 	return result, nil
 }
 
-func usageStatScope(db *gorm.DB, input UsageQuery) *gorm.DB {
+func usageStatScope(db *gorm.DB, input UsageQuery, groupIDs ...uint) *gorm.DB {
 	scope := db.Session(&gorm.Session{NewDB: true}).Model(&models.UsageStat{}).
 		Where("bucket_start_ms >= ? AND bucket_start_ms < ?", input.FromMS, input.ToMS).
 		// Older versions aggregated zero-attempt requests under the unbound
 		// (group_id=0, model='') key. Keep those derived rows invisible so home
 		// and monitor share the current contract.
 		Where("NOT (group_id = ? AND model = ?)", 0, "")
+	if len(groupIDs) > 0 {
+		scope = scope.Where("group_id IN ?", groupIDs)
+	}
 	if input.GroupID != nil {
 		scope = scope.Where("group_id = ?", *input.GroupID)
 	}

@@ -216,7 +216,7 @@ func TestExternalDatabaseDonationManualReviewTransactions(t *testing.T) {
 	}
 }
 
-func TestExternalDatabaseDonationManualReviewUpgrades0015History(t *testing.T) {
+func TestExternalDatabaseDonationManualReviewUpgrades0018History(t *testing.T) {
 	fixture, _ := newExternalDonationFixture(t)
 	groupID := newExternalDonationEmptyGroup(t, fixture, "external-manual-upgrade")
 	capabilities, err := fixture.service.DonationCapabilities(t.Context())
@@ -234,14 +234,14 @@ func TestExternalDatabaseDonationManualReviewUpgrades0015History(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if err := fixture.db.AutoMigrate(migrations.SchemaModels0015()...); err != nil {
+	if err := fixture.db.AutoMigrate(migrations.SchemaModels0018()...); err != nil {
 		t.Fatal(err)
 	}
-	if err := fixture.db.Exec("DELETE FROM schema_migrations WHERE id = ?", migrations.ID0016).Error; err != nil {
+	if err := fixture.db.Exec("DELETE FROM schema_migrations WHERE id = ?", migrations.ID0019).Error; err != nil {
 		t.Fatal(err)
 	}
 	source, batchID, itemID := capabilities.SourceID, donationTestID(7000), donationTestID(7001)
-	const key = "synthetic-0015-upgrade-key"
+	const key = "synthetic-0018-upgrade-key"
 	request := DonationBatchRequest{BatchID: batchID, GroupID: groupID, TargetRevision: groups[0].TargetRevision,
 		Items: []DonationItemRequest{{ItemID: itemID, Key: key}}}
 	digest, err := fixture.service.donationBatchDigest(request, donationModeAuto)
@@ -269,7 +269,7 @@ func TestExternalDatabaseDonationManualReviewUpgrades0015History(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := storage.AutoMigrate(fixture.db); err != nil {
-		t.Fatalf("upgrade real 0015 history: %v", err)
+		t.Fatalf("upgrade real 0018 history: %v", err)
 	}
 	if err := storage.AutoMigrate(fixture.db); err != nil {
 		t.Fatalf("repeat upgraded migration: %v", err)

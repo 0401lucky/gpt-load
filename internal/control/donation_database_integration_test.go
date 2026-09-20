@@ -45,10 +45,10 @@ func TestExternalDatabaseDonationMigrationBackfillsInventory(t *testing.T) {
 		t.Fatalf("legacy inventory count = %d, want 3", len(beforeCredentials))
 	}
 
-	// 只在本测试新建的隔离库移除增量 0015、0016，重建带库存的 0014 升级起点。
+	// 只在本测试新建的隔离库移除增量 0018、0019，重建带库存的 0014 升级起点。
 	// 其余 schema 来自真实迁移执行器，不复制历史 DDL，也不修改库存行。
 	seenTables := make(map[string]bool)
-	for _, table := range append(migrationfiles.TableNames0015(), migrationfiles.TableNames0016()...) {
+	for _, table := range append(migrationfiles.TableNames0018(), migrationfiles.TableNames0019()...) {
 		if seenTables[table] {
 			continue
 		}
@@ -57,7 +57,7 @@ func TestExternalDatabaseDonationMigrationBackfillsInventory(t *testing.T) {
 			t.Fatalf("prepare pre-donation schema: %v", err)
 		}
 	}
-	for _, id := range []string{migrationfiles.ID0015, migrationfiles.ID0016} {
+	for _, id := range []string{migrationfiles.ID0018, migrationfiles.ID0019} {
 		if err := fixture.db.Exec("DELETE FROM schema_migrations WHERE id = ?", id).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -625,12 +625,12 @@ func newExternalDonationFixture(t *testing.T) (serviceFixture, string) {
 
 func assertExternalDonationMigration(t *testing.T, db *gorm.DB) {
 	t.Helper()
-	for _, table := range migrationfiles.TableNames0015() {
+	for _, table := range migrationfiles.TableNames0018() {
 		if !db.Migrator().HasTable(table) {
 			t.Fatalf("donation migration omitted table %q", table)
 		}
 	}
-	assertExternalDonationCount(t, db.Table("schema_migrations").Where("id = ?", migrationfiles.ID0015), 1)
+	assertExternalDonationCount(t, db.Table("schema_migrations").Where("id = ?", migrationfiles.ID0018), 1)
 	assertExternalDonationCount(t, db.Table("schema_migrations").Where("id LIKE ?", "%#building"), 0)
 }
 
