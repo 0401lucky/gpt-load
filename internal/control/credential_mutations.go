@@ -7,6 +7,7 @@ import (
 	"math"
 	"sort"
 	"time"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 
@@ -19,17 +20,21 @@ import (
 	"gpt-load/internal/storage/models"
 )
 
+// maxCredentialNoteRunes 与 credentials.note 的 varchar(2048) 字符语义一致。
+const maxCredentialNoteRunes = 2048
+
 func normalizeCredentialUpdate(
 	request CredentialUpdateRequest,
 	encryptionService encryption.Service,
-) (status *state.CredentialStatus, weight *int, weightSet bool, proxy *string, proxySet bool, err error) {
-	if !request.Status.Set && !request.WeightManual.Set && !request.Proxy.Set {
-		return nil, nil, false, nil, false, app_errors.ErrBadRequest
+) (status *state.CredentialStatus, weight *int, weightSet bool, proxy *string, proxySet bool,
+	note string, noteSet bool, err error) {
+	if !request.Status.Set && !request.WeightManual.Set && !request.Proxy.Set && !request.Note.Set {
+		return nil, nil, false, nil, false, "", false, app_errors.ErrBadRequest
 	}
 	if request.Status.Set {
 		if request.Status.Null ||
 			(request.Status.Value != state.CredentialStatusActive && request.Status.Value != state.CredentialStatusDisabled) {
-			return nil, nil, false, nil, false, app_errors.ErrValidation
+			return nil, nil, false, nil, false, "", false, app_errors.ErrValidation
 		}
 		value := request.Status.Value
 		status = &value
@@ -38,7 +43,7 @@ func normalizeCredentialUpdate(
 		weightSet = true
 		if !request.WeightManual.Null {
 			if request.WeightManual.Value < 1 || request.WeightManual.Value > state.MaxWeight {
-				return nil, nil, false, nil, false, app_errors.ErrValidation
+				return nil, nil, false, nil, false, "", false, app_errors.ErrValidation
 			}
 			value := request.WeightManual.Value
 			weight = &value
@@ -46,9 +51,19 @@ func normalizeCredentialUpdate(
 	}
 	proxy, proxySet, err = normalizeProxyOverride(request.Proxy, encryptionService)
 	if err != nil {
-		return nil, nil, false, nil, false, err
+		return nil, nil, false, nil, false, "", false, err
 	}
-	return status, weight, weightSet, proxy, proxySet, nil
+	// 显式 null 与空串等价为「清空备注」，未传时不改动既有备注。
+	if request.Note.Set {
+		noteSet = true
+		if !request.Note.Null {
+			if utf8.RuneCountInString(request.Note.Value) > maxCredentialNoteRunes {
+				return nil, nil, false, nil, false, "", false, app_errors.ErrValidation
+			}
+			note = request.Note.Value
+		}
+	}
+	return status, weight, weightSet, proxy, proxySet, note, noteSet, nil
 }
 
 func nextCredentialUpdatedAtMS(now time.Time, previous int64) (int64, error) {
@@ -137,7 +152,7 @@ func (s *Service) UpdateGroupCredential(
 	if groupID == 0 || credentialID == 0 {
 		return CredentialItemResponse{}, app_errors.ErrBadRequest
 	}
-	status, weight, weightSet, proxy, proxySet, err := normalizeCredentialUpdate(request, s.encryption)
+	status, weight, weightSet, proxy, proxySet, note, noteSet, err := normalizeCredentialUpdate(request, s.encryption)
 	if err != nil {
 		return CredentialItemResponse{}, err
 	}
@@ -184,6 +199,10 @@ func (s *Service) UpdateGroupCredential(
 		if proxySet {
 			committed.ProxyConfig = proxy
 			updates["proxy_config"] = proxy
+		}
+		if noteSet {
+			committed.Note = note
+			updates["note"] = committed.Note
 		}
 		committed.UpdatedAtMS = updatedAtMS
 		committedProxy, committedProxyFingerprint, err = storedProxyIdentity(s.encryption, committed.ProxyConfig)
@@ -475,6 +494,7 @@ func (s *Service) mapCredentialItem(
 	item.ConnectionType = string(normalizeGroupConnectionType(group.ConnectionType))
 	item.SecretVersion = row.SecretVersion
 	item.AuthState = string(row.AuthState)
+	item.Note = row.Note
 	item.Account = account
 	proxyViews, err := s.credentialProxyViews(ctx, s.db, group, []models.Credential{row})
 	if err != nil {

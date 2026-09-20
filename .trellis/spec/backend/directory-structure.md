@@ -157,6 +157,7 @@ func (s *Server) HTTPModule() httproute.Module {
 - 内部结构体显式小写：`normalizedGroupCreate`、`credentialCandidate`。
 - **可选字段用泛型 `optionalField[T]`**（区分"未传 / 传了 null / 传了值"，`control/group_write.go:81`）：`struct { Set bool; Null bool; Value T }`。
 - **请求体一律走严格 JSON 绑定**：`bindStrictJSON` / `bindOptionalEmptyJSONObject` / `bindOptionalProbeJSON`（`control/server.go:1030` 起）—— 禁用未知字段、拒绝多值、限制 32 MiB。
+- **classic / modern 共用响应结构体时，只有 modern 该看到的新字段必须标 `json:"-"`**：classic 的投影白名单（`web/src/frontends/classic/app/resources/credentials.ts` 的 `credentialItemFields`）会拒绝白名单外的**任何**字段并抛 `InvalidResponseError` —— 字段只要序列化出去，classic 对应页面就是整页报错，而不是忽略。做法是在共用结构体（如 `CredentialItemResponse`）上标 `json:"-"`，再由 modern 侧的嵌入结构体重新以 snake_case 暴露；写路径的响应是经典格式，modern 前端需按请求值自行回填。现成先例：`WeightManual` → `weight_manual`、`Note` → `note`（`control/modern_credentials.go`）。
 
 ---
 

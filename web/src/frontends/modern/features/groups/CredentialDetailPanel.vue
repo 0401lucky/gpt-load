@@ -43,6 +43,7 @@ const item = computed(() => query.data.value ?? props.row)
 const state = computed(() => credentialStatus(item.value))
 const saved = ref<CredentialRow>()
 const weight = ref('')
+const note = ref('')
 const proxyMode = ref('inherit')
 const proxyURL = ref('')
 const saving = ref(false)
@@ -55,6 +56,7 @@ const dirty = computed(
     !completed.value &&
     Boolean(saved.value) &&
     (weight.value !== String(saved.value!.weightManual ?? '') ||
+      note.value !== saved.value!.note ||
       proxyMode.value !== saved.value!.proxy.mode ||
       Boolean(proxyURL.value)),
 )
@@ -64,6 +66,7 @@ watch(
     if (!value || dirty.value || saving.value) return
     saved.value = value
     weight.value = String(value.weightManual ?? '')
+    note.value = value.note
     proxyMode.value = value.proxy.mode
     proxyURL.value = ''
   },
@@ -101,6 +104,7 @@ async function save(): Promise<void> {
   const patch: Parameters<typeof updateCredential>[3] = {}
   if (weight.value !== String(saved.value.weightManual ?? ''))
     patch.weight_manual = weight.value ? Number(weight.value) : null
+  if (note.value !== saved.value.note) patch.note = note.value
   if (proxyChanged.value)
     patch.proxy =
       proxyMode.value === 'inherit'
@@ -256,6 +260,16 @@ useMessageSource(() =>
             </span>
           </AppTooltip>
         </div>
+        <AppTextField
+          v-model="note"
+          :label="t('credentialCards.note')"
+          :placeholder="t('credentialCards.notePlaceholder')"
+          :description="t('credentialCards.noteHelp')"
+          size="sm"
+          maxlength="2048"
+          :disabled="saving"
+          autocomplete="off"
+        />
         <div class="modern-credential-detail-routing">
           <AppTextField
             v-model="weight"

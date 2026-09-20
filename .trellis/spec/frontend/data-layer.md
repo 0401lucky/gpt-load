@@ -53,7 +53,7 @@
 两条容易忽略的纪律：
 
 - **绝不使用 `as` 断言**。所有 DTO 都从 `unknown` 手动投影出来。
-- **`assertNoSecretLikeFields` 是安全防线，不是风格洁癖**。它用正则 `secretLikeField` 拒绝任何**不在白名单里、但名字像密钥**的字段 —— 防止后端误把凭据字段塞进响应。
+- **`assertNoSecretLikeFields` 是安全防线，不是风格洁癖**：**白名单外的任何字段**都会 `invalidResponse()`。注意函数里 `secretLikeField.test(field)` 之后紧跟的 `invalidResponse()` 是**无条件**执行的，正则并不构成放行条件 —— 不要以为"名字不像密钥的字段"会被忽略。后端往 classic 读到的响应里加字段 = classic 整页报错，对策见 [backend/directory-structure.md](../backend/directory-structure.md) 的「DTO 与请求体」。
 - **跨字段一致性断言也是允许且必要的**（`groups.ts:469`）：
   ```ts
   if (items.length !== total || pending > total ||

@@ -111,7 +111,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0019
+    // ... 至 ID0020
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -121,8 +121,11 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 规则：
 
 - ID 必须匹配 `^(\d{4})_[a-z0-9]+(?:_[a-z0-9]+)*$`，且编号必须等于数组下标 —— `validateMigrationRegistry` 会自我校验，三个函数指针都不能为 nil。
-- 每个迁移导出：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`。
-- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`。
+- 导出符号按迁移形状分两类，**不是每个迁移都导出一整套**：
+  - **建表型**：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`（先例 `0019_donation_manual_review.go`）。
+  - **加列 / 改列型**：只需 `Up000N` / `Validate000N` / `ValidateRecoverable000N`，**不导出** `SchemaModels` / `TableNames` / `ValidateCurrent`（先例 `0005_proxy_config.go`、`0014_affinity_kind.go`、`0020_credential_note.go`）。`Up` 内先 `HasColumn` 判重再 `ALTER TABLE`，末尾 `return Validate000N(db)`。
+- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`、`0020_credential_note.go`。
+- 追加迁移会连带改到**断言完整链**的测试，漏改就红：`internal/storage/migration_test.go`（注册表 ID 列表）、`internal/storage/db_test.go`（`schema_migrations` ID 列表）、`internal/storage/database_integration_test.go`（账本长度 + 期望列清单）。另注意**建旧 schema 的测试**要用 `db.Omit("新列")` 建行（先例 `migrations/0003_remove_observation_fresh_until_test.go` 的 `Omit("ProxyConfig", "Note")`），否则 GORM 会往尚不存在的列里写。
 - **账本顺序即身份**：`applyMigrationsLocked` 用数组下标逐条比对 `schema_migrations` 里的 ID，任何一条对不上就拒绝启动。因此迁移只能追加在链尾，**不得插入、重排或重编号已发布的迁移**；fork 与上游冲突时，让位于上游、把本地迁移整体顺延。
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。

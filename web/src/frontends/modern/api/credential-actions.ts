@@ -24,7 +24,7 @@ export async function updateCredential(
   client: ApiClient,
   group: number,
   id: number,
-  patch: { weight_manual?: number | null; proxy?: ProxyOverride | null },
+  patch: { weight_manual?: number | null; proxy?: ProxyOverride | null; note?: string | null },
   signal: AbortSignal,
 ) {
   const row = readCredential(
@@ -34,7 +34,11 @@ export async function updateCredential(
       signal,
     }),
   )
-  return Object.hasOwn(patch, 'weight_manual') ? { ...row, weightManual: patch.weight_manual } : row
+  // 经典响应不下发这两个字段，按请求值回填。
+  const result = Object.hasOwn(patch, 'weight_manual')
+    ? { ...row, weightManual: patch.weight_manual }
+    : row
+  return Object.hasOwn(patch, 'note') ? { ...result, note: patch.note ?? '' } : result
 }
 
 export async function exportAllCredentials(client: ApiClient, group: number, signal: AbortSignal) {
