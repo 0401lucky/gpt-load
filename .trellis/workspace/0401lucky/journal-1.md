@@ -133,3 +133,46 @@
 ### Next Steps
 
 - 推分支并观察 CI（本机无 make，gofmt/prettier 因 CRLF 检出假阳性；MySQL/PostgreSQL 路径本地无 DSN 只能由 database-contract 矩阵覆盖）。上线走常规 upgrade.sh：0020 追加在链尾，无需修账本、无需停机。
+
+
+## Session 5: 合并上游 main 33 提交：迁移编号 B 方案（上游顺延为链尾）
+<!-- trellis-session: v=2 fp=2f7f3d32551184b4 -->
+
+**Date**: 2026-09-23
+**Task**: 合并上游 main 33 提交：迁移编号 B 方案（上游顺延为链尾）
+**Branch**: `main`
+
+### Summary
+
+合并 upstream/main 33 个提交（342 文件）进 fork main。两侧迁移编号再次撞车，改选 B 方案：fork 冻结 0018_donation_intake/0019_donation_manual_review/0020_credential_note，上游新增 4 条顺延为 0021_auto_model/0022_auto_decision_attribution/0023_client_model_overrides/0024_request_audit，使生产账本恢复纯追加语义，升级退化为 pull + up -d。冲突 5 个文件全在 internal/storage；另发现上游 3 个新测试硬编码注册表下标（顺延后会失败或静默测错迁移），按 fork 既有范式改为按 ID 定位 helper。用生产库快照（312MB、账本 20 条）在服务器 /tmp 一次性容器中演练：20→24 且前 20 行逐行未变、486 资源与身份 UUID 未变、二次启动幂等、空库 24 条。spec 已把编号策略改为「fork 冻结 + 上游顺延到链尾」。本地未 push、生产未升级。
+
+### Main Changes
+
+- git merge --no-ff upstream/main 至 0af4e399：保留 fork 三条迁移编号，上游 4 条迁移文件与导出符号顺延为 0021-0024，DDL 级内部名（auto_decision_usage_stats_0019、chk_auto_decision_usage_0019_* 等）保持上游原样。
+- 解决 5 个 internal/storage 冲突：注册表 24 条、migration_test/db_test/database_integration_test 链式断言同步、operation_index_migration_test 保留按 ID 定位实现。
+- 上游 3 个新测试的固定下标改为 autoDecisionAttributionMigrationIndex/clientModelOverrideMigrationIndex/requestAuditMigrationIndex，避免静默测错迁移。
+- spec 更新：database-guidelines.md 编号约定改为 fork 冻结、上游顺延到链尾，并新增 DDL 内部名保留与绝对下标两条规则；归档 PRD/设计/执行计划/演练证据/生产升级说明。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0af4e399` | merge: 合并上游 main 至 f2840466（上游新增迁移顺延为 0021-0024） |
+| `9f4e7a57` | chore(spec): 冻结 fork 迁移编号并记录上游顺延约定 |
+
+### Testing
+
+- [OK] [OK] go build ./... 与 go vet ./... 退出 0；go test ./internal/storage/... 全通过。
+- [OK] [OK] 全量 go test . ./internal/... 与 59d75050 纯净副本基线逐包对比：失败包集合一致（catalog/container/gateway/platform-authkey/webui）；唯一新增 TestCodexModelCatalogSnapshotDigest 已定位为 Windows core.autocrlf 检出 CRLF 的伪失败（blob 级 sha256 = 期望值，LF 内容下测试通过）。
+- [OK] [OK] 前端 type-check / lint / build 全部退出 0（固定 pnpm 11.17.0）。
+- [OK] [OK] 生产库快照演练：账本 20→24 前 20 行未变、业务计数与 instance_id/source_id 未变、三张新表与新列落库、二次启动幂等、空库全新安装 24 条。
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- push main 触发出 ghcr-main 镜像流水线（外部发布需用户确认）。
+- 生产升级按 research/production-upgrade-note.md 走常规 pull + up -d：无需改账本、无需停机；回滚仍需卷快照与旧镜像成对。
+- trellis-check 子代理本轮因 spawn_agent 持续不可用未能派发，交叉核查（blob 级比对、注册表、索引 helper 等价性）由主会话完成，证据在 rehearsal-evidence 与 baseline-tests。

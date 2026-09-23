@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 4
-- **Last Active**: 2026-09-20
+- **Total Sessions**: 5
+- **Last Active**: 2026-09-23
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~135 | Active |
+| `journal-1.md` | ~178 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 5 | 2026-09-23 | 合并上游 main 33 提交：迁移编号 B 方案（上游顺延为链尾） | `0af4e399`, `9f4e7a57` | `main` |
 | 4 | 2026-09-20 | 凭据备注字段：门禁验证、端到端实测、spec 同步与提交 | `4d721020` | `feat/credential-note` |
 | 3 | 2026-09-20 | 合并上游 main 并重编号 donation 迁移 | `b2aba7d6`, `364988a4` | `main` |
 | 2 | 2026-09-15 | gpt-load 主分支镜像自动构建与发布 | `7a522cb7ffaf22a7bc53e166de0ef1ffefa75e13` | `main` |
