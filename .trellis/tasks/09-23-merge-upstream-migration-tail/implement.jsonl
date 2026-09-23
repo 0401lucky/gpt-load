@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "后端 spec 索引与提交前自查清单"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "迁移注册表格式、账本顺序语义、迁移文件命名与链式断言的同步要求"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "make check 门禁、测试与代码风格约定；本机无 make 时按等价命令执行"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "改动常量前后需 grep 全仓引用点的固定动作"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/prd.md", "reason": "本轮需求与验收标准"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/design.md", "reason": "B 方案编号映射、冲突解决策略、schema 级内部名保留原则、验证矩阵"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/implement.md", "reason": "有序执行清单与每步验证命令"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/research/recon-2026-09-23.md", "reason": "冲突文件清单、上游编号引用点、生产账本与业务数据实测"}

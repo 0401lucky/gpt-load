@@ -124,10 +124,15 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 - 导出符号按迁移形状分两类，**不是每个迁移都导出一整套**：
   - **建表型**：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`（先例 `0019_donation_manual_review.go`）。
   - **加列 / 改列型**：只需 `Up000N` / `Validate000N` / `ValidateRecoverable000N`，**不导出** `SchemaModels` / `TableNames` / `ValidateCurrent`（先例 `0005_proxy_config.go`、`0014_affinity_kind.go`、`0020_credential_note.go`）。`Up` 内先 `HasColumn` 判重再 `ALTER TABLE`，末尾 `return Validate000N(db)`。
-- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`、`0020_credential_note.go`。
+- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`、`0020_credential_note.go`、`0021_auto_model.go`、`0022_auto_decision_attribution.go`、`0023_client_model_overrides.go`、`0024_request_audit.go`。后四条本属上游 `0018`–`0021`，顺延原因见下面的编号约定。
 - 追加迁移会连带改到**断言完整链**的测试，漏改就红：`internal/storage/migration_test.go`（注册表 ID 列表）、`internal/storage/db_test.go`（`schema_migrations` ID 列表）、`internal/storage/database_integration_test.go`（账本长度 + 期望列清单）。另注意**建旧 schema 的测试**要用 `db.Omit("新列")` 建行（先例 `migrations/0003_remove_observation_fresh_until_test.go` 的 `Omit("ProxyConfig", "Note")`），否则 GORM 会往尚不存在的列里写。
-- **账本顺序即身份**：`applyMigrationsLocked` 用数组下标逐条比对 `schema_migrations` 里的 ID，任何一条对不上就拒绝启动。因此迁移只能追加在链尾，**不得插入、重排或重编号已发布的迁移**；fork 与上游冲突时，让位于上游、把本地迁移整体顺延。
+- **账本顺序即身份**：`applyMigrationsLocked` 用数组下标逐条比对 `schema_migrations` 里的 ID，任何一条对不上就拒绝启动。因此迁移只能追加在链尾，**不得插入、重排或重编号已发布的迁移**。
+- **fork 与上游的编号约定（2026-09-23 起）**：fork 自己的迁移编号**冻结不动**；上游新增迁移进入 fork 时**顺延到 fork 链尾**（例：上游 `0018`–`0021` → fork `0021`–`0024`）。这样已上线库的账本恒为注册表的**前缀**，升级退化为 `docker compose pull` + `up -d`，无需停机、无需改账本。
+  - 顺延只改：文件名、`ID00NN` 与 `Up00NN` / `Validate00NN` / `ValidateCurrent00NN` / `ValidateRecoverable00NN` / `SchemaModels00NN` / `TableNames00NN` 等导出符号、注册表与链式断言。
+  - **不改上游迁移内部会落进 DDL 的名字**（`auto_decision_usage_stats_0019`、`chk_auto_decision_usage_0019_*`、`autoLog0019` / `autoUsage0019` 等）：改名会让 fork 库 schema 与上游永久分叉，上游后续迁移按名引用时会错位。文件顶部加一行来源注释即可。
+  - 反例：把 fork 迁移整体顺延到上游之后（2026-09-20 曾采用）会让已上线库的账本中段与注册表错位，每次合并都要停机 + 删账本行 + 重放迁移。
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
+- **上游迁移测试常硬编码注册表下标**（`migrations[:18]`、`migrations[19]`、`migrations[:20]`）。顺延编号后这些下标会指向别的迁移：要么直接失败，要么**静默测错对象却仍然通过**。合并上游并顺延编号时，必须把这类文件改成按 ID 定位（先例：`autoDecisionAttributionMigrationIndex`、`clientModelOverrideMigrationIndex`、`requestAuditMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
 方言分支（改迁移时最容易踩的地方）：

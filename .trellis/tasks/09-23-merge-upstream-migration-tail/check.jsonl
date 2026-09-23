@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "后端质量检查清单"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "门禁与测试约定，复核是否有未跑项"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "迁移注册表与账本语义，复核 24 条终态顺序与命名"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/prd.md", "reason": "逐条核对 AC1–AC8"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/design.md", "reason": "复核 schema 级内部名未被误改、冲突解决符合设计"}
+{"file": ".trellis/tasks/09-23-merge-upstream-migration-tail/research/recon-2026-09-23.md", "reason": "生产账本与业务数据基线，用于核对演练证据"}
