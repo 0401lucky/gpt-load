@@ -651,6 +651,9 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 			t.Errorf("AutoMigrate() did not create table %q", table)
 		}
 	}
+	if db.Migrator().HasTable("auto_response_bindings") {
+		t.Fatal("AutoMigrate() created an unnecessary shared binding table")
+	}
 
 	var migrationIDs []string
 	if err := db.Table("schema_migrations").Order("id ASC").Pluck("id", &migrationIDs).Error; err != nil {
@@ -677,6 +680,10 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 		"0018_donation_intake",
 		"0019_donation_manual_review",
 		"0020_credential_note",
+		"0021_auto_model",
+		"0022_auto_decision_attribution",
+		"0023_client_model_overrides",
+		"0024_request_audit",
 	}
 	if !reflect.DeepEqual(migrationIDs, wantMigrationIDs) {
 		t.Fatalf("schema_migrations IDs = %v, want %v", migrationIDs, wantMigrationIDs)

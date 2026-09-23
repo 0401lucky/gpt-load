@@ -16,6 +16,8 @@ import (
 
 	"gpt-load/internal/accessquota"
 	"gpt-load/internal/affinity"
+	"gpt-load/internal/automodel"
+	"gpt-load/internal/catalog"
 	"gpt-load/internal/channel"
 	"gpt-load/internal/connection"
 	"gpt-load/internal/dialect"
@@ -28,6 +30,8 @@ import (
 	"gpt-load/internal/platform/utils"
 	"gpt-load/internal/pricing"
 	"gpt-load/internal/ratelimit"
+	"gpt-load/internal/requestaudit"
+	"gpt-load/internal/requestredact"
 	"gpt-load/internal/scheduler"
 	"gpt-load/internal/state"
 	subscriptionproviders "gpt-load/internal/subscription/providers"
@@ -86,7 +90,11 @@ type runtimeCredentialRegistry interface {
 }
 
 type Handler struct {
+	guardrails          requestaudit.Cache
+	autoTasks           autoTaskCache
+	decisionClient      autoDecisionRunner
 	manager             *state.Manager
+	catalog             *catalog.Runtime
 	channels            *channel.Registry
 	subscriptions       *subscriptionruntime.Runtime
 	registry            runtimeCredentialRegistry
@@ -99,6 +107,7 @@ type Handler struct {
 	requestLogSink      telemetry.RequestLogSink
 	priceTables         PriceTableProvider
 	accessQuota         *accessquota.Runtime
+	usageReader         AccessKeyUsageReader
 	newRequestID        func() (string, error)
 	requestNow          func() time.Time
 	now                 func() time.Time
@@ -212,6 +221,8 @@ func NewHandlerWithLifecycle(
 	accessQuota *accessquota.Runtime,
 	lifecycle *httplifecycle.Coordinator,
 	responseBindings *state.ResponseBindings,
+	catalogRuntime *catalog.Runtime,
+	usageReader AccessKeyUsageReader,
 ) *Handler {
 	handler := NewHandler(
 		manager,
@@ -234,6 +245,8 @@ func NewHandlerWithLifecycle(
 	}
 	handler.lifecycle = lifecycle
 	handler.responseBindings = responseBindings
+	handler.catalog = catalogRuntime
+	handler.usageReader = usageReader
 	return handler
 }
 
@@ -407,6 +420,10 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 	}
 	if requestContext.locallyRejected {
 		handler.dataPlaneRouteNotFound(ginContext)
+		return
+	}
+	if requestContext.selectedRoute.Kind == endpointUsage {
+		handler.handleUsage(ginContext, requestContext)
 		return
 	}
 	if websocketIntent(ginContext.Request) {
@@ -590,6 +607,37 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 		recorder.completeCanceled(ginContext.Request.Context(), 0, -1)
 		return
 	}
+	recorder.setClientModel(model)
+	recorder.setOperation(metadata.Operation)
+	recorder.setStream(metadata.Stream)
+	var boundAuto *automodel.Selection
+	autoQuery := scheduler.Query{}
+	if metadata.PreviousResponseID != "" {
+		binding, found := handler.responseBindings.Lookup(accessKey.ID, metadata.PreviousResponseID)
+		if !found {
+			handler.completeReason(ginContext, recorder, reasonResponseBindingNotFound)
+			return
+		}
+		boundAuto = binding.AutoSelection
+		autoQuery.AllowedCredentialRefs = map[uint]state.CredentialRef{binding.CredentialID: {
+			ID: binding.CredentialID, GroupID: binding.GroupID, IdentityGeneration: binding.IdentityGeneration,
+		}}
+	}
+	if _, automatic := snapshot.AutoModels.Lookup(model); automatic {
+		ctx := ginContext.Request.Context()
+		var failure *reason
+		parsed, metadata, recorder.autoDecision, failure = handler.prepareAutoModel(ctx, snapshot, accessKey, selectedDialect, parsed, metadata, boundAuto, func() *reason {
+			return handler.admitAutoQuota(snapshot, quotaAdmission)
+		}, autoQuery)
+		if failure != nil {
+			handler.completeReason(ginContext, recorder, *failure)
+			return
+		}
+		if ctx.Err() != nil {
+			recorder.completeCanceled(ctx, 0, -1)
+			return
+		}
+	}
 	query := scheduler.Query{
 		ClientProtocol:           selectedRoute.Protocol,
 		Operation:                metadata.Operation,
@@ -604,7 +652,6 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 	for _, ref := range capturedRefs {
 		allowedCredentialRefs[ref.ID] = ref
 	}
-	recorder.setClientModel(model)
 	recorder.setOperation(metadata.Operation)
 	recorder.setStream(metadata.Stream)
 	recorder.setReasoning(metadata.Reasoning)
@@ -641,6 +688,7 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 	iterator := scheduler.New(snapshot, handler.registry, query)
 	handler.executeAttempts(
 		ginContext,
+		snapshot,
 		iterator,
 		retryAttemptLimit(snapshot.Settings.RetryCount),
 		allowedCredentialRefs,
@@ -813,6 +861,7 @@ func headerFieldValues(headers http.Header, name string) []string {
 
 func (handler *Handler) executeAttempts(
 	ginContext *gin.Context,
+	snapshot *state.ConfigSnapshot,
 	iterator *scheduler.Iterator,
 	forwardAttemptLimit int,
 	allowedCredentialRefs map[uint]state.CredentialRef,
@@ -856,22 +905,32 @@ func (handler *Handler) executeAttempts(
 	var cachedPrepared *preparedRequest
 	loggedOverrideFailures := make(map[uint]struct{})
 	var parameterOverrideFailure *reason
-	prepareRequest := func(selection scheduler.Selection) preparedRequest {
+	prepareRequest := func(selection scheduler.Selection) (prepared preparedRequest) {
 		if cachedPrepared != nil && preparedGroupID == selection.GroupID {
 			return *cachedPrepared
 		}
 		cachedPrepared = nil
 		preparedGroupID = selection.GroupID
-		prepared := preparedRequest{
+		prepared = preparedRequest{
 			request: parsed, observations: originalMetadata, observationsAvailable: true,
 		}
+		defer func() {
+			if prepared.err == nil {
+				prepared.request, prepared.err = redactOutboundRequest(snapshot.RequestRedaction, selectedDialect.Protocol(), prepared.request)
+			}
+			cachedPrepared = &prepared
+		}()
 		if operation == execution.OperationWebSearch {
 			return prepared
+		}
+		routeModel := externalModel
+		if recorder.autoDecision != nil {
+			routeModel = recorder.autoDecision.Selection.TargetModel
 		}
 		body, applied, err := selection.Group.ParameterOverrides.Apply(
 			selectedDialect.Protocol(),
 			originalMetadata.Operation,
-			externalModel,
+			routeModel,
 			parsed.Body,
 		)
 		if err != nil {
@@ -1040,6 +1099,10 @@ func (handler *Handler) executeAttempts(
 		}
 		prepared := prepareRequest(selection)
 		if prepared.err != nil {
+			if errors.Is(prepared.err, requestredact.ErrContent) {
+				handler.completeReason(ginContext, recorder, reasonRedactionFailed)
+				return
+			}
 			if errors.Is(prepared.err, errRequestTooLarge) {
 				if parameterOverrideFailure == nil {
 					parameterOverrideFailure = &reasonRequestTooLarge
@@ -1150,6 +1213,10 @@ func (handler *Handler) executeAttempts(
 			quotaAdmission.admitted = true
 		}
 
+		if failure := handler.checkRequestAudit(ginContext.Request.Context(), snapshot, snapshot.AccessKeysByID[recorder.accessKeyID], prepared.request.Body, recorder, func() *reason { return handler.admitAutoQuota(snapshot, quotaAdmission) }); failure != nil {
+			handler.completeReason(ginContext, recorder, *failure)
+			return
+		}
 		attemptSequence++
 		forwardAttempts++
 		if attemptSequence == 1 && (originalMetadata.PreviousResponseID != "" ||
@@ -1192,7 +1259,7 @@ func (handler *Handler) executeAttempts(
 			ProxyFingerprint:       proxyFingerprint,
 			ForceCredentialRefresh: forceCredentialRefresh,
 			ContinuityKey:          requestAffinity.continuityKey,
-			OnResponse:             handler.responseBindingObserver(recorder.accessKeyID, selection, ref, prepared.request),
+			OnResponse:             handler.responseBindingObserver(recorder.accessKeyID, selection, ref, prepared.request, recorder.autoSelection()),
 			OnFirstResponse: func() {
 				recorder.recordFirstResponse()
 			},

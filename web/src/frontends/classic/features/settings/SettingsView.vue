@@ -31,13 +31,17 @@ import { useSectionNavigation } from '@/composables/use-section-navigation'
 import { formatLocalInstant } from '@/lib/format'
 
 import BrowserAccessSection from './BrowserAccessSection.vue'
+import AutoModelSettingsSection from './AutoModelSettingsSection.vue'
 import ConnectionSettingsSection from './ConnectionSettingsSection.vue'
 import DataMaintenanceSection from './DataMaintenanceSection.vue'
+import RequestRedactionSection from './RequestRedactionSection.vue'
+import type { RedactionRule } from '@/app/resources/request-redaction'
 import FrontendSettingsSection from './FrontendSettingsSection.vue'
 import ReliabilitySettingsSection from './ReliabilitySettingsSection.vue'
 import RoutingSettingsSection from './RoutingSettingsSection.vue'
 import SystemInfoSection from './SystemInfoSection.vue'
 import {
+  createSettingsDraft,
   isValidAffinityCapacity,
   isValidNonNegativeInteger,
   isValidRetention,
@@ -65,6 +69,8 @@ const settingsRefreshing = computed(
   () => settingsQuery.data.value !== undefined && settingsQuery.isFetching.value,
 )
 const headerRulesInvalidEdits = ref(false)
+const autoModelInvalidEdits = ref(false)
+const redactionInvalid = ref(false)
 const responseRulesInvalidEdits = ref(false)
 const browserAccessEditorRevision = ref(0)
 const discardDialogOpen = ref(false)
@@ -82,7 +88,11 @@ const proxyState = computed(() =>
     : { dirty: false, invalid: false, value: undefined },
 )
 const hasLocalEdits = computed(
-  () => headerRulesInvalidEdits.value || responseRulesInvalidEdits.value || proxyState.value.dirty,
+  () =>
+    headerRulesInvalidEdits.value ||
+    responseRulesInvalidEdits.value ||
+    autoModelInvalidEdits.value ||
+    proxyState.value.dirty,
 )
 const {
   base,
@@ -98,6 +108,18 @@ const {
   discard: discardDraft,
   saveAll,
 } = useSettingsController(resource, { hasLocalEdits })
+
+function updateRedaction(rules: RedactionRule[]): void {
+  if (!draft.value) return
+  const next = createSettingsDraft({
+    values: draft.value.values,
+    overrides: [...draft.value.overrides],
+    read_only: [...draft.value.readOnly],
+  })
+  next.values.request_redaction = rules
+  next.overrides.add('request_redaction')
+  updateDraft({ key: 'request_redaction', draft: next })
+}
 
 function resetProxyDraft(view: ProxyViewDto): void {
   proxyMode.value = view.configured_mode
@@ -120,8 +142,10 @@ const navItems = computed(() => [
   { id: 'settings-reliability', label: t('settings.navigation.reliability') },
   { id: 'settings-browser-access', label: t('settings.navigation.browserAccess') },
   { id: 'settings-data-maintenance', label: t('settings.navigation.dataMaintenance') },
-  { id: 'settings-system', label: t('settings.navigation.system') },
+  { id: 'settings-redaction', label: t('requestRedaction.title') },
+  { id: 'settings-experimental', label: t('settings.navigation.experimental') },
   { id: 'settings-interface', label: t('settings.frontend.title') },
+  { id: 'settings-system', label: t('settings.navigation.system') },
 ])
 const routeSection = computed(() => parseSettingsSection(route.query))
 const { activeSection, selectSection } = useSectionNavigation({
@@ -137,12 +161,18 @@ const pageOperationLocked = computed(() => operationLocked.value)
 const dirty = computed(
   () =>
     controllerDirty.value ||
+    autoModelInvalidEdits.value ||
     headerRulesInvalidEdits.value ||
     responseRulesInvalidEdits.value ||
     proxyState.value.dirty,
 )
 const valid = computed(
-  () => controllerValid.value && browserAccessValid.value && !proxyState.value.invalid,
+  () =>
+    !(redactionInvalid.value && patch.value.request_redaction != null) &&
+    controllerValid.value &&
+    browserAccessValid.value &&
+    !autoModelInvalidEdits.value &&
+    !proxyState.value.invalid,
 )
 const timeoutKeys = [
   'first_byte_timeout',
@@ -258,8 +288,10 @@ function sectionFromID(id: string): SettingsSection | undefined {
     section === 'reliability' ||
     section === 'browser-access' ||
     section === 'data-maintenance' ||
-    section === 'system' ||
-    section === 'interface'
+    section === 'interface' ||
+    section === 'redaction' ||
+    section === 'experimental' ||
+    section === 'system'
     ? section
     : undefined
 }
@@ -291,6 +323,10 @@ function confirmDiscard(): void {
 }
 
 function settingLabel(key: RuntimeSettingKey): string {
+  if (key === 'request_redaction') return t('requestRedaction.title')
+  if (key === 'jev') return t('jev.title')
+  if (key === 'request_audit') return t('requestAudit.title')
+  if (key === 'auto_model') return t('autoModel.title')
   if (key === 'affinity_enabled' || key === 'affinity_ttl' || key === 'affinity_capacity')
     return t(`settings.affinity.${key}`)
   if (key === 'request_log_retention_days') return t('settings.logs.retention')
@@ -301,12 +337,16 @@ function settingLabel(key: RuntimeSettingKey): string {
 }
 
 function settingTarget(key: RuntimeSettingKey): string {
+  if (key === 'request_redaction') return 'settings-redaction'
+  if (['auto_model', 'jev', 'request_audit'].includes(key)) return 'settings-experimental'
   if (key === 'header_rules' || key === 'cors' || key === 'response_header_rules')
     return 'settings-browser-access'
   return `settings-value-${key}`
 }
 
 function sectionForKey(key: RuntimeSettingKey): SettingsSection {
+  if (key === 'request_redaction') return 'redaction'
+  if (['auto_model', 'jev', 'request_audit'].includes(key)) return 'experimental'
   if (key === 'header_rules' || key === 'cors' || key === 'response_header_rules')
     return 'browser-access'
   if (
@@ -455,8 +495,24 @@ onBeforeUnmount(() => {
             />
           </template>
 
-          <SystemInfoSection />
+          <RequestRedactionSection
+            v-if="base && draft"
+            :model-value="draft.values.request_redaction"
+            :disabled="pageOperationLocked"
+            @update:model-value="updateRedaction"
+            @invalid="redactionInvalid = $event"
+          />
+          <AutoModelSettingsSection
+            v-if="base && draft"
+            :base="base"
+            :draft="draft"
+            :disabled="pageOperationLocked"
+            :revision="browserAccessEditorRevision"
+            @change="updateDraft"
+            @invalid="autoModelInvalidEdits = $event"
+          />
           <FrontendSettingsSection :disabled="dirty || pageOperationLocked" />
+          <SystemInfoSection />
         </div>
       </div>
 

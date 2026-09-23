@@ -1,3 +1,5 @@
+import { jaJP as requestRedaction } from './request-redaction'
+import { jaJP as experimental } from './experimental'
 import { protocolMessages as protocols } from '../protocols'
 import { jaJP as inspector } from './inspector'
 import { jaJP as home } from './home'
@@ -15,9 +17,12 @@ import { jaJP as groupCreate } from './group-create'
 import { jaJP as modelSelection } from './model-selection'
 import { jaJP as modelManager } from './model-manager'
 import { jaJP as settingsForm } from './settings-form'
+import { jaJP as autoModel } from './auto-model'
 import { jaJP as subscriptions } from './subscriptions'
 
 export default {
+  requestRedaction,
+  ...experimental,
   home,
   inspector,
   protocols,
@@ -33,6 +38,7 @@ export default {
   modelSelection,
   modelManager,
   settingsForm,
+  autoModel,
   groupCreate,
   ui,
   ...groupMessages,

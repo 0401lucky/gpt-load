@@ -1,3 +1,14 @@
+import { readRedactionRules, type RedactionRule } from './request-redaction'
+import {
+  readJev,
+  readAudit,
+  readDecisionRoutes,
+  readAuditAccessKeys,
+  type JevConfig,
+  type AuditConfig,
+  type DecisionRoute,
+  type AuditAccessKey,
+} from './experimental'
 import { queryOptions } from '@tanstack/vue-query'
 import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 
@@ -22,6 +33,12 @@ import {
   projectString,
 } from './projector'
 import { projectProxyView } from './proxy'
+import {
+  projectAutoModel,
+  projectAutoEntry,
+  type AutoModelConfigDto,
+  type AutoEntryDto,
+} from './auto-model'
 
 export const runtimeSettingKeys = [
   'route_strategy',
@@ -40,6 +57,10 @@ export const runtimeSettingKeys = [
   'validation_interval',
   'request_log_retention_days',
   'models_dev_auto_sync_enabled',
+  'auto_model',
+  'jev',
+  'request_audit',
+  'request_redaction',
 ] as const
 
 export type RuntimeSettingKey = (typeof runtimeSettingKeys)[number]
@@ -56,6 +77,10 @@ export type TimeoutSettingKey = Exclude<
   | 'affinity_capacity'
   | 'request_log_retention_days'
   | 'models_dev_auto_sync_enabled'
+  | 'auto_model'
+  | 'jev'
+  | 'request_audit'
+  | 'request_redaction'
 >
 export type PolicyCountSettingKey = 'retry_count' | 'blacklist_threshold'
 
@@ -70,6 +95,10 @@ export interface CORSConfigDto {
 }
 
 export interface SettingsValues {
+  request_redaction: RedactionRule[]
+  jev: JevConfig
+  request_audit: AuditConfig
+  auto_model?: AutoModelConfigDto
   route_strategy: RouteStrategy
   first_byte_timeout: number
   request_timeout: number
@@ -90,12 +119,21 @@ export interface SettingsValues {
 }
 
 export interface SettingsDto {
+  decision_routes: DecisionRoute[]
+  audit_access_keys: AuditAccessKey[]
+  request_audit_preset: AuditConfig
+  auto_model_template?: AutoEntryDto
+  decision_models: string[]
   values: SettingsValues
   overrides: RuntimeSettingKey[]
   read_only: RuntimeSettingKey[]
 }
 
 export type SettingsPatch = Partial<{
+  auto_model: AutoModelConfigDto | null
+  jev: JevConfig | null
+  request_redaction: RedactionRule[] | null
+  request_audit: AuditConfig | null
   route_strategy: RouteStrategy | null
   first_byte_timeout: number | null
   request_timeout: number | null
@@ -119,7 +157,16 @@ export interface SettingsResource {
   settings: SettingsDto
 }
 
-const settingsFields = ['values', 'overrides', 'read_only'] as const
+const settingsFields = [
+  'values',
+  'overrides',
+  'read_only',
+  'auto_model_template',
+  'decision_models',
+  'decision_routes',
+  'audit_access_keys',
+  'request_audit_preset',
+] as const
 const settingsValueFields = [...runtimeSettingKeys, 'proxy_config'] as const
 
 function invalidResponse(): never {
@@ -195,7 +242,19 @@ export function projectSettings(value: unknown): SettingsDto {
   if (new Set(readOnly).size !== readOnly.length) invalidResponse()
 
   return {
+    auto_model_template:
+      record.auto_model_template === undefined
+        ? undefined
+        : projectAutoEntry(record.auto_model_template),
+    decision_models: projectArray(record.decision_models, projectString),
+    decision_routes: readDecisionRoutes(record.decision_routes),
+    audit_access_keys: readAuditAccessKeys(record.audit_access_keys),
+    request_audit_preset: readAudit(record.request_audit_preset),
     values: {
+      auto_model: projectAutoModel(values.auto_model),
+      jev: readJev(values.jev),
+      request_audit: readAudit(values.request_audit),
+      request_redaction: readRedactionRules(values.request_redaction),
       route_strategy: projectEnum(values.route_strategy, routeStrategies),
       first_byte_timeout: projectSafeInteger(values.first_byte_timeout, { minimum: 1 }),
       request_timeout: projectSafeInteger(values.request_timeout, { minimum: 1 }),

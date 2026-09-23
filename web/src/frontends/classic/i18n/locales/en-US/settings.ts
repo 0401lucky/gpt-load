@@ -1,4 +1,11 @@
+import { enUS as requestRedaction } from '../request-redaction'
+import { enUS as experimental } from '../experimental'
+import { enUS as autoModel } from '../auto-model'
+
 export default {
+  requestRedaction,
+  ...experimental,
+  autoModel,
   settings: {
     frontend: {
       title: 'Interface',
@@ -49,6 +56,7 @@ export default {
       reliability: 'Retries and credential health',
       browserAccess: 'Headers and CORS',
       dataMaintenance: 'Data and maintenance',
+      experimental: 'Experimental features',
       system: 'System information',
     },
     validation: {

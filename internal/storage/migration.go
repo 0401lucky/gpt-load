@@ -111,6 +111,10 @@ var migrations = []migration{
 	{ID: migrationfiles.ID0018, Up: migrationfiles.Up0018, Validate: migrationfiles.Validate0018, ValidateCurrent: migrationfiles.ValidateCurrent0018, ValidateRecoverable: migrationfiles.ValidateRecoverable0018},
 	{ID: migrationfiles.ID0019, Up: migrationfiles.Up0019, Validate: migrationfiles.Validate0019, ValidateCurrent: migrationfiles.ValidateCurrent0019, ValidateRecoverable: migrationfiles.ValidateRecoverable0019},
 	{ID: migrationfiles.ID0020, Up: migrationfiles.Up0020, Validate: migrationfiles.Validate0020, ValidateRecoverable: migrationfiles.ValidateRecoverable0020},
+	{ID: migrationfiles.ID0021, Up: migrationfiles.Up0021, Validate: migrationfiles.Validate0021, ValidateRecoverable: migrationfiles.ValidateRecoverable0021},
+	{ID: migrationfiles.ID0022, Up: migrationfiles.Up0022, Validate: migrationfiles.Validate0022, ValidateRecoverable: migrationfiles.ValidateRecoverable0022},
+	{ID: migrationfiles.ID0023, Up: migrationfiles.Up0023, Validate: migrationfiles.Validate0023, ValidateRecoverable: migrationfiles.ValidateRecoverable0023},
+	{ID: migrationfiles.ID0024, Up: migrationfiles.Up0024, Validate: migrationfiles.Validate0024, ValidateRecoverable: migrationfiles.ValidateRecoverable0024},
 }
 
 func applyMigrations(db *gorm.DB) error {
@@ -175,9 +179,16 @@ func validateMigrationRegistry(entries []migration) error {
 }
 
 func applyMigrationsLocked(db *gorm.DB, entries []migration, useMigrationTransactions bool) error {
-	hadMigrationLedger := db.Migrator().HasTable(migrationLedgerTable)
+	hadMigrationLedger, err := migrationTableExists(db, migrationLedgerTable)
+	if err != nil {
+		return fmt.Errorf("inspect schema_migrations: %w", err)
+	}
 	if !hadMigrationLedger {
-		if db.Migrator().HasTable(initialSchemaSentinelTable) {
+		hadInitialSchema, err := migrationTableExists(db, initialSchemaSentinelTable)
+		if err != nil {
+			return fmt.Errorf("inspect initial schema: %w", err)
+		}
+		if hadInitialSchema {
 			return fmt.Errorf(
 				"initialize database schema: %s table already exists",
 				initialSchemaSentinelTable,
@@ -204,13 +215,19 @@ func applyMigrationsLocked(db *gorm.DB, entries []migration, useMigrationTransac
 			return fmt.Errorf("schema_migrations contains unknown or non-contiguous migration %q", id)
 		}
 	}
-	for index, id := range applied {
-		validator := entries[index].Validate
-		if entries[index].ValidateCurrent != nil {
-			validator = entries[index].ValidateCurrent
+	if len(applied) > 0 {
+		inspection, err := newMigrationInspection(db)
+		if err != nil {
+			return err
 		}
-		if err := validator(db); err != nil {
-			return fmt.Errorf("validate applied migration %s: %w", id, err)
+		for index, id := range applied {
+			validator := entries[index].Validate
+			if entries[index].ValidateCurrent != nil {
+				validator = entries[index].ValidateCurrent
+			}
+			if err := inspection.validate(validator); err != nil {
+				return fmt.Errorf("validate applied migration %s: %w", id, err)
+			}
 		}
 	}
 
@@ -231,7 +248,7 @@ func applyMigration(db *gorm.DB, entry migration, useMigrationTransactions bool)
 			return fmt.Errorf("apply migration %s: %w", entry.ID, err)
 		}
 		if entry.Validate != nil {
-			if err := entry.Validate(tx); err != nil {
+			if err := validateMigrationAfterDDL(tx, entry.Validate); err != nil {
 				return fmt.Errorf("validate migration %s: %w", entry.ID, err)
 			}
 		}
