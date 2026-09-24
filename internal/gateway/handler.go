@@ -985,6 +985,7 @@ func (handler *Handler) executeAttempts(
 			CredentialRefreshable:    credentialRefreshable,
 			Method:                   method,
 			Operation:                operation,
+			RateLimitResetHint:       selection.Group.RateLimitResetHintEnabled,
 		}
 	}
 	recordCandidatePreparationFailure := func(
@@ -1522,8 +1523,9 @@ func (handler *Handler) executeAttempts(
 		return
 	}
 	if until, limited := iterator.CooldownUntil(); limited {
-		setCooldownRetryAfter(ginContext, until, handler.now())
-		handler.completeReason(ginContext, recorder, reasonUpstreamRateLimited)
+		now := handler.now()
+		setCooldownRetryAfter(ginContext, until, now)
+		handler.completeReason(ginContext, recorder, accountsUnavailableReason(externalModel, until, now))
 		return
 	}
 	handler.completeReason(ginContext, recorder, reasonNoCandidate)

@@ -141,6 +141,7 @@ export const zhCN = {
     blacklist_threshold: '连续失败拉黑阈值',
     affinity_enabled: '会话亲和',
     responses_websocket_enabled: 'Responses WebSocket',
+    rate_limit_reset_hint_enabled: '按重置时间冷却',
   },
 }
 
@@ -295,6 +296,7 @@ export const enUS: typeof zhCN = {
     blacklist_threshold: 'Consecutive failure threshold',
     affinity_enabled: 'Session affinity',
     responses_websocket_enabled: 'Responses WebSocket',
+    rate_limit_reset_hint_enabled: 'Reset-time cooldown',
   },
 }
 
@@ -445,5 +447,6 @@ export const jaJP: typeof zhCN = {
     blacklist_threshold: '連続失敗のしきい値',
     affinity_enabled: 'セッションアフィニティ',
     responses_websocket_enabled: 'Responses WebSocket',
+    rate_limit_reset_hint_enabled: 'リセット時間のクールダウン',
   },
 }

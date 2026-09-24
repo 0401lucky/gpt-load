@@ -355,6 +355,9 @@ export default {
         websocketHelp: '关闭会立即断开本分组的 WS 连接并中断生成，HTTP/SSE 不受影响。',
         affinity_enabled: '请求亲和',
         affinityHelp: '只控制本分组是否学习或复用亲和目标，不改变普通轮询、权重或重试。',
+        rate_limit_reset_hint_enabled: '按重置时间冷却',
+        resetHintHelp:
+          '开启后，上游 429 写明模型重置时间时，本分组按该时间冷却对应凭据上的该模型，而不是固定 1 分钟。',
       },
       delete: {
         sectionDescription: '删除分组会同时删除其全部渠道凭据，且无法撤销。',

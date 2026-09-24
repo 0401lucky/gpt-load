@@ -278,6 +278,19 @@ const websocketEnabledLabel = computed(() =>
     ? t('group.settings.runtime.enabledValue')
     : t('group.settings.runtime.disabledValue'),
 )
+const resetHintOverridden = computed(
+  () => draft.value?.overrides.rate_limit_reset_hint_enabled !== undefined,
+)
+const resetHintPendingRestore = computed(
+  () =>
+    !resetHintOverridden.value &&
+    saved.value?.overrides.rate_limit_reset_hint_enabled !== undefined,
+)
+const resetHintEnabledLabel = computed(() =>
+  saved.value?.effective.rate_limit_reset_hint_enabled
+    ? t('group.settings.runtime.enabledValue')
+    : t('group.settings.runtime.disabledValue'),
+)
 function resetSavedDraft(settings: GroupSettingsDto): void {
   saved.value = settings
   draft.value = createGroupSettingsDraft(settings)
@@ -465,6 +478,22 @@ function setWebsocketValue(value: boolean): void {
   draft.value = {
     ...draft.value,
     overrides: { ...draft.value.overrides, responses_websocket_enabled: value },
+  }
+}
+
+function toggleResetHintOverride(): void {
+  if (!draft.value || !saved.value) return
+  const overrides = { ...draft.value.overrides }
+  if (resetHintOverridden.value) delete overrides.rate_limit_reset_hint_enabled
+  else overrides.rate_limit_reset_hint_enabled = saved.value.effective.rate_limit_reset_hint_enabled
+  draft.value = { ...draft.value, overrides }
+}
+
+function setResetHintValue(value: boolean): void {
+  if (!draft.value) return
+  draft.value = {
+    ...draft.value,
+    overrides: { ...draft.value.overrides, rate_limit_reset_hint_enabled: value },
   }
 }
 
@@ -914,7 +943,6 @@ onBeforeUnmount(() => {
                 "
                 :overridden="affinityOverridden"
                 :pending-restore="affinityPendingRestore"
-                :divided="false"
                 :disabled="mutationPending"
                 @toggle="toggleAffinityOverride"
               >
@@ -924,6 +952,41 @@ onBeforeUnmount(() => {
                     :disabled="mutationPending"
                     :label="t('group.settings.runtime.affinity_enabled')"
                     @update:model-value="setAffinityValue"
+                  />
+                </template>
+              </SettingRow>
+              <SettingRow
+                :label="t('group.settings.runtime.rate_limit_reset_hint_enabled')"
+                :value="
+                  resetHintPendingRestore
+                    ? t('group.settings.runtime.resetPending')
+                    : resetHintEnabledLabel
+                "
+                :help="t('group.settings.runtime.resetHintHelp')"
+                :source-label="
+                  resetHintOverridden
+                    ? t('group.settings.runtime.override')
+                    : resetHintPendingRestore
+                      ? t('group.settings.runtime.pendingRestoreSource')
+                      : t('group.settings.runtime.inherited')
+                "
+                :action-label="
+                  resetHintOverridden
+                    ? t('group.settings.runtime.useInherited')
+                    : t('group.settings.runtime.useOverride')
+                "
+                :overridden="resetHintOverridden"
+                :pending-restore="resetHintPendingRestore"
+                :divided="false"
+                :disabled="mutationPending"
+                @toggle="toggleResetHintOverride"
+              >
+                <template #control>
+                  <AppSwitch
+                    :model-value="draft.overrides.rate_limit_reset_hint_enabled ?? false"
+                    :disabled="mutationPending"
+                    :label="t('group.settings.runtime.rate_limit_reset_hint_enabled')"
+                    @update:model-value="setResetHintValue"
                   />
                 </template>
               </SettingRow>

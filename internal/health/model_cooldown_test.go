@@ -87,3 +87,44 @@ func TestModelCooldownDoesNotUseUnrelatedWindowResetHeaders(t *testing.T) {
 		}
 	}
 }
+
+func TestModelCooldownUsesResetHintOnlyWhenEnabled(t *testing.T) {
+	now := time.Now()
+	const resetHint = "Error 429: Daily free limit reached on model z-ai/glm-5.3-flash. Try again in 3h 18m"
+	for _, test := range []struct {
+		name     string
+		enabled  bool
+		summary  string
+		want     time.Duration
+		wantRule RuleID
+	}{
+		{
+			name: "enabled parses the upstream deadline", enabled: true, summary: resetHint,
+			want: 3*time.Hour + 19*time.Minute, wantRule: "rate_limit.reset_hint",
+		},
+		{
+			name: "disabled keeps the default cooldown", enabled: false, summary: resetHint,
+			want: time.Minute, wantRule: "rate_limit.model.default_cooldown",
+		},
+		{
+			name: "enabled without a usable deadline keeps the default cooldown", enabled: true,
+			summary: "Error 429: Daily free limit reached on model z-ai/glm-5.3-flash.",
+			want:    time.Minute, wantRule: "rate_limit.model.default_cooldown",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			result := JudgeExecution(ExecutionAttempt{
+				DispatchState: execution.DispatchMaybeSent, StatusCode: http.StatusTooManyRequests, Now: now,
+				Evidence: &execution.ErrorEvidence{
+					Kind: execution.ErrorKindHTTP, Hint: execution.FailureHintRateLimited,
+					StatusCode: http.StatusTooManyRequests, Summary: test.summary,
+				},
+			}, DecisionContext{Operation: execution.OperationChatCompletion, RateLimitResetHint: test.enabled})
+			if result.Effect != EffectCooldownModel || result.RuleID != test.wantRule ||
+				!result.CooldownUntil.Equal(now.Add(test.want)) {
+				t.Fatalf("decision = %#v; want effect=%s rule=%s deadline=%v",
+					result, EffectCooldownModel, test.wantRule, now.Add(test.want))
+			}
+		})
+	}
+}

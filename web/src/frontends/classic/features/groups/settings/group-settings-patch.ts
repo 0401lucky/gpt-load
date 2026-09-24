@@ -77,6 +77,8 @@ function cloneOverrides(value: GroupRuntimeConfigDto): GroupRuntimeConfigDto {
   if (value.affinity_enabled !== undefined) next.affinity_enabled = value.affinity_enabled
   if (value.responses_websocket_enabled !== undefined)
     next.responses_websocket_enabled = value.responses_websocket_enabled
+  if (value.rate_limit_reset_hint_enabled !== undefined)
+    next.rate_limit_reset_hint_enabled = value.rate_limit_reset_hint_enabled
   if (value.parameter_overrides?.length)
     next.parameter_overrides = cloneParameterOverrides(value.parameter_overrides)
   return next

@@ -370,6 +370,9 @@ export default {
         affinity_enabled: 'リクエストアフィニティ',
         affinityHelp:
           '通常の重み、スケジューリング、再試行を変えず、このグループがアフィニティ対象を学習または再利用するかを制御します。',
+        rate_limit_reset_hint_enabled: 'リセット時間のクールダウン',
+        resetHintHelp:
+          '有効にすると、上流の 429 がモデルのリセット時刻を示した場合、既定の 1 分ではなくその時刻まで該当の認証情報とモデルをクールダウンします。',
       },
       delete: {
         sectionDescription:

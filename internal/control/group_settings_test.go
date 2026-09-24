@@ -226,6 +226,60 @@ func TestUpdateGroupSettingsOverridesAffinityParticipation(t *testing.T) {
 	}
 }
 
+func TestUpdateGroupSettingsOverridesRateLimitResetHint(t *testing.T) {
+	t.Parallel()
+	fixture := newServiceFixture(t)
+	groupID := createGroupForCredentialImport(t, fixture, "sk-settings-reset-hint")
+
+	defaults, err := fixture.service.GetGroupSettings(t.Context(), groupID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if defaults.Effective.RateLimitResetHintEnabled ||
+		defaults.Overrides[state.SettingRateLimitResetHintEnabled] != nil {
+		t.Fatalf("default settings = %#v", defaults)
+	}
+
+	for _, test := range []struct {
+		name     string
+		override config.Settings
+		want     bool
+	}{
+		{name: "enable", override: config.Settings{state.SettingRateLimitResetHintEnabled: true}, want: true},
+		{name: "disable", override: config.Settings{state.SettingRateLimitResetHintEnabled: false}, want: false},
+		{name: "inherit", override: config.Settings{}, want: false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			if _, err := fixture.service.UpdateGroupSettings(t.Context(), groupID, GroupSettingsUpdateRequest{
+				Overrides: optionalField[config.Settings]{Set: true, Value: test.override},
+			}); err != nil {
+				t.Fatal(err)
+			}
+			// 开启 → 保存 → 重新读取必须保持同一个值，否则前端会在下次保存时抹掉它。
+			got, err := fixture.service.GetGroupSettings(t.Context(), groupID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.Effective.RateLimitResetHintEnabled != test.want {
+				t.Fatalf("effective switch = %t, want %t", got.Effective.RateLimitResetHintEnabled, test.want)
+			}
+			if view := fixture.manager.Current().Groups[groupID]; view.RateLimitResetHintEnabled != test.want {
+				t.Fatalf("snapshot switch = %t, want %t", view.RateLimitResetHintEnabled, test.want)
+			}
+			persisted, exists := got.Overrides[state.SettingRateLimitResetHintEnabled]
+			if _, overridden := test.override[state.SettingRateLimitResetHintEnabled]; !overridden {
+				if exists {
+					t.Fatalf("inherited overrides = %#v, want the key absent", got.Overrides)
+				}
+				return
+			}
+			if !exists || persisted != test.want {
+				t.Fatalf("persisted override = %#v, want %t", got.Overrides, test.want)
+			}
+		})
+	}
+}
+
 func TestUpdateGroupSettingsOverridesBlacklistPolicy(t *testing.T) {
 	t.Parallel()
 	fixture := newServiceFixture(t)

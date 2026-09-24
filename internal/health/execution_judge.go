@@ -632,6 +632,13 @@ func rateLimitDecision(attempt ExecutionAttempt, decisionContext DecisionContext
 		result.RuleID = "rate_limit.reset_header"
 		return result
 	}
+	// 分组开关开启时才采信上游文案里的重置时间，作用域沿用上面的分流结果。
+	if decisionContext.RateLimitResetHint {
+		if hint, ok := ParseResetHint(attempt.Evidence.Summary); ok {
+			result.CooldownUntil, result.RuleID = attempt.Now.Add(hint), "rate_limit.reset_hint"
+			return result
+		}
+	}
 	result.CooldownUntil = attempt.Now.Add(decisionContext.DefaultRateLimitCooldown)
 	return result
 }

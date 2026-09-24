@@ -369,6 +369,9 @@ export default {
         affinity_enabled: 'Request affinity',
         affinityHelp:
           'Controls whether this Group learns or reuses affinity targets without changing normal weights, scheduling, or retries.',
+        rate_limit_reset_hint_enabled: 'Reset-time cooldown',
+        resetHintHelp:
+          'When enabled, an upstream 429 that states when the model resets cools that credential and model until then instead of the default one minute.',
       },
       delete: {
         sectionDescription:

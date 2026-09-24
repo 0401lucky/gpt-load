@@ -3,6 +3,7 @@ package gateway
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -78,7 +79,51 @@ var (
 		Code:    "parameter_override_unavailable",
 		Message: "No upstream candidate could apply the configured parameter overrides.",
 	}
+	// reasonModelAccountsUnavailable 是「该模型在所有候选凭据上都处于冷却」的出口。
+	// Code 与 reasonUpstreamRateLimited 保持一致，下游按 code 归类渠道错误不受影响；
+	// Message 由 accountsUnavailableReason 按实际模型与恢复时间组装，这里是不含
+	// 模型名时的退化措辞。
+	reasonModelAccountsUnavailable = reason{
+		Status:  http.StatusTooManyRequests,
+		Code:    "upstream_rate_limited",
+		Message: "No available account for the requested model.",
+	}
 )
+
+// accountsUnavailableReason 组装「运行中的候选全部处于冷却」的对外错误。
+func accountsUnavailableReason(model string, until, now time.Time) reason {
+	value := reasonModelAccountsUnavailable
+	subject := "the requested model"
+	if trimmed := strings.TrimSpace(model); trimmed != "" {
+		subject = "model " + trimmed
+	}
+	value.Message = "No available account for " + subject +
+		". Earliest recovery in about " + cooldownRecoveryLabel(until, now) + "."
+	return value
+}
+
+// cooldownRecoveryLabel 把最早恢复时间渲染成上游风格的紧凑时长文案。
+func cooldownRecoveryLabel(until, now time.Time) string {
+	seconds := int64(math.Ceil(until.Sub(now).Seconds()))
+	if seconds < 1 {
+		seconds = 1
+	}
+	days := seconds / 86_400
+	hours := seconds % 86_400 / 3_600
+	minutes := seconds % 3_600 / 60
+	switch {
+	case days > 0 && hours > 0:
+		return fmt.Sprintf("%dd %dh", days, hours)
+	case days > 0:
+		return fmt.Sprintf("%dd", days)
+	case hours > 0:
+		return fmt.Sprintf("%dh %dm", hours, minutes)
+	case minutes > 0:
+		return fmt.Sprintf("%dm", minutes)
+	default:
+		return fmt.Sprintf("%ds", seconds)
+	}
+}
 
 type accessKeyCostLimitRuleError struct {
 	ID             uint             `json:"id"`

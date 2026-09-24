@@ -63,6 +63,8 @@ type DecisionContext struct {
 	CredentialRefreshable    bool
 	Method                   string
 	Operation                execution.Operation
+	// RateLimitResetHint 允许按上游 429 文案里的重置时间延长本次冷却。
+	RateLimitResetHint bool
 }
 
 // Decision is the complete business decision for one execution attempt.

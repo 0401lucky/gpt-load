@@ -348,6 +348,59 @@ func TestAffinitySettingsArePublicAndGroupEnableIsOverridable(t *testing.T) {
 	}
 }
 
+func TestRateLimitResetHintDefaultsOffAndIsGroupOverridable(t *testing.T) {
+	defaults, err := ResolveRuntimeSettings(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if defaults.RateLimitResetHintEnabled {
+		t.Fatal("RateLimitResetHintEnabled = true, want default false")
+	}
+	// 分组专属键不得暴露为全局 runtime 键：全局 PUT 与全局 overrides 投影都按
+	// IsRuntimeSettingKey 放行，放行会让两套前端设置页拿到未知键。先例见
+	// parameter_overrides 的同款守护断言。
+	if IsRuntimeSettingKey(SettingRateLimitResetHintEnabled) {
+		t.Fatal("IsRuntimeSettingKey() exposed group-only rate limit reset hint")
+	}
+
+	enabled, err := ResolveRuntimeSettings(config.Settings{SettingRateLimitResetHintEnabled: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !enabled.RateLimitResetHintEnabled {
+		t.Fatal("RateLimitResetHintEnabled = false, want parsed true")
+	}
+	inherited, err := ResolveGroupRuntimeSettings(enabled, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !inherited.RateLimitResetHintEnabled {
+		t.Fatalf("group inherited switch = %#v, want true", inherited)
+	}
+	disabled, err := ResolveGroupRuntimeSettings(
+		enabled,
+		config.Settings{SettingRateLimitResetHintEnabled: false},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if disabled.RateLimitResetHintEnabled {
+		t.Fatalf("group overridden switch = %#v, want false", disabled)
+	}
+
+	for _, value := range []any{nil, 0, "true"} {
+		if _, err := ResolveRuntimeSettings(config.Settings{SettingRateLimitResetHintEnabled: value}); err == nil {
+			t.Errorf("ResolveRuntimeSettings(%#v) accepted a non-boolean switch", value)
+		}
+		if _, err := ResolveGroupRuntimeSettings(
+			defaults,
+			config.Settings{SettingRateLimitResetHintEnabled: value},
+		); err == nil {
+			t.Errorf("ResolveGroupRuntimeSettings(%#v) accepted a non-boolean switch", value)
+		}
+	}
+}
+
 func TestAffinitySettingsRejectInvalidValues(t *testing.T) {
 	for key, values := range map[string][]any{
 		SettingAffinityEnabled:  {nil, 0, "true"},
@@ -691,7 +744,7 @@ func TestIsRuntimeSettingKeyRecognizesOnlyPublicRuntimeKeys(t *testing.T) {
 			t.Errorf("IsRuntimeSettingKey(%q) = false", key)
 		}
 	}
-	for _, key := range []string{"", "retry_enabled", "blacklist_enabled", "_internal.bootstrap"} {
+	for _, key := range []string{"", "retry_enabled", "blacklist_enabled", "_internal.bootstrap", SettingRateLimitResetHintEnabled} {
 		if IsRuntimeSettingKey(key) {
 			t.Errorf("IsRuntimeSettingKey(%q) = true", key)
 		}
