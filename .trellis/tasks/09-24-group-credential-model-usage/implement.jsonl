@@ -1,0 +1,11 @@
+{"file": ".trellis/spec/guides/index.md", "reason": "Pre-Modification Rule：改动前先 grep 新键名/字段名/接口路径，确认无重名"}
+{"file": ".trellis/spec/backend/index.md", "reason": "后端三条红线：依赖边界测试、错误出口唯一、门禁固定为 make check"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "依赖边界：internal/health、internal/scheduler、internal/telemetry 不得 import storage/control/gorm；新代码的落点与 DTO 约定"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "新增只读接口 GET /api/groups/:id/model-usage 的错误出口必须走 writeServiceError，不得外泄裸 error"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "本任务明确不新增迁移；该文件是迁移注册表与编号策略的权威依据，用于确认「复用既有表 + 检查点」不触发迁移要求"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "测试约定（表格驱动、t.Cleanup、不用 testify、t.Setenv）与代码风格、门禁九步"}
+{"file": ".trellis/spec/backend/i18n-guidelines.md", "reason": "新增用户可见文案必须走 i18n key 且 locales/{zh-CN,en-US,ja-JP}.go 三份同步"}
+{"file": ".trellis/spec/frontend/index.md", "reason": "前端四条红线，尤其 projector 白名单与三套 locale 同步无脚本守护"}
+{"file": ".trellis/spec/frontend/data-layer.md", "reason": "资源层四段式、projector 严格白名单、禁止 as 断言、query key 与 invalidation 登记；含「新增分组级设置键」联动清单可作投影登记的参照"}
+{"file": ".trellis/spec/frontend/i18n.md", "reason": "classic 与 modern 两侧 locale key 的组织方式与三语言同步要求"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "本次是 storage/state/requestlog/control + 两套前端的跨层改动，需按跨层指南核对字段全程贯通与同批提交要求"}

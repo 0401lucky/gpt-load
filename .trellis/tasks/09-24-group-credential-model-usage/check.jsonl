@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "后端 Quality Check 清单与红线，作为验收核对基准"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "门禁界定（make check 九步、不自行加 race/覆盖率）、Code Review 自查清单"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "核对新增 import 是否跨越 dependency_test.go 划定的依赖边界"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "核对本任务确实零迁移：账本保持 24 条、未新增表/列、未触碰迁移注册表"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "核对新接口的响应与错误出口、无裸 error 外泄"}
+{"file": ".trellis/spec/frontend/data-layer.md", "reason": "核对两套前端的投影白名单逐字段登记、无 as 断言、query key 与失效登记合规"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "前端提交前自查清单：白名单、三套 locale、无新增 hex、类型导入、组件目录"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "核对字段在 state→requestlog→control→两套前端全链路逐层贯通；核对「接口与两套前端同批提交」"}
