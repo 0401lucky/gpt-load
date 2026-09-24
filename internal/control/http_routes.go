@@ -288,6 +288,12 @@ func (s *Server) HTTPModule() httproute.Module {
 				s.handleGetGroupModels,
 			),
 			controlRoute(
+				"control.groups.model-usage.get",
+				http.MethodGet,
+				"/groups/:group_id/model-usage",
+				s.handleGetGroupModelUsage,
+			),
+			controlRoute(
 				"control.groups.models.update",
 				http.MethodPut,
 				"/groups/:group_id/models",

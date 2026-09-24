@@ -16,6 +16,10 @@ type CredentialRuntimeCheckpoint struct {
 	FailureCount       int                  `json:"failure_count"`
 	IdentityGeneration uint64               `json:"identity_generation,omitempty"`
 	ModelCooldowns     map[string]time.Time `json:"model_cooldowns,omitempty"`
+	// 额度窗口锚点：与 ModelCooldowns 同时保存，但独立于冷却是否过期。
+	// 旧版本检查点缺这两个字段时按空处理，回滚到旧镜像只是退化为近 24 小时口径。
+	ModelCycleStarts map[string]time.Time `json:"model_cycle_starts,omitempty"`
+	ModelNextResets  map[string]time.Time `json:"model_next_resets,omitempty"`
 }
 
 // CaptureRuntimeCheckpoint returns detached runtime health state in stable
@@ -33,7 +37,9 @@ func (r *CredentialRegistry) CaptureRuntimeCheckpoint() []CredentialRuntimeCheck
 				Blacklisted:        entry.Blacklisted,
 				FailureCount:       entry.FailureCount,
 				IdentityGeneration: entry.IdentityGeneration,
-				ModelCooldowns:     cloneModelCooldowns(entry.ModelCooldowns),
+				ModelCooldowns:     cloneModelTimes(entry.ModelCooldowns),
+				ModelCycleStarts:   cloneModelTimes(entry.ModelCycleStarts),
+				ModelNextResets:    cloneModelTimes(entry.ModelNextResets),
 			})
 		}
 	}
@@ -71,8 +77,13 @@ func (r *CredentialRegistry) RestoreRuntimeCheckpoint(checkpoints []CredentialRu
 		entry.Blacklisted = checkpoint.Blacklisted
 		entry.FailureCount = checkpoint.FailureCount
 		if checkpoint.IdentityGeneration == entry.IdentityGeneration {
-			entry.ModelCooldowns = cloneModelCooldowns(checkpoint.ModelCooldowns)
+			entry.ModelCooldowns = cloneModelTimes(checkpoint.ModelCooldowns)
 			pruneModelCooldowns(entry.ModelCooldowns, time.Now())
+			// 恢复路径只能做过期清理，不能复用 pruneModelCooldowns 的语义：
+			// 冷却此刻可能已经过期，但周期锚点必须活着。
+			entry.ModelCycleStarts = cloneModelTimes(checkpoint.ModelCycleStarts)
+			entry.ModelNextResets = cloneModelTimes(checkpoint.ModelNextResets)
+			pruneModelCycles(entry.ModelCycleStarts, entry.ModelNextResets, time.Now())
 		}
 		r.scheduling.SyncCredential(runtimeView(entry))
 		restored++

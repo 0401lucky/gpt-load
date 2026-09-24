@@ -52,11 +52,11 @@ func (service *Service) QueryCredentialActivity(
 		ctx = context.Background()
 	}
 
-	hourlyFromMS, err := alignHourUp(input.FromMS)
+	hourlyFromMS, err := epochms.AlignUp(input.FromMS, epochms.MillisecondsPerHour)
 	if err != nil {
 		return nil, fmt.Errorf("query credential activity: align window start: %w", err)
 	}
-	hourlyToMS, err := alignHourUp(input.ToMS)
+	hourlyToMS, err := epochms.AlignUp(input.ToMS, epochms.MillisecondsPerHour)
 	if err != nil {
 		return nil, fmt.Errorf("query credential activity: align window end: %w", err)
 	}

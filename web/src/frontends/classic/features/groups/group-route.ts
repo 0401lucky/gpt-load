@@ -11,7 +11,7 @@ import {
   serializePositiveRouteIntegerList,
 } from '@/app/route-query'
 
-export type GroupTab = 'credentials' | 'models' | 'settings'
+export type GroupTab = 'credentials' | 'models' | 'usage' | 'settings'
 export type GroupSettingsSection =
   'general' | 'routing' | 'runtime' | 'parameters' | 'headers' | 'danger'
 export type GroupModelDiscoveryFilter = 'unadded' | 'all'
@@ -55,7 +55,9 @@ export function parsePositiveId(raw: unknown): number | undefined {
 }
 
 export function normalizeGroupTab(raw: unknown): GroupTab {
-  return raw === 'models' || raw === 'settings' || raw === 'credentials' ? raw : 'credentials'
+  return raw === 'models' || raw === 'usage' || raw === 'settings' || raw === 'credentials'
+    ? raw
+    : 'credentials'
 }
 
 export function normalizeCredentialSearch(value: string | undefined): string | undefined {
@@ -166,5 +168,6 @@ export function normalizeGroupQuery(query: LocationQuery): LocationQueryRaw {
     )
   }
   if (tab === 'models') return serializeGroupModelsRouteQuery(parseGroupModelsRouteQuery(query))
+  if (tab === 'usage') return { tab: 'usage' }
   return serializeGroupSettingsRouteQuery(parseGroupSettingsRouteQuery(query))
 }

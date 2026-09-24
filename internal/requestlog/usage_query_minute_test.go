@@ -322,7 +322,7 @@ func assertMinuteUsageReportTotals(t *testing.T, report UsageReport) {
 	var total UsageAggregate
 	for _, point := range report.Series {
 		var err error
-		total, err = addUsageAggregates(total, point.UsageAggregate)
+		total, err = AddUsageAggregates(total, point.UsageAggregate)
 		if err != nil {
 			t.Fatal(err)
 		}

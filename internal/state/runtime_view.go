@@ -61,7 +61,7 @@ func runtimeView(entry *CredentialEntry) CredentialRuntimeView {
 		Status:             entry.Status,
 		AuthState:          entry.AuthState.normalize(),
 		CooldownUntil:      entry.CooldownUntil,
-		ModelCooldowns:     cloneModelCooldowns(entry.ModelCooldowns),
+		ModelCooldowns:     cloneModelTimes(entry.ModelCooldowns),
 		Blacklisted:        entry.Blacklisted,
 		FailureCount:       entry.FailureCount,
 		QuotaRemaining:     cloneFloat(entry.quotaRemaining),

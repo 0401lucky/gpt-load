@@ -365,7 +365,7 @@ func mergeUsageHours(source []usageHourPoint, bucketWidthMS int64) ([]UsageSerie
 			})
 			continue
 		}
-		merged, err := addUsageAggregates(series[len(series)-1].UsageAggregate, point.UsageAggregate)
+		merged, err := AddUsageAggregates(series[len(series)-1].UsageAggregate, point.UsageAggregate)
 		if err != nil {
 			return nil, fmt.Errorf("merge usage bucket %d: %w", bucketStartMS, err)
 		}
@@ -374,7 +374,10 @@ func mergeUsageHours(source []usageHourPoint, bucketWidthMS int64) ([]UsageSerie
 	return series, nil
 }
 
-func addUsageAggregates(left, right UsageAggregate) (UsageAggregate, error) {
+// AddUsageAggregates sums two usage aggregates with the shared checked arithmetic
+// and validates the result, so callers outside this package never re-derive the
+// token or cost totals.
+func AddUsageAggregates(left, right UsageAggregate) (UsageAggregate, error) {
 	result := UsageAggregate{}
 	fields := []struct {
 		name        string

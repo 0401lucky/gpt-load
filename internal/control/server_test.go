@@ -104,6 +104,7 @@ func TestGroupCollectionHTTPRoutesDeclareStaticOptionsBeforeDynamicDetail(t *tes
 		{name: "control.groups.get", path: "/groups/:group_id"},
 		{name: "control.groups.settings.get", path: "/groups/:group_id/settings"},
 		{name: "control.groups.models.get", path: "/groups/:group_id/models"},
+		{name: "control.groups.model-usage.get", path: "/groups/:group_id/model-usage"},
 		{name: "control.group-credentials.list", path: "/groups/:group_id/credentials"},
 		{name: "control.group-credentials.detail", path: "/groups/:group_id/credentials/:credential_id"},
 		{name: "control.group-credentials.quota-history", path: "/groups/:group_id/credentials/:credential_id/quota-history"},

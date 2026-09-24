@@ -16,6 +16,7 @@ const activeTab = computed(() => normalizeGroupTab(route.query.tab))
 const items = computed<AppTabItem[]>(() => [
   { value: 'credentials', label: t('group.tabs.credentials'), count: n(props.credentialCount) },
   { value: 'models', label: t('group.tabs.models'), count: n(props.modelCount) },
+  { value: 'usage', label: t('group.tabs.usage') },
   { value: 'settings', label: t('group.tabs.settings') },
 ])
 

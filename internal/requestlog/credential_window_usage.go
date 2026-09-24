@@ -3,7 +3,6 @@ package requestlog
 import (
 	"context"
 	"fmt"
-	"math"
 
 	"gorm.io/gorm"
 
@@ -104,7 +103,7 @@ func (service *Service) queryCredentialHourlyUsage(
 	db *gorm.DB,
 	input CredentialWindowUsageQuery,
 ) (CredentialWindowUsage, error) {
-	fullHoursFromMS, err := alignHourUp(input.FromMS)
+	fullHoursFromMS, err := epochms.AlignUp(input.FromMS, epochms.MillisecondsPerHour)
 	if err != nil {
 		return CredentialWindowUsage{}, fmt.Errorf("align window start: %w", err)
 	}
@@ -150,7 +149,7 @@ func (service *Service) queryCredentialHourlyUsage(
 		if err != nil {
 			return err
 		}
-		result.UsageAggregate, err = addUsageAggregates(
+		result.UsageAggregate, err = AddUsageAggregates(
 			result.UsageAggregate,
 			boundary.UsageAggregate,
 		)
@@ -188,20 +187,6 @@ func (service *Service) requestLogWindowRetained(fromMS int64) bool {
 	}
 	cutoffMS, err := retentionCutoffMS(service.now().UTC().UnixMilli(), service.retentionPolicy.RequestLogRetentionDays())
 	return err == nil && fromMS >= cutoffMS
-}
-
-func alignHourUp(value int64) (int64, error) {
-	aligned, err := epochms.AlignDown(value, epochms.MillisecondsPerHour)
-	if err != nil {
-		return 0, err
-	}
-	if aligned == value {
-		return value, nil
-	}
-	if aligned > math.MaxInt64-epochms.MillisecondsPerHour {
-		return 0, fmt.Errorf("aligned time overflow")
-	}
-	return aligned + epochms.MillisecondsPerHour, nil
 }
 
 type credentialRequestLogUsageRow struct {

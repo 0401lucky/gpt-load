@@ -14,6 +14,7 @@ import {
 } from '@modern/api/group-detail'
 import { getGroupUsage, getGroupWorkspace, groupQueryKey } from '@modern/api/groups'
 import { getGroupUsageTrend } from '@modern/api/group-usage-trend'
+import { getGroupModelUsage, groupModelUsageKey } from '@modern/api/group-model-usage'
 import { usePageRefresh } from '@modern/app/page-refresh'
 import {
   AppBadge,
@@ -31,6 +32,7 @@ import GroupAdvancedPanel from './GroupAdvancedPanel.vue'
 import GroupBasicsForm from './GroupBasicsForm.vue'
 import GroupCredentialAddPanel from './GroupCredentialAddPanel.vue'
 import GroupCredentials from './GroupCredentials.vue'
+import GroupModelUsageMatrix from './GroupModelUsageMatrix.vue'
 import GroupModelsPanel from './GroupModelsPanel.vue'
 import GroupOverview from './GroupOverview.vue'
 
@@ -74,6 +76,13 @@ const trend = useQuery(
   computed(() => ({
     queryKey: ['modern', 'group-usage-trend', id.value],
     queryFn: ({ signal }: { signal: AbortSignal }) => getGroupUsageTrend(client, id.value, signal),
+    enabled: Boolean(group.value),
+  })),
+)
+const modelUsage = useQuery(
+  computed(() => ({
+    queryKey: groupModelUsageKey(id.value),
+    queryFn: ({ signal }: { signal: AbortSignal }) => getGroupModelUsage(client, id.value, signal),
     enabled: Boolean(group.value),
   })),
 )
@@ -137,6 +146,7 @@ async function refresh(): Promise<void> {
     models.refetch(),
     usage.refetch(),
     trend.refetch(),
+    modelUsage.refetch(),
     credentials.value?.refresh(),
     basics.value?.refresh(),
   ])
@@ -148,6 +158,7 @@ usePageRefresh({
     models.isFetching.value ||
     usage.isFetching.value ||
     trend.isFetching.value ||
+    modelUsage.isFetching.value ||
     basicsPending.value ||
     credentialsPending.value,
   updatedAt: () =>
@@ -156,6 +167,7 @@ usePageRefresh({
       models.dataUpdatedAt.value,
       usage.dataUpdatedAt.value,
       trend.dataUpdatedAt.value,
+      modelUsage.dataUpdatedAt.value,
       basicsUpdatedAt.value,
       credentialsUpdatedAt.value,
     ) || undefined,
@@ -181,6 +193,7 @@ async function groupDeleted(): Promise<void> {
     'credential-trends',
     'group-overview-usage',
     'group-usage-trend',
+    'group-model-usage',
   ]) {
     await cache.cancelQueries({ queryKey: ['modern', key, deletedID] })
     cache.removeQueries({ queryKey: ['modern', key, deletedID] })
@@ -298,6 +311,12 @@ useMessageSource(() =>
           @changed="cache.invalidateQueries({ queryKey: groupQueryKey })"
           @pending="credentialsPending = $event"
           @updated-at="credentialsUpdatedAt = $event"
+        />
+        <GroupModelUsageMatrix
+          :data="modelUsage.data.value"
+          :loading="modelUsage.isFetching.value"
+          :failed="modelUsage.isError.value"
+          @retry="modelUsage.refetch()"
         />
       </div>
       <aside class="modern-group-workspace-sidebar" :aria-label="t('groupDetail.settings')">

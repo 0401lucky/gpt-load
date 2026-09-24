@@ -24,6 +24,7 @@ import GroupCredentialsTab from './credentials/GroupCredentialsTab.vue'
 import GroupModelsTab from './models/GroupModelsTab.vue'
 import GroupTabs from './GroupTabs.vue'
 import GroupSettingsTab from './settings/GroupSettingsTab.vue'
+import GroupModelUsageTab from './usage/GroupModelUsageTab.vue'
 import { normalizeGroupTab, parseCredentialRouteQuery, parsePositiveId } from './group-route'
 
 const route = useRoute()
@@ -106,6 +107,11 @@ watch(
               :key="groupId"
               :group-id="groupId"
               :channel-id="summaryQuery.data.value.channel_id"
+            />
+            <GroupModelUsageTab
+              v-else-if="activeTab === 'usage'"
+              :key="groupId"
+              :group-id="groupId"
             />
             <GroupSettingsTab
               v-else-if="activeTab === 'settings'"

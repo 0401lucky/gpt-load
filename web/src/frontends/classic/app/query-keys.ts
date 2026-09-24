@@ -89,6 +89,8 @@ export const controlQueryKeys = {
         'collection',
         normalizeCredentialCollectionFilters(filters),
       ] as const,
+    modelUsageAll: () => ['control', 'groups', 'model-usage'] as const,
+    modelUsage: (id: number) => ['control', 'groups', 'model-usage', id] as const,
   },
   channels: {
     all: ['control', 'channels'] as const,

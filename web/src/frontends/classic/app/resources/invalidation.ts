@@ -20,6 +20,7 @@ const importedCredentialResourcePlan = (groupID: number) =>
     [
       controlQueryKeys.groups.credentialsAll(groupID),
       controlQueryKeys.groups.collectionAll,
+      controlQueryKeys.groups.modelUsageAll(),
       controlQueryKeys.home.all,
     ],
   )

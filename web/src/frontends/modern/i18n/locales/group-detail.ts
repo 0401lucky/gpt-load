@@ -143,6 +143,47 @@ export const zhCN = {
     responses_websocket_enabled: 'Responses WebSocket',
     rate_limit_reset_hint_enabled: '按重置时间冷却',
   },
+  modelUsage: {
+    title: '凭据 × 模型用量',
+    description: '按（凭据, 上游模型）展示本额度窗口内已消耗的 token。',
+    hint: '按整点统计：{from} – {to}',
+    truncated: '仅显示用量最高的 {shown} 行，共 {total} 行。',
+    loading: '正在加载模型用量…',
+    loadFailed: '无法加载模型用量。',
+    stale: '模型用量可能已过期，最近一次刷新失败。',
+    retry: '重新加载',
+    refresh: '刷新模型用量',
+    empty: '当前分组在统计区间内没有模型用量。',
+    emptyFiltered: '没有符合条件的组合。',
+    filters: {
+      onlyCooling: '只看冷却中',
+      groupByModel: '按模型折叠',
+    },
+    columns: {
+      credential: '凭据',
+      model: '上游模型',
+      tokens: '本窗口 token',
+      requests: '请求数',
+      window: '窗口口径',
+      cooldown: '冷却状态',
+    },
+    window: {
+      exact: '本周期',
+      fallback: '近 24h',
+      help: '本周期：窗口起点取该组合上一次已发生的重置时刻；近 24h：该组合尚无周期记录，回退到近 24 小时。',
+    },
+    windowStart: '窗口起点 {time}',
+    cooldown: {
+      cooling: '冷却中',
+      none: '—',
+      until: '{time} 恢复',
+    },
+    tokensDetail: {
+      label: '输入 {input} · 输出 {output}',
+      cache: '缓存读 {read} · 缓存写 {write}',
+    },
+    requestsDetail: '成功 {success} · 失败 {failure}',
+  },
 }
 
 export const enUS: typeof zhCN = {
@@ -298,6 +339,47 @@ export const enUS: typeof zhCN = {
     responses_websocket_enabled: 'Responses WebSocket',
     rate_limit_reset_hint_enabled: 'Reset-time cooldown',
   },
+  modelUsage: {
+    title: 'Credential × model usage',
+    description: 'Tokens consumed in the current quota window, per (credential, upstream model).',
+    hint: 'Counted by whole hours: {from} – {to}',
+    truncated: 'Showing the top {shown} rows of {total}.',
+    loading: 'Loading model usage…',
+    loadFailed: 'Unable to load model usage.',
+    stale: 'Model usage may be out of date; the last refresh failed.',
+    retry: 'Reload',
+    refresh: 'Refresh model usage',
+    empty: 'No model usage in the counted range for this group.',
+    emptyFiltered: 'No combination matches the filters.',
+    filters: {
+      onlyCooling: 'Cooling only',
+      groupByModel: 'Group by model',
+    },
+    columns: {
+      credential: 'Credential',
+      model: 'Upstream model',
+      tokens: 'Window tokens',
+      requests: 'Requests',
+      window: 'Window basis',
+      cooldown: 'Cooldown',
+    },
+    window: {
+      exact: 'This cycle',
+      fallback: 'Last 24h',
+      help: 'This cycle: the window starts at the last reset that already happened for that pair. Last 24h: the pair has no cycle record yet, so the last 24 hours are used.',
+    },
+    windowStart: 'Window starts {time}',
+    cooldown: {
+      cooling: 'Cooling down',
+      none: '—',
+      until: 'available {time}',
+    },
+    tokensDetail: {
+      label: 'Input {input} · output {output}',
+      cache: 'Cache read {read} · cache write {write}',
+    },
+    requestsDetail: 'Succeeded {success} · failed {failure}',
+  },
 }
 
 export const jaJP: typeof zhCN = {
@@ -448,5 +530,46 @@ export const jaJP: typeof zhCN = {
     affinity_enabled: 'セッションアフィニティ',
     responses_websocket_enabled: 'Responses WebSocket',
     rate_limit_reset_hint_enabled: 'リセット時間のクールダウン',
+  },
+  modelUsage: {
+    title: '認証情報 × モデル使用量',
+    description: '（認証情報, 上流モデル）ごとに、現在の割り当て期間で消費したトークンを示します。',
+    hint: '正時単位で集計：{from} – {to}',
+    truncated: '使用量の多い上位 {shown} 行のみ表示しています（全 {total} 行）。',
+    loading: 'モデル使用量を読み込み中…',
+    loadFailed: 'モデル使用量を読み込めません。',
+    stale: 'モデル使用量が古い可能性があります。直近の更新に失敗しました。',
+    retry: '再読み込み',
+    refresh: 'モデル使用量を更新',
+    empty: '集計期間内にこのグループのモデル使用量はありません。',
+    emptyFiltered: '条件に一致する組み合わせはありません。',
+    filters: {
+      onlyCooling: 'クールダウンのみ',
+      groupByModel: 'モデルでまとめる',
+    },
+    columns: {
+      credential: '認証情報',
+      model: '上流モデル',
+      tokens: '期間内トークン',
+      requests: 'リクエスト数',
+      window: '集計基準',
+      cooldown: 'クールダウン',
+    },
+    window: {
+      exact: '現在の期間',
+      fallback: '直近 24 時間',
+      help: '現在の期間：この組み合わせで直前に発生したリセット時刻を起点にします。直近 24 時間：周期の記録がまだないため、直近 24 時間で代用します。',
+    },
+    windowStart: '期間の起点 {time}',
+    cooldown: {
+      cooling: 'クールダウン中',
+      none: '—',
+      until: '{time} に復帰',
+    },
+    tokensDetail: {
+      label: '入力 {input} · 出力 {output}',
+      cache: 'キャッシュ読取 {read} · 書込 {write}',
+    },
+    requestsDetail: '成功 {success} · 失敗 {failure}',
   },
 }

@@ -42,6 +42,24 @@ func AlignDown(value, width int64) (int64, error) {
 	return value - value%width, nil
 }
 
+// AlignUp returns the Unix epoch boundary at or after value.
+func AlignUp(value, width int64) (int64, error) {
+	if value < 0 {
+		return 0, errInvalidEpochMilliseconds
+	}
+	if width <= 0 {
+		return 0, errors.New("epoch millisecond width must be positive")
+	}
+	aligned := value - value%width
+	if aligned == value {
+		return value, nil
+	}
+	if aligned > math.MaxInt64-width {
+		return 0, errors.New("epoch millisecond boundary overflows int64")
+	}
+	return aligned + width, nil
+}
+
 // WindowEndingAt returns count full buckets ending after observedAt's bucket.
 func WindowEndingAt(observedAt, width int64, count int) (from, to int64, err error) {
 	if count <= 0 {

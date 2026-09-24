@@ -38,6 +38,8 @@ type CredentialEntry struct {
 	AuthState               CredentialAuthState
 	CooldownUntil           time.Time
 	ModelCooldowns          map[string]time.Time
+	ModelCycleStarts        map[string]time.Time
+	ModelNextResets         map[string]time.Time
 	ModelCooldownGeneration uint64
 	Blacklisted             bool
 	FailureCount            int
@@ -1029,7 +1031,9 @@ func cloneCredentialEntry(entry CredentialEntry) CredentialEntry {
 	entry.WeightManual = cloneWeight(entry.WeightManual)
 	entry.quotaRemaining = cloneFloat(entry.quotaRemaining)
 	entry.FailureGeneration = 0
-	entry.ModelCooldowns = cloneModelCooldowns(entry.ModelCooldowns)
+	entry.ModelCooldowns = cloneModelTimes(entry.ModelCooldowns)
+	entry.ModelCycleStarts = cloneModelTimes(entry.ModelCycleStarts)
+	entry.ModelNextResets = cloneModelTimes(entry.ModelNextResets)
 	return entry
 }
 
@@ -1053,7 +1057,9 @@ func (state CredentialAuthState) valid() bool {
 func detachCredentialEntryExact(entry CredentialEntry) CredentialEntry {
 	entry.WeightManual = cloneWeight(entry.WeightManual)
 	entry.quotaRemaining = cloneFloat(entry.quotaRemaining)
-	entry.ModelCooldowns = cloneModelCooldowns(entry.ModelCooldowns)
+	entry.ModelCooldowns = cloneModelTimes(entry.ModelCooldowns)
+	entry.ModelCycleStarts = cloneModelTimes(entry.ModelCycleStarts)
+	entry.ModelNextResets = cloneModelTimes(entry.ModelNextResets)
 	return entry
 }
 

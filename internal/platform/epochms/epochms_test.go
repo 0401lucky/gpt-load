@@ -52,6 +52,44 @@ func TestAlignDownUsesUnixEpochBoundaries(t *testing.T) {
 	}
 }
 
+func TestAlignUpRoundsNonAlignedValuesToTheNextBoundary(t *testing.T) {
+	tests := []struct {
+		name         string
+		value, width int64
+		want         int64
+	}{
+		{name: "already aligned", value: 1_785_373_200_000, width: MillisecondsPerHour, want: 1_785_373_200_000},
+		{name: "hour", value: 1_785_373_750_987, width: MillisecondsPerHour, want: 1_785_376_800_000},
+		{name: "day", value: 1_785_370_150_987, width: MillisecondsPerDay, want: 1_785_456_000_000},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := AlignUp(tt.value, tt.width)
+			if err != nil {
+				t.Fatalf("AlignUp() error = %v", err)
+			}
+			if got != tt.want {
+				t.Fatalf("AlignUp(%d, %d) = %d, want %d", tt.value, tt.width, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAlignUpRejectsInvalidWidthAndOverflow(t *testing.T) {
+	for _, width := range []int64{0, -1} {
+		if _, err := AlignUp(1, width); err == nil {
+			t.Fatalf("AlignUp() accepted width %d", width)
+		}
+	}
+	if _, err := AlignUp(-1, MillisecondsPerHour); err == nil {
+		t.Fatal("AlignUp() accepted a negative instant")
+	}
+	if _, err := AlignUp(math.MaxInt64-1, 10); err == nil {
+		t.Fatal("AlignUp() accepted a boundary that overflows int64")
+	}
+}
+
 func TestEpochMillisecondsRejectInvalidPersistentTimeAndWindowOverflow(t *testing.T) {
 	if _, err := FromTime(time.Unix(-1, 0)); err == nil {
 		t.Fatal("FromTime() accepted a negative instant")

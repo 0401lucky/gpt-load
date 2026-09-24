@@ -163,6 +163,40 @@ export interface GroupModelsDto {
   pending: number
 }
 
+/** 窗口口径：reset 为该 (凭据, 上游模型) 自身周期的精确窗口，fallback_24h 为无周期记录时的近 24 小时兜底。 */
+export type GroupModelWindowSource = 'reset' | 'fallback_24h'
+
+export interface GroupModelUsageItemDto {
+  credential_id: number
+  model: string
+  window_start_ms: number
+  window_source: GroupModelWindowSource
+  cooldown_until_ms: number | null
+  request_count: number
+  success_count: number
+  failure_count: number
+  uncached_input_tokens: number
+  cache_read_tokens: number
+  cache_write_5m_tokens: number
+  cache_write_1h_tokens: number
+  cache_write_unknown_tokens: number
+  output_tokens: number
+  total_tokens: number
+}
+
+export interface GroupModelUsagePaginationDto {
+  total_items: number
+}
+
+export interface GroupModelUsageDto {
+  observed_at_ms: number
+  counted_from_ms: number
+  counted_to_ms: number
+  items: GroupModelUsageItemDto[]
+  /** 截断信息按既有列表的 pagination 形态下发，字段可能整体缺失。 */
+  pagination?: GroupModelUsagePaginationDto
+}
+
 export type CredentialStatus = 'available' | 'cooldown' | 'blacklisted' | 'disabled'
 export type CredentialConfiguredStatus = 'active' | 'disabled'
 export type CredentialRecoveryMode = 'none' | 'cooldown' | 'probe' | 'manual'
