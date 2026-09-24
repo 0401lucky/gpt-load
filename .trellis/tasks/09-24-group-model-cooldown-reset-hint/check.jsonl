@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "后端 Quality Check 清单与三条红线，作为验收核对基准"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "门禁界定（make check 七步、不自行加 race/覆盖率）、Code Review 自查清单"}
+{"file": ".trellis/spec/backend/directory-structure.md", "reason": "核对新增 import 是否跨越 dependency_test.go 划定的依赖边界"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "核对新增 reason 的 code/status/文案是否走既有出口，无裸 error 外泄"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "前端提交前自查清单：白名单登记、三套 locale、无新增 hex、类型导入"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "核对配置键与模型名在 state→control→gateway→classic/modern 全链路是否逐层贯通、无遗漏投影"}
