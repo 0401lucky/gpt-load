@@ -104,6 +104,28 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 
 ---
 
+## 留存与清理：哪些数据会被删
+
+清理由 `requestlog.(*Service).Sweep` 执行（`internal/requestlog/retention.go`）。**只有三张表会被裁剪**，各自留存的语义不同 —— 写历史数据分析类功能前必须先看这张表，用错数据源会静默低估：
+
+| 表 | 留存 | 裁剪依据 |
+|---|---|---|
+| `request_logs`（逐请求明细） | `request_log_retention_days`，默认 **7 天**（`state.DefaultRuntimeSettings()`；可由系统设置改） | `completed_at_ms < cutoff` |
+| `usage_aggregation_journal`（聚合幂等日志） | **35 天** | `bucket_start_ms < cutoff` |
+| `credential_quota_histories`（订阅类渠道的百分比额度历史） | **35 天** | `observed_at_ms < cutoff` |
+| **`usage_stats`（小时用量聚合）** | **永久保留，不裁剪** | — |
+
+> **Warning**：`usage_stats` 是**唯一**不受留存影响的历史用量来源（`retention.go:22-24` 的文档注释明写 "Hourly aggregates are retained indefinitely"；`retention_test.go` 有 `TestRetentionSweepKeepsUsageStats…` 固定该行为）。因此**任何跨天/跨周期的 token 用量统计都应基于 `usage_stats`**；`request_logs` 只适合「留存窗口内的逐请求精确边界」，超出留存即静默缺数据。
+
+**取窗口用量的两条路径**（都在 `internal/requestlog/credential_window_usage.go`）：
+
+- `SourceHourlyStats`：整点对齐后查 `usage_stats` 取主体，再从 `request_logs` 合并首尾**不完整的小时**做精确边界；`DataComplete` 反映边界段是否仍在 `request_logs` 留存内。**单个凭据 + 单个窗口**的形态。
+- `SourceRequestLogs`：整段走 `request_logs`，`DataComplete = requestLogWindowRetained(FromMS)`。窗口超出留存时统计不完整但**不报错** —— 调用方必须读 `DataComplete`。
+
+⚠️ 需要**多个不同窗口**（例：按 `(凭据, 模型)` 各自的重置时刻划窗）时**不能**对每行调用上面这条单窗口接口 —— 那是 N 次查询。做法是取全组最早窗口起点、整点向上对齐为一次查询下界，一次取回后在内存按行归并（先例：`internal/requestlog/group_model_usage.go` 的 `QueryGroupModelUsage`，其 `TestQueryGroupModelUsageReadsTheBucketRangeInOneRowQuery` 用 GORM 查询回调计数固定「一次取回」）。
+
+---
+
 ## 迁移
 
 `internal/storage/migration.go` 是核心：**版本化注册表 + 每个迁移内部调用 GORM 的 AutoMigrate**。
