@@ -313,6 +313,7 @@ useMessageSource(() =>
           @updated-at="credentialsUpdatedAt = $event"
         />
         <GroupModelUsageMatrix
+          :group-id="id"
           :data="modelUsage.data.value"
           :loading="modelUsage.isFetching.value"
           :failed="modelUsage.isError.value"

@@ -89,6 +89,10 @@ export const controlQueryKeys = {
         'collection',
         normalizeCredentialCollectionFilters(filters),
       ] as const,
+    // 凭据标识映射（id → mask）单独一个键：credentialsAll 前缀下缓存的是凭据分页响应，
+    // 既有的批量更新逻辑会按那个形状读写，放 Map 会让它们读到 undefined。
+    credentialIdentities: (id: number) =>
+      ['control', 'groups', 'credential-identities', id] as const,
     modelUsageAll: () => ['control', 'groups', 'model-usage'] as const,
     modelUsage: (id: number) => ['control', 'groups', 'model-usage', id] as const,
   },

@@ -173,6 +173,7 @@ export const zhCN = {
       help: '本周期：窗口起点取该组合上一次已发生的重置时刻；近 24h：该组合尚无周期记录，回退到近 24 小时。',
     },
     windowStart: '窗口起点 {time}',
+    credentialLabel: '凭据 #{id}',
     cooldown: {
       cooling: '冷却中',
       none: '—',
@@ -369,6 +370,7 @@ export const enUS: typeof zhCN = {
       help: 'This cycle: the window starts at the last reset that already happened for that pair. Last 24h: the pair has no cycle record yet, so the last 24 hours are used.',
     },
     windowStart: 'Window starts {time}',
+    credentialLabel: 'Credential #{id}',
     cooldown: {
       cooling: 'Cooling down',
       none: '—',
@@ -561,6 +563,7 @@ export const jaJP: typeof zhCN = {
       help: '現在の期間：この組み合わせで直前に発生したリセット時刻を起点にします。直近 24 時間：周期の記録がまだないため、直近 24 時間で代用します。',
     },
     windowStart: '期間の起点 {time}',
+    credentialLabel: '認証情報 #{id}',
     cooldown: {
       cooling: 'クールダウン中',
       none: '—',

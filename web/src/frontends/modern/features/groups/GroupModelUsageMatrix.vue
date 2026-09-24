@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight, Info, RefreshCw } from '@lucide/vue'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getGroupCredentials, type CredentialFilters } from '@modern/api/group-detail'
 import {
   groupRowsByModel,
   sortModelUsage,
@@ -21,15 +23,18 @@ import {
   AppTooltip,
 } from '@modern/components/ui'
 import { formatCompactNumber, formatRemainingDuration } from '@modern/components/ui/format'
+import { useApiClient } from '@shared/http/client-context'
 import { credentialTime } from './credential-presentation'
 
 const props = defineProps<{
+  groupId: number
   data?: GroupModelUsage
   loading: boolean
   failed: boolean
 }>()
 const emit = defineEmits<{ retry: [] }>()
 const { t, n, locale } = useI18n()
+const client = useApiClient()
 const onlyCooling = ref(false)
 const grouped = ref(false)
 const expanded = ref(true)
@@ -37,10 +42,59 @@ const sort = ref<ModelUsageSort>('total_tokens')
 const direction = ref<ModelUsageDirection>('desc')
 const collapsed = ref<Set<string>>(new Set())
 
+// 矩阵只下发 credential_id；可识别的标识来自该组凭据列表。后端只接受 page_size ≤ 100，
+// 凭据可能有一页以上，因此按页取全后合并；任一分页失败即停止翻页，用已取到的部分建映射，
+// 未覆盖的组合回退到内部 id，矩阵本身不受影响。
+const credentialIdentityPageSize = 100
+// 翻页硬上限：最多 10 页（1000 个凭据），避免凭据异常多时打出无限请求。
+const credentialIdentityPageLimit = 10
+const identityFilters: CredentialFilters = {
+  q: '',
+  page: 1,
+  pageSize: credentialIdentityPageSize,
+  sort: 'name',
+  status: '',
+  proxy: '',
+  reset: '',
+}
+async function loadCredentialIdentities(signal: AbortSignal) {
+  const map = new Map<number, { mask: string; note: string }>()
+  for (let page = 1; page <= credentialIdentityPageLimit; page += 1) {
+    try {
+      const result = await getGroupCredentials(
+        client,
+        props.groupId,
+        { ...identityFilters, page },
+        signal,
+      )
+      for (const item of result.items) map.set(item.id, { mask: item.mask, note: item.note })
+      if (page * result.pageSize >= result.total) break
+    } catch {
+      // 任一页失败就保留已取到的部分，不向上抛错。
+      break
+    }
+  }
+  return map
+}
+// 标识映射单独放一个查询键：既有 groupCredentialsKey 前缀下缓存的是凭据分页响应，
+// 其他组件会按该形状 setQueriesData，放 Map 会让那些更新器读到 undefined。
+const credentials = useQuery(
+  computed(() => ({
+    queryKey: ['modern', 'group-credential-identities', props.groupId] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }) => loadCredentialIdentities(signal),
+    enabled: props.groupId > 0,
+  })),
+)
+const identities = computed(
+  () => credentials.data.value ?? new Map<number, { mask: string; note: string }>(),
+)
+
 const visible = computed(() =>
   (props.data?.items ?? []).filter((row) => !onlyCooling.value || row.cooldownUntil !== null),
 )
-const rows = computed(() => sortModelUsage(visible.value, sort.value, direction.value))
+const rows = computed(() =>
+  sortModelUsage(visible.value, sort.value, direction.value, credentialLabel),
+)
 const groups = computed(() => groupRowsByModel(rows.value))
 function toggleSort(next: ModelUsageSort): void {
   if (sort.value === next) {
@@ -97,6 +151,22 @@ function remaining(row: GroupModelUsageRow): string {
   return row.cooldownUntil === null
     ? ''
     : formatRemainingDuration(row.cooldownUntil - (props.data?.observedAt ?? 0), locale.value)
+}
+function credentialIDLabel(row: GroupModelUsageRow): string {
+  return t('groupDetail.modelUsage.credentialLabel', { id: n(row.credentialID) })
+}
+// 排序与实际显示共用同一标识：备注优先，其次掩码；两者都缺失时回退到内部 id。
+function credentialLabel(credentialID: number): string | undefined {
+  const entry = identities.value.get(credentialID)
+  return entry?.note || entry?.mask || undefined
+}
+function credentialIdentity(row: GroupModelUsageRow): string {
+  return credentialLabel(row.credentialID) ?? credentialIDLabel(row)
+}
+function credentialHint(row: GroupModelUsageRow): string {
+  const identity = credentialIdentity(row)
+  const idLabel = credentialIDLabel(row)
+  return identity === idLabel ? idLabel : `${identity}\n${idLabel}`
 }
 </script>
 
@@ -241,7 +311,13 @@ function remaining(row: GroupModelUsageRow): string {
             </tr>
             <template v-if="!grouped || !collapsed.has(group.model)">
               <tr v-for="row in group.rows" :key="rowKey(row)">
-                <td class="modern-model-usage-credential">#{{ n(row.credentialID) }}</td>
+                <td class="modern-model-usage-credential">
+                  <AppTooltip :label="credentialHint(row)"
+                    ><span class="modern-model-usage-credential-text" tabindex="0">{{
+                      credentialIdentity(row)
+                    }}</span></AppTooltip
+                  >
+                </td>
                 <td>
                   <span class="modern-model-usage-model"
                     ><AppOverflowText :text="row.model"
@@ -383,7 +459,7 @@ function remaining(row: GroupModelUsageRow): string {
 }
 .modern-model-usage-table th:first-child,
 .modern-model-usage-table td:first-child {
-  width: 84px;
+  width: 120px;
 }
 .modern-model-usage-table th:nth-child(3),
 .modern-model-usage-table td:nth-child(3) {
@@ -411,6 +487,12 @@ function remaining(row: GroupModelUsageRow): string {
 .modern-model-usage-number,
 .modern-model-usage-credential {
   color: var(--modern-text);
+}
+.modern-model-usage-credential-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .modern-model-usage-window {
   white-space: nowrap;

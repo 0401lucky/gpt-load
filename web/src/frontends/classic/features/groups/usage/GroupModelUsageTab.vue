@@ -7,7 +7,9 @@ import { useI18n } from 'vue-i18n'
 import { useApiClient } from '@shared/http/client-context'
 import type { GroupModelUsageItemDto } from '@/api/control/types'
 import { useStableLoading } from '@/app/loading-state'
+import { controlQueryKeys } from '@/app/query-keys'
 import { groupModelUsageQueryOptions } from '@/app/resources/group-model-usage'
+import { getCredentialCollection } from '@/app/resources/credentials'
 import {
   formatInteger,
   formatISOInstant,
@@ -30,6 +32,37 @@ const props = defineProps<{ groupId: number }>()
 const client = useApiClient()
 const { t, n, locale } = useI18n()
 const query = useQuery(groupModelUsageQueryOptions(client, () => props.groupId))
+// 矩阵只下发 credential_id；可识别的标识来自该组凭据列表。后端只接受 page_size ≤ 100，
+// 凭据可能有一页以上，因此按页取全后合并；任一分页失败即停止翻页，用已取到的部分建映射，
+// 未覆盖的组合回退到内部 id，矩阵本身不受影响。
+const credentialIdentityPageSize = 100
+// 翻页硬上限：最多 10 页（1000 个凭据），避免凭据异常多时打出无限请求。
+const credentialIdentityPageLimit = 10
+async function loadCredentialMasks(signal: AbortSignal): Promise<Map<number, string>> {
+  const map = new Map<number, string>()
+  for (let page = 1; page <= credentialIdentityPageLimit; page += 1) {
+    try {
+      const collection = await getCredentialCollection(
+        client,
+        props.groupId,
+        { page, page_size: credentialIdentityPageSize },
+        signal,
+      )
+      for (const item of collection.items) map.set(item.credential_id, item.mask)
+      if (page >= collection.pagination.total_pages) break
+    } catch {
+      // 任一页失败就保留已取到的部分，不向上抛错。
+      break
+    }
+  }
+  return map
+}
+const credentialsQuery = useQuery({
+  queryKey: computed(() => controlQueryKeys.groups.credentialIdentities(props.groupId)),
+  queryFn: ({ signal }: { signal: AbortSignal }) => loadCredentialMasks(signal),
+  enabled: computed(() => props.groupId > 0),
+})
+const credentialMasks = computed(() => credentialsQuery.data.value ?? new Map<number, string>())
 const initialLoading = useStableLoading(
   () => query.isPending.value && query.data.value === undefined,
 )
@@ -56,7 +89,7 @@ const rows = computed(() => {
     }
     const difference =
       sort.value === 'credential_id'
-        ? left.credential_id - right.credential_id
+        ? credentialOrder(left, right)
         : sort.value === 'request_count'
           ? left.request_count - right.request_count
           : left.total_tokens - right.total_tokens
@@ -66,6 +99,15 @@ const rows = computed(() => {
       : left.credential_id - right.credential_id || left.model.localeCompare(right.model)
   })
 })
+// 凭据列按用户在单元格里实际看到的标识排序；任一侧没有标识（凭据列表未加载或查不到）时
+// 退回内部 id，与该列此前按 id 排序的行为一致。
+function credentialOrder(left: GroupModelUsageItemDto, right: GroupModelUsageItemDto): number {
+  const leftMask = credentialMasks.value.get(left.credential_id)
+  const rightMask = credentialMasks.value.get(right.credential_id)
+  return leftMask !== undefined && rightMask !== undefined
+    ? leftMask.localeCompare(rightMask)
+    : left.credential_id - right.credential_id
+}
 // 分组折叠只改变呈现分组，不改变行顺序；组内沿用传入顺序。
 const modelGroups = computed(() => {
   const groups = new Map<string, GroupModelUsageItemDto[]>()
@@ -145,6 +187,17 @@ function countedRange(): string {
     from: formatLocalTime(data.counted_from_ms, locale.value),
     to: formatLocalTime(data.counted_to_ms, locale.value),
   })
+}
+function credentialIDLabel(row: GroupModelUsageItemDto): string {
+  return t('group.usage.credentialLabel', { id: n(row.credential_id) })
+}
+function credentialIdentity(row: GroupModelUsageItemDto): string {
+  return credentialMasks.value.get(row.credential_id) || credentialIDLabel(row)
+}
+function credentialHint(row: GroupModelUsageItemDto): string {
+  const identity = credentialIdentity(row)
+  const idLabel = credentialIDLabel(row)
+  return identity === idLabel ? idLabel : `${identity}\n${idLabel}`
 }
 </script>
 
@@ -300,7 +353,9 @@ function countedRange(): string {
               class="group-usage__row"
             >
               <td class="group-usage__credential">
-                {{ t('group.usage.credentialLabel', { id: n(row.credential_id) }) }}
+                <AppTooltip :content="credentialHint(row)">
+                  <span tabindex="0">{{ credentialIdentity(row) }}</span>
+                </AppTooltip>
               </td>
               <td class="group-usage__mono">{{ row.model }}</td>
               <td class="group-usage__number">

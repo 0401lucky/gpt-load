@@ -92,6 +92,7 @@ export function sortModelUsage(
   rows: readonly GroupModelUsageRow[],
   sort: ModelUsageSort,
   direction: ModelUsageDirection,
+  credentialLabel?: (credentialID: number) => string | undefined,
 ): GroupModelUsageRow[] {
   const factor = direction === 'asc' ? 1 : -1
   return [...rows].sort((left, right) => {
@@ -101,7 +102,7 @@ export function sortModelUsage(
     }
     const difference =
       sort === 'credential_id'
-        ? left.credentialID - right.credentialID
+        ? credentialOrder(left, right, credentialLabel)
         : sort === 'request_count'
           ? left.requestCount - right.requestCount
           : left.totalTokens - right.totalTokens
@@ -110,6 +111,20 @@ export function sortModelUsage(
       ? factor * difference
       : left.credentialID - right.credentialID || left.model.localeCompare(right.model)
   })
+}
+
+// 凭据列按用户在单元格里实际看到的标识排序；任一侧没有标识（凭据列表未加载或查不到）时
+// 退回内部 id，与该列此前按 id 排序的行为一致。
+function credentialOrder(
+  left: GroupModelUsageRow,
+  right: GroupModelUsageRow,
+  credentialLabel?: (credentialID: number) => string | undefined,
+): number {
+  const leftLabel = credentialLabel?.(left.credentialID)
+  const rightLabel = credentialLabel?.(right.credentialID)
+  return leftLabel !== undefined && rightLabel !== undefined
+    ? leftLabel.localeCompare(rightLabel)
+    : left.credentialID - right.credentialID
 }
 
 // 分组折叠只改变呈现分组，不改变行顺序；组内沿用传入顺序。
