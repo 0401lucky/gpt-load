@@ -10,7 +10,7 @@
 |---|---|
 | 决定新组件/新模块放哪、命名 | [directory-structure.md](./directory-structure.md) |
 | 写 CSS、加组件变体、改主题 | [design-system.md](./design-system.md) |
-| 取数、写数、加 query key、改缓存 | [data-layer.md](./data-layer.md) |
+| 取数、写数、加 query key、改缓存、新增分组设置页的配置键 | [data-layer.md](./data-layer.md) |
 | 加用户可见文案 | [i18n.md](./i18n.md) |
 | 提交前自查、写组件/composable | [quality-guidelines.md](./quality-guidelines.md) |
 

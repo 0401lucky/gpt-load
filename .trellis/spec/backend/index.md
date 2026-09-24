@@ -11,6 +11,7 @@
 | 你要做的事 | 必读 |
 |---|---|
 | 决定代码放哪个包、加 handler、注册路由、改 DI 装配 | [directory-structure.md](./directory-structure.md) |
+| 新增/修改运行时配置键（系统级或分组级）、动 `IsRuntimeSettingKey` | [runtime-settings.md](./runtime-settings.md) |
 | 返回错误、写 handler 响应、解析请求参数、加新 APIError | [error-handling.md](./error-handling.md) |
 | 加日志、改日志字段、处理敏感信息 | [logging-guidelines.md](./logging-guidelines.md) |
 | 新增用户可见文案、加翻译 key | [i18n-guidelines.md](./i18n-guidelines.md) |

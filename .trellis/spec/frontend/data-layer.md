@@ -64,6 +64,42 @@
 
 ---
 
+## 新增分组级设置键：classic 六处 + modern 一处联动
+
+分组设置页的开关/数值键在多处联动，**漏一处不会报错，只会静默失效或整页报错**。新增一个键必须同时改：
+
+### classic（`web/src/frontends/classic/`）
+
+| # | 位置 | 漏掉的后果 |
+|---|---|---|
+| 1 | `app/resources/groups.ts` 的 `runtimeSettingFields` | **分组设置页整页 `InvalidResponseError`**（`effective` 走 `complete=true`，用该列表当严格白名单；`groupRuntimeSettingFields` 是它的 spread 派生，加一处即两处生效） |
+| 2 | 同文件 `GroupRuntimeConfigDto`（可选 `?`，喂 `overrides`）与 `GroupEffectiveConfigDto`（必填，喂 `effective`） | `vue-tsc --noEmit` 编译报错 |
+| 3 | 同文件 `projectRuntimeConfig` 的投影分支 | 字段静默丢失，页面上恒为默认值 |
+| 4 | `api/control/types.ts` 的同名两个 DTO（`GroupSettingsDto` 的实际类型来源） | `vue-tsc --noEmit` 编译报错 |
+| 5 | `features/groups/settings/group-settings-patch.ts` 的 `cloneOverrides` | **保存时静默丢弃该键**，dirty 比对同时失真 |
+| 6 | `features/groups/settings/GroupSettingsTab.vue` 的 computed / toggle+set 函数 / `SettingRow` 模板行 | 键存在但页面上没有可操作的控件 |
+
+`SettingRow` 的 `divided` 默认 `true`（画底部分隔线）：新行若成为该视觉块的**最后一行**，要给它 `:divided="false"`，并去掉原最后一行的 `divided`。
+
+### modern（`web/src/frontends/modern/`）
+
+| # | 位置 | 漏掉的后果 |
+|---|---|---|
+| 1 | `api/group-detail.ts` 的 `runtimeSwitches` | `readRuntime` 丢弃该键、保存时把它抹掉。渲染（`v-for`）与提交循环都从该列表派生，登记后自动生效，无需改组件 |
+
+### i18n（两套都要）
+
+- classic：`i18n/locales/{zh-CN,en-US,ja-JP}/group.ts` 各加 **label 与 help 两个键**，命名沿用既有惯例（`affinity_enabled` / `affinityHelp`）。
+- modern：`i18n/locales/group-detail.ts` 的 `runtimeFields` 三语言块（`enUS: typeof zhCN` 强制键一致），只需 label。
+
+**这一步没有脚本守护，漏了不会有任何报错**，详见 [i18n.md](./i18n.md)。
+
+> **Warning**：后端往共享响应结构体加字段、而前端白名单没登记 = 前端整页报错；后端的投影变更与两套前端的登记**必须放同一个提交**，否则中间那个提交是坏的、不可二分。
+>
+> 后端侧的键作用域判定（公共 runtime 键 vs 分组专属键）见 [backend/runtime-settings.md](../backend/runtime-settings.md)。
+
+---
+
 ## TanStack Vue Query 约定
 
 全局 client（`web/src/app/query.ts`）**只设 `retry: false`**（queries 与 mutations 都是）。重试策略由业务决定，不设默认重试。
