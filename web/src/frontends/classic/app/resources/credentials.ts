@@ -132,6 +132,9 @@ const credentialRecoveryFields = ['mode', 'automatic', 'at_ms'] as const
 const credentialPaginationFields = ['page', 'page_size', 'total_items', 'total_pages'] as const
 const credentialBatchFields = ['affected_credential_ids', 'summary'] as const
 const credentialTestResultFields = [
+  'upstream_status_code',
+  'error_summary',
+  'retry_after_seconds',
   'outcome',
   'model',
   'protocol',
@@ -918,6 +921,15 @@ export function projectCredentialTestResult(value: unknown): CredentialTestResul
     model: projectString(record.model),
     protocol: projectEnum(record.protocol, enabledDataProtocols),
     latency_ms: projectSafeInteger(record.latency_ms, { minimum: 0 }),
+    upstream_status_code:
+      record.upstream_status_code === null
+        ? null
+        : projectSafeInteger(record.upstream_status_code, { minimum: 100, maximum: 599 }),
+    error_summary: record.error_summary === null ? null : projectString(record.error_summary),
+    retry_after_seconds:
+      record.retry_after_seconds === null
+        ? null
+        : projectSafeInteger(record.retry_after_seconds, { minimum: 1 }),
     reason,
     can_restore: canRestore,
     restore_proof: restoreProof,

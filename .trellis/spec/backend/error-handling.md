@@ -248,6 +248,16 @@ defer func() {
 
 ---
 
+## 凭据连接测试的诊断合同
+
+1. **适用范围**：管理端单凭据连接测试；“暂时无法判断”是凭据有效性的结论，不代表可以丢弃已知上游错误。
+2. **入口**：`POST /api/groups/:group_id/credentials/:credential_id/test`，`CredentialProbeResponse` 定义于 `internal/control/credential_probe.go`。
+3. **响应**：保留 `outcome` / `reason` / 恢复证明；附带 `upstream_status_code`（无上游 HTTP 响应则 null）、`error_summary`（安全摘要或 null）、`retry_after_seconds`（明确上游建议或 null）。正文 `Try again in` 可以保留在摘要，不得把已加余量且钳制的 `ParseResetHint` 返回值当作供应商原始时长。
+4. **错误矩阵**：上游 429 → 原分类 `inconclusive/rate_limited` 加具体摘要；401 → 既有凭据无效分类加可用摘要；超时/无响应 → 状态 null；成功 → 无错误摘要；内部/准备失败 → 现有安全错误出口。管理 API 的 HTTP 200 不能冒充上游状态码。
+5. **正常/基础/异常样例**：`Daily free limit reached ... Try again in 23h 54m` 可展示；只有 429 无摘要时显示分类；原始 HTML、凭据回显、内部堆栈不得直传。沿用 `platform/redact` 和执行层摘要限长，先用已知秘密脱敏再截断。
+6. **必要测试**：正文限流、Retry-After 秒数/日期、401、成功、超时、非法 AttemptResult、非标准 key/代理认证回显、超长文本、控制字符；检查探测不改变调度/冷却状态，两套前端投影字段同时更新。
+7. **错误与正确做法**：错误：只返回分类或直接返回原始响应 body。正确：原分类 + 可安全展示的诊断字段，Vue 文本插值渲染；日志只能复用同一份安全诊断。
+
 ## 反模式
 
 - ❌ **把裸 error 返回给客户端** —— `writeServiceErrorResponse` 会兜底成 500 `internal_error`，别指望绕过它。

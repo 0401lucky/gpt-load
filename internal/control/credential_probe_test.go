@@ -74,6 +74,75 @@ func successfulCredentialProbeResult() execution.AttemptResult {
 	}
 }
 
+func TestCredentialProbeDiagnosticsSanitizeAndPreserveExplicitEvidence(t *testing.T) {
+	now := time.Date(2026, 9, 28, 9, 17, 0, 0, time.UTC)
+	spec := execution.AttemptSpec{Credential: execution.NewCredentialSnapshot(1, 1, 1, []byte(`{"api_key":"sk_nonstandard_probe_secret"}`)),
+		Header: http.Header{"X-Custom-Token": {"configured-header-secret"}, "Authorization": {"Bearer custom-auth-token"}},
+		Proxy:  outboundproxy.Effective{Config: outboundproxy.Config{Mode: outboundproxy.ModeCustom, URL: "http://proxyuser:proxypassword@proxy.test:8080"}}}
+	for _, test := range []struct {
+		name, summary string
+		status        int
+		header        http.Header
+		evidence      time.Duration
+		kind          execution.ErrorKind
+		wantSummary   bool
+		retry         int64
+	}{
+		{name: "cline", status: 429, summary: "Daily free limit reached. Try again in 23h 54m", wantSummary: true},
+		{name: "seconds", status: 429, summary: "limited", header: http.Header{"Retry-After": {"35"}}, wantSummary: true, retry: 35},
+		{name: "date", status: 429, summary: "limited", header: http.Header{"Retry-After": {now.Add(time.Minute).Format(http.TimeFormat)}}, wantSummary: true, retry: 60},
+		{name: "evidence priority", status: 429, summary: "limited", header: http.Header{"Retry-After": {"35"}}, evidence: 1500 * time.Millisecond, wantSummary: true, retry: 2},
+		{name: "invalid retry", status: 429, summary: "limited", header: http.Header{"Retry-After": {"-1"}}, wantSummary: true},
+		{name: "401 echoes", status: 401, summary: "Invalid sk_nonstandard_probe_secret configured-header-secret custom-auth-token proxyuser proxypassword", wantSummary: true},
+		{name: "timeout without response", summary: "private transport error", kind: execution.ErrorKindTimeout},
+		{name: "html", status: 502, summary: "<html>upstream debug</html>"},
+		{name: "json without message", status: 502, summary: `{"payload":"private"}`},
+		{name: "control", status: 502, summary: "error\x00private"},
+		{name: "too long invalid result", status: 502, summary: strings.Repeat("x", execution.MaxErrorSummaryLength+1)},
+		{name: "internal", status: 502, summary: "private internal error", kind: execution.ErrorKindTransport},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			kind := test.kind
+			if kind == "" {
+				kind = execution.ErrorKindHTTP
+			}
+			result := failedCredentialProbeResult(test.status, kind, "")
+			result.Error.Summary = test.summary
+			result.Header = test.header
+			result.Error.RetryAfter = test.evidence
+			d := projectCredentialProbeDiagnostics(result, spec, now)
+			if (d.summary != nil) != test.wantSummary {
+				t.Fatalf("summary=%v", d.summary)
+			}
+			if test.wantSummary {
+				for _, secret := range []string{"sk_nonstandard_probe_secret", "configured-header-secret", "custom-auth-token", "proxyuser", "proxypassword"} {
+					if strings.Contains(*d.summary, secret) {
+						t.Fatal("secret leaked")
+					}
+				}
+			}
+			if test.retry == 0 && d.retry != nil || test.retry > 0 && (d.retry == nil || *d.retry != test.retry) {
+				t.Fatalf("retry=%v", d.retry)
+			}
+			if test.status == 0 && d.status != nil || test.status != 0 && result.Validate() == nil && (d.status == nil || *d.status != test.status) {
+				t.Fatalf("status=%v", d.status)
+			}
+		})
+	}
+	passed := projectCredentialProbeDiagnostics(successfulCredentialProbeResult(), spec, now)
+	if passed.status == nil || *passed.status != 200 || passed.summary != nil || passed.retry != nil {
+		t.Fatalf("passed=%+v", passed)
+	}
+	// Known-secret replacement can lengthen valid evidence; truncate only after redaction.
+	spec.Header = http.Header{"X-Custom-Token": {"x"}}
+	long := failedCredentialProbeResult(429, execution.ErrorKindHTTP, "")
+	long.Error.Summary = strings.Repeat("x ", execution.MaxErrorSummaryLength/2)
+	d := projectCredentialProbeDiagnostics(long, spec, now)
+	if d.summary == nil || len([]rune(*d.summary)) > execution.MaxErrorSummaryLength || strings.Contains(*d.summary, "x") {
+		t.Fatal("redaction/truncation order is unsafe")
+	}
+}
+
 func TestGroupCredentialProbeHTTPRequiresAuthAndUsesOnlySpecifiedCredential(t *testing.T) {
 	t.Parallel()
 	initControlI18n(t)
@@ -222,7 +291,7 @@ func TestGroupCredentialProbeHTTPReturnsCompletedUpstreamFailureAsData(t *testin
 		execution.FailureHintInvalidCredential,
 	)
 	result.Body = []byte("sensitive-upstream-response")
-	result.Error.Summary = "sensitive-upstream-response"
+	result.Error.Summary = "Invalid credential probe-http-failure-secret"
 	fixture.service.executor = &credentialProbeTestExecutor{result: result}
 	const auth = "credential-probe-failure-auth"
 	engine := gin.New()
@@ -241,6 +310,9 @@ func TestGroupCredentialProbeHTTPReturnsCompletedUpstreamFailureAsData(t *testin
 		!strings.Contains(response.Body.String(), `"code":0`) ||
 		!strings.Contains(response.Body.String(), `"outcome":"failed"`) ||
 		!strings.Contains(response.Body.String(), `"reason":"invalid_credential"`) ||
+		!strings.Contains(response.Body.String(), `"upstream_status_code":401`) ||
+		!strings.Contains(response.Body.String(), "Invalid credential [REDACTED]") ||
+		strings.Contains(response.Body.String(), "probe-http-failure-secret") ||
 		strings.Contains(response.Body.String(), "sensitive-upstream-response") {
 		t.Fatalf("probe failure response = %d %s", response.Code, response.Body.String())
 	}

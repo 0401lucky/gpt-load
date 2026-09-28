@@ -167,6 +167,7 @@ export interface GroupModelsDto {
 export type GroupModelWindowSource = 'reset' | 'fallback_24h'
 
 export interface GroupModelUsageItemDto {
+  data_complete: boolean
   credential_id: number
   model: string
   window_start_ms: number
@@ -375,6 +376,9 @@ export type CredentialTestReason =
   | 'unknown'
 
 export interface CredentialTestResultDto {
+  upstream_status_code: number | null
+  error_summary: string | null
+  retry_after_seconds: number | null
   outcome: CredentialTestOutcome
   model: string
   protocol: ProtocolValue

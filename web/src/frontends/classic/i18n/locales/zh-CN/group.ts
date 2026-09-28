@@ -466,6 +466,11 @@ export default {
           testedAt: '测试时间',
         },
         latency: '{value} 毫秒',
+        upstreamStatus: '上游 HTTP 状态',
+        upstreamDetail: '上游错误说明',
+        noDetail: '上游未提供可展示的错误详情',
+        retryAfter: '建议重试等待',
+        retrySeconds: '{value} 秒',
         reason: {
           passed: '未发现异常',
           invalid_credential: '密钥无效',
@@ -731,7 +736,8 @@ export default {
     },
     usage: {
       title: '凭据 × 模型用量',
-      hint: '按整点统计：{from} – {to}',
+      hint: '统计覆盖范围：{from} – {to}；各行按自身窗口统计，边界明细过期时已知数值不代表全部用量。',
+      incomplete: '统计不完整',
       truncated: '仅显示用量最高的 {shown} 行，共 {total} 行。',
       loading: '正在加载模型用量…',
       loadFailed: '无法加载模型用量。',

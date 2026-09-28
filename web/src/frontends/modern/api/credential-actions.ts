@@ -163,6 +163,9 @@ export async function resetCredentialQuota(
   }
 }
 export interface CredentialTestResult {
+  upstreamStatusCode: number | null
+  errorSummary: string | null
+  retryAfterSeconds: number | null
   outcome: 'passed' | 'failed' | 'inconclusive'
   latency: number
   model: string
@@ -188,6 +191,11 @@ export async function testCredential(
   return {
     outcome: oneOf(data.outcome, ['passed', 'failed', 'inconclusive']),
     latency: integer(data.latency_ms),
+    upstreamStatusCode:
+      data.upstream_status_code === null ? null : integer(data.upstream_status_code, 100),
+    errorSummary: data.error_summary === null ? null : text(data.error_summary),
+    retryAfterSeconds:
+      data.retry_after_seconds === null ? null : integer(data.retry_after_seconds, 1),
     model: text(data.model),
     protocol: text(data.protocol),
     reason: data.reason === null ? null : text(data.reason),

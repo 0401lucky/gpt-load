@@ -118,6 +118,22 @@ function setOpen(open: boolean): void {
             <dd>{{ t('group.credentials.test.latency', { value: n(result.latency_ms) }) }}</dd>
             <dt>{{ t('group.credentials.test.fields.reason') }}</dt>
             <dd>{{ reasonLabel }}</dd>
+            <template v-if="result.upstream_status_code !== null">
+              <dt>{{ t('group.credentials.test.upstreamStatus') }}</dt>
+              <dd>{{ result.upstream_status_code }}</dd>
+            </template>
+            <template v-if="result.outcome !== 'passed'">
+              <dt>{{ t('group.credentials.test.upstreamDetail') }}</dt>
+              <dd>{{ result.error_summary ?? t('group.credentials.test.noDetail') }}</dd>
+            </template>
+            <template v-if="result.retry_after_seconds !== null">
+              <dt>{{ t('group.credentials.test.retryAfter') }}</dt>
+              <dd>
+                {{
+                  t('group.credentials.test.retrySeconds', { value: n(result.retry_after_seconds) })
+                }}
+              </dd>
+            </template>
             <dt>{{ t('group.credentials.test.fields.testedAt') }}</dt>
             <dd>{{ formatLocalInstant(result.tested_at_ms, locale) }}</dd>
           </dl>

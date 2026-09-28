@@ -483,6 +483,11 @@ export default {
           testedAt: 'テスト日時',
         },
         latency: '{value} ミリ秒',
+        upstreamStatus: '上流 HTTP ステータス',
+        upstreamDetail: '上流エラーの詳細',
+        noDetail: '表示可能な上流エラー詳細はありません',
+        retryAfter: '再試行までの推奨待機時間',
+        retrySeconds: '{value} 秒',
         reason: {
           passed: '問題は検出されませんでした',
           invalid_credential: 'API キーが無効です',
@@ -769,7 +774,8 @@ export default {
     },
     usage: {
       title: '認証情報 × モデル使用量',
-      hint: '正時単位で集計：{from} – {to}',
+      hint: '集計対象：{from} – {to}。各行の期間で集計し、境界の明細が保存期限を過ぎた場合、表示値は全使用量を表しません。',
+      incomplete: '集計が不完全',
       truncated: '使用量の多い上位 {shown} 行のみ表示しています（全 {total} 行）。',
       loading: 'モデル使用量を読み込み中…',
       loadFailed: 'モデル使用量を読み込めません。',

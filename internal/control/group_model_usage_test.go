@@ -169,11 +169,11 @@ func TestGetGroupModelUsageResolvesEachRowWindowIndependently(t *testing.T) {
 	NewServer(&config.Config{AuthKey: authTestKey}, fixture.service).RegisterRoutes(engine)
 	payload := requestGroupModelUsage(t, engine, group.ID)
 
-	if payload.ObservedAtMS != now.UnixMilli() || payload.CountedToMS != hourBucket(now).UnixMilli() {
+	if payload.ObservedAtMS != now.UnixMilli() || payload.CountedToMS != now.UnixMilli() {
 		t.Fatalf("counted interval = [%d, %d), want observed %d and aligned end %d",
 			payload.CountedFromMS, payload.CountedToMS, now.UnixMilli(), hourBucket(now).UnixMilli())
 	}
-	if want := hourBucket(now.Add(-30 * time.Hour)).Add(time.Hour).UnixMilli(); payload.CountedFromMS != want {
+	if want := now.Add(-30 * time.Hour).UnixMilli(); payload.CountedFromMS != want {
 		t.Fatalf("counted_from_ms = %d, want %d (aligned earliest window start)", payload.CountedFromMS, want)
 	}
 	if payload.Pagination.TotalItems != 3 || payload.Pagination.Page != 1 ||
@@ -251,8 +251,8 @@ func TestGetGroupModelUsageDropsRowsWithoutUsageOrCooldown(t *testing.T) {
 		t.Fatalf("payload = %+v, want no rows", payload)
 	}
 	// 无行时 counted 区间仍按兜底窗口下发，便于前端解释空状态。
-	if payload.CountedFromMS != hourBucket(now.Add(-24*time.Hour)).Add(time.Hour).UnixMilli() ||
-		payload.CountedToMS != hourBucket(now).UnixMilli() {
+	if payload.CountedFromMS != now.Add(-24*time.Hour).UnixMilli() ||
+		payload.CountedToMS != now.UnixMilli() {
 		t.Fatalf("counted interval = [%d, %d)", payload.CountedFromMS, payload.CountedToMS)
 	}
 }
@@ -290,6 +290,7 @@ func TestGetGroupModelUsageResponseContractFields(t *testing.T) {
 		t.Fatalf("items = %+v, want one row", items)
 	}
 	assertJSONFields(t, items[0], []string{
+		"data_complete",
 		"credential_id", "model", "window_start_ms", "window_source", "cooldown_until_ms",
 		"request_count", "success_count", "failure_count",
 		"uncached_input_tokens", "cache_read_tokens", "cache_write_5m_tokens",
@@ -349,6 +350,32 @@ func TestGetGroupModelUsageRequiresTheUsageReader(t *testing.T) {
 	)
 	if recorder.Code != http.StatusInternalServerError {
 		t.Fatalf("status = %d, want 500 without a usage reader: %s", recorder.Code, recorder.Body.String())
+	}
+}
+
+func TestGroupModelUsageItemsCapAfterFilteringAndRetainIncompleteEvidence(t *testing.T) {
+	now := time.Date(2026, 9, 28, 12, 25, 0, 0, time.UTC)
+	cycles := map[uint][]state.CredentialModelCycleView{}
+	rows := make([]requestlog.GroupModelWindowUsage, 0, 505)
+	for id := uint(1); id <= 501; id++ {
+		cycles[id] = nil
+		rows = append(rows, requestlog.GroupModelWindowUsage{CredentialID: id, Model: "a", UsageAggregate: requestlog.UsageAggregate{RequestCount: 1, SuccessCount: 1, OutputTokens: int64(id)}})
+	}
+	cycles[502] = nil
+	cycles[503] = nil
+	rows = append(rows, requestlog.GroupModelWindowUsage{CredentialID: 502, Model: "expired", DataIncomplete: true, BoundaryUsageEvidence: true},
+		requestlog.GroupModelWindowUsage{CredentialID: 503, Model: "empty", DataIncomplete: true},
+		requestlog.GroupModelWindowUsage{CredentialID: 999, Model: "deleted", UsageAggregate: requestlog.UsageAggregate{RequestCount: 99}})
+	items, total, err := buildGroupModelUsageItems(rows, cycles, now.UnixMilli())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if total != 502 || len(items) != 500 || items[0].CredentialID != 501 || items[499].CredentialID != 2 {
+		t.Fatalf("total=%d count=%d", total, len(items))
+	}
+	items, total, err = buildGroupModelUsageItems(rows[501:], cycles, now.UnixMilli())
+	if err != nil || total != 1 || len(items) != 1 || items[0].DataComplete || items[0].CredentialID != 502 {
+		t.Fatalf("incomplete rows=%+v total=%d err=%v", items, total, err)
 	}
 }
 

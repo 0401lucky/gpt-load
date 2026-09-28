@@ -384,6 +384,9 @@ function credentialHint(row: GroupModelUsageItemDto): string {
                     >
                   </span>
                 </AppTooltip>
+                <StatusBadge v-if="!row.data_complete" tone="warning" size="compact">{{
+                  t('group.usage.incomplete')
+                }}</StatusBadge>
               </td>
               <td>
                 <span v-if="row.cooldown_until_ms === null">{{ t('group.usage.none') }}</span>

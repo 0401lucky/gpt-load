@@ -9,6 +9,7 @@ import { controlQueryKeys } from '@/app/query-keys'
 import {
   assertNoSecretLikeFields,
   projectArray,
+  projectBoolean,
   projectEnum,
   projectEpochMilliseconds,
   projectNullableEpochMilliseconds,
@@ -31,6 +32,7 @@ const groupModelUsageFields = [
   'pagination',
 ] as const
 const groupModelUsageItemFields = [
+  'data_complete',
   'credential_id',
   'model',
   'window_start_ms',
@@ -54,6 +56,7 @@ function projectGroupModelUsageItem(value: unknown): GroupModelUsageItemDto {
   const record = projectRecord(value)
   assertNoSecretLikeFields(record, groupModelUsageItemFields)
   return {
+    data_complete: projectBoolean(record.data_complete),
     credential_id: projectSafeInteger(record.credential_id, { minimum: 1 }),
     model: projectString(record.model),
     window_start_ms: projectEpochMilliseconds(record.window_start_ms),

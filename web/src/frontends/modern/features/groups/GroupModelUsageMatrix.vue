@@ -348,6 +348,9 @@ function credentialHint(row: GroupModelUsageRow): string {
                         : t('groupDetail.modelUsage.window.fallback')
                     }}</AppBadge
                   >
+                  <AppBadge v-if="!row.dataComplete" size="xs" tone="warning">{{
+                    t('groupDetail.modelUsage.incomplete')
+                  }}</AppBadge>
                 </td>
                 <td class="modern-model-usage-cooldown">
                   <AppBadge v-if="row.cooldownUntil !== null" size="xs" tone="warning" dot>{{

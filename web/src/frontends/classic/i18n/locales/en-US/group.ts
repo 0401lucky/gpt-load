@@ -482,6 +482,11 @@ export default {
           testedAt: 'Tested at',
         },
         latency: '{value} ms',
+        upstreamStatus: 'Upstream HTTP status',
+        upstreamDetail: 'Upstream error details',
+        noDetail: 'No displayable upstream error details',
+        retryAfter: 'Suggested retry delay',
+        retrySeconds: '{value} seconds',
         reason: {
           passed: 'No issue detected',
           invalid_credential: 'The API key is invalid',
@@ -762,7 +767,8 @@ export default {
     },
     usage: {
       title: 'Credential × model usage',
-      hint: 'Counted by whole hours: {from} – {to}',
+      hint: 'Coverage: {from} – {to}. Each row uses its own window; expired boundary details mean totals are incomplete.',
+      incomplete: 'Incomplete statistics',
       truncated: 'Showing the top {shown} rows of {total}.',
       loading: 'Loading model usage…',
       loadFailed: 'Unable to load model usage.',

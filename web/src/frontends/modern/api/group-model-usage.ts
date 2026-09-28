@@ -1,6 +1,6 @@
 import type { ApiClient } from '@shared/http/client'
 import { InvalidResponseError } from '@shared/http/errors'
-import { integer, list, oneOf, record, text } from './response'
+import { boolean, integer, list, oneOf, record, text } from './response'
 
 export const groupModelUsageKey = (id: number) => ['modern', 'group-model-usage', id] as const
 // 窗口口径：reset 为该 (凭据, 上游模型) 自身周期的精确窗口，fallback_24h 为无周期记录时的近 24 小时兜底。
@@ -8,6 +8,7 @@ export const windowSources = ['reset', 'fallback_24h'] as const
 export type WindowSource = (typeof windowSources)[number]
 
 export interface GroupModelUsageRow {
+  dataComplete: boolean
   credentialID: number
   model: string
   windowStart: number
@@ -37,6 +38,7 @@ export interface GroupModelUsage {
 function readRow(value: unknown): GroupModelUsageRow {
   const row = record(value)
   return {
+    dataComplete: boolean(row.data_complete),
     credentialID: integer(row.credential_id, 1),
     model: text(row.model),
     windowStart: integer(row.window_start_ms),

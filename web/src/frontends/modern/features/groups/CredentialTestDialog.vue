@@ -32,7 +32,7 @@ import AppDraftGuard from '@modern/components/AppDraftGuard.vue'
 import { groupValidationModelOptions } from './group-model-options'
 const props = defineProps<{ groupId: number; row: CredentialRow }>()
 const emit = defineEmits<{ close: []; changed: [] }>()
-const { t } = useI18n()
+const { t, n } = useI18n()
 const client = useApiClient()
 const settings = useQuery({
   queryKey: groupSettingsKey(props.groupId),
@@ -204,6 +204,22 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
             · {{ t('credentialCards.testReason.' + result.reason) }}</span
           ></AppNotice
         >
+        <dl v-if="result" class="modern-credential-test-details">
+          <template v-if="result.upstreamStatusCode !== null"
+            ><dt>{{ t('credentialCards.upstreamStatus') }}</dt>
+            <dd>{{ result.upstreamStatusCode }}</dd></template
+          >
+          <template v-if="result.outcome !== 'passed'"
+            ><dt>{{ t('credentialCards.upstreamDetail') }}</dt>
+            <dd>{{ result.errorSummary ?? t('credentialCards.noDetail') }}</dd></template
+          >
+          <template v-if="result.retryAfterSeconds !== null"
+            ><dt>{{ t('credentialCards.retryAfter') }}</dt>
+            <dd>
+              {{ t('credentialCards.retrySeconds', { value: n(result.retryAfterSeconds) }) }}
+            </dd></template
+          >
+        </dl>
         <div class="modern-credential-test-actions">
           <AppButton :disabled="pending" @click="close">{{ t('shell.close') }}</AppButton
           ><AppButton
@@ -238,5 +254,16 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
   justify-content: flex-end;
   gap: var(--modern-space-2);
   margin-top: var(--modern-space-2);
+}
+.modern-credential-test-details {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--modern-space-2) var(--modern-space-3);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.modern-credential-test-details dd {
+  min-width: 0;
+  margin: 0;
 }
 </style>

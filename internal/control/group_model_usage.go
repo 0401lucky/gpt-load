@@ -31,7 +31,7 @@ const (
 )
 
 type groupModelUsageReader interface {
-	QueryGroupModelUsage(context.Context, uint, int64, int64) ([]requestlog.GroupModelUsageBucket, error)
+	QueryGroupModelWindowUsage(context.Context, uint, int64, int64, map[requestlog.GroupModelUsageKey]int64, map[uint]bool) ([]requestlog.GroupModelWindowUsage, error)
 }
 
 type groupModelUsagePagination struct {
@@ -46,6 +46,7 @@ type groupModelUsageItemResponse struct {
 	Model                   string `json:"model"`
 	WindowStartMS           int64  `json:"window_start_ms"`
 	WindowSource            string `json:"window_source"`
+	DataComplete            bool   `json:"data_complete"`
 	CooldownUntilMS         *int64 `json:"cooldown_until_ms"`
 	RequestCount            int64  `json:"request_count"`
 	SuccessCount            int64  `json:"success_count"`
@@ -92,33 +93,32 @@ func (s *Service) GetGroupModelUsage(ctx context.Context, groupID uint) (groupMo
 	if err != nil {
 		return groupModelUsageResponse{}, err
 	}
-	countedToMS, err := epochms.AlignDown(observedAtMS, epochms.MillisecondsPerHour)
-	if err != nil {
-		return groupModelUsageResponse{}, err
-	}
+	countedToMS := observedAtMS
 	cycles := s.registry.GroupModelCycles(groupID, now)
 	// 检索下界必须按本组最早的窗口起点确定：若图省事用 now-24h，
 	// 起点更早的行会被系统性低估。
-	earliestMS := observedAtMS - groupModelUsageFallbackWindowMS
-	for _, list := range cycles {
+	earliestMS := max(observedAtMS-groupModelUsageFallbackWindowMS, 0)
+	starts := make(map[requestlog.GroupModelUsageKey]int64)
+	credentials := make(map[uint]bool, len(cycles))
+	for credentialID, list := range cycles {
+		credentials[credentialID] = true
 		for _, cycle := range list {
-			if startMS, _ := groupModelUsageWindow(cycle, observedAtMS); startMS < earliestMS {
+			startMS, _ := groupModelUsageWindow(cycle, observedAtMS)
+			starts[requestlog.GroupModelUsageKey{CredentialID: credentialID, Model: cycle.Model}] = startMS
+			if startMS < earliestMS {
 				earliestMS = startMS
 			}
 		}
 	}
-	countedFromMS, err := epochms.AlignUp(earliestMS, epochms.MillisecondsPerHour)
-	if err != nil {
-		return groupModelUsageResponse{}, err
-	}
-	var rows []requestlog.GroupModelUsageBucket
+	countedFromMS := earliestMS
+	var rows []requestlog.GroupModelWindowUsage
 	if countedFromMS < countedToMS {
-		rows, err = reader.QueryGroupModelUsage(ctx, groupID, countedFromMS, countedToMS)
+		rows, err = reader.QueryGroupModelWindowUsage(ctx, groupID, max(observedAtMS-groupModelUsageFallbackWindowMS, 0), countedToMS, starts, credentials)
 		if err != nil {
 			return groupModelUsageResponse{}, app_errors.ParseDBError(err)
 		}
 	}
-	items, totalItems, err := buildGroupModelUsageItems(rows, cycles, observedAtMS, countedToMS)
+	items, totalItems, err := buildGroupModelUsageItems(rows, cycles, observedAtMS)
 	if err != nil {
 		return groupModelUsageResponse{}, err
 	}
@@ -157,24 +157,23 @@ func groupModelUsageWindow(cycle state.CredentialModelCycleView, nowMS int64) (i
 }
 
 type groupModelUsageAccumulator struct {
-	credentialID  uint
-	model         string
-	cycle         state.CredentialModelCycleView
-	windowStartMS int64
-	windowSource  string
-	cooling       bool
-	// fromMS 是窗口起点按整点向上对齐后的统计下界：usage_stats 是小时桶，
-	// 只有完全落在窗口内的桶才参与统计，单侧误差不超过一小时。
-	fromMS    int64
-	aggregate requestlog.UsageAggregate
+	credentialID          uint
+	model                 string
+	cycle                 state.CredentialModelCycleView
+	windowStartMS         int64
+	windowSource          string
+	cooling               bool
+	boundaryUsageEvidence bool
+	dataIncomplete        bool
+	aggregate             requestlog.UsageAggregate
 }
 
-// buildGroupModelUsageItems 在内存中按 (凭据, 上游模型) 归并窗口内用量。每行按各自的
-// 窗口起点裁剪桶，绝不允许按组统一窗口。返回截断前的总行数与已排序截断后的行集合。
+// buildGroupModelUsageItems joins exact window totals with current cycle state,
+// then returns sorted, capped rows and the total count before truncation.
 func buildGroupModelUsageItems(
-	rows []requestlog.GroupModelUsageBucket,
+	rows []requestlog.GroupModelWindowUsage,
 	cycles map[uint][]state.CredentialModelCycleView,
-	observedAtMS, countedToMS int64,
+	observedAtMS int64,
 ) ([]groupModelUsageItemResponse, int64, error) {
 	accumulators := make(map[groupModelUsageKey]*groupModelUsageAccumulator, len(cycles))
 	ordered := make([]*groupModelUsageAccumulator, 0, len(cycles))
@@ -188,24 +187,16 @@ func buildGroupModelUsageItems(
 		ordered = append(ordered, accumulator)
 		return accumulator
 	}
-	startWindow := func(accumulator *groupModelUsageAccumulator, cycle state.CredentialModelCycleView) error {
+	startWindow := func(accumulator *groupModelUsageAccumulator, cycle state.CredentialModelCycleView) {
 		accumulator.cycle = cycle
 		accumulator.windowStartMS, accumulator.windowSource = groupModelUsageWindow(cycle, observedAtMS)
 		accumulator.cooling = !cycle.CooldownUntil.IsZero()
-		fromMS, err := epochms.AlignUp(accumulator.windowStartMS, epochms.MillisecondsPerHour)
-		if err != nil {
-			return err
-		}
-		accumulator.fromMS = fromMS
-		return nil
 	}
 	// 先登记周期锚点：正在冷却但窗口内没有用量的组合也必须出现在矩阵里。
 	for credentialID, list := range cycles {
 		for _, cycle := range list {
 			accumulator := accumulatorFor(credentialID, cycle.Model)
-			if err := startWindow(accumulator, cycle); err != nil {
-				return nil, 0, err
-			}
+			startWindow(accumulator, cycle)
 		}
 	}
 	for _, row := range rows {
@@ -215,13 +206,10 @@ func buildGroupModelUsageItems(
 		}
 		accumulator := accumulatorFor(row.CredentialID, row.Model)
 		if accumulator.windowSource == "" {
-			if err := startWindow(accumulator, state.CredentialModelCycleView{}); err != nil {
-				return nil, 0, err
-			}
+			startWindow(accumulator, state.CredentialModelCycleView{})
 		}
-		if row.BucketStartMS < accumulator.fromMS || row.BucketStartMS >= countedToMS {
-			continue
-		}
+		accumulator.dataIncomplete = accumulator.dataIncomplete || row.DataIncomplete
+		accumulator.boundaryUsageEvidence = accumulator.boundaryUsageEvidence || row.BoundaryUsageEvidence
 		summed, err := requestlog.AddUsageAggregates(accumulator.aggregate, row.UsageAggregate)
 		if err != nil {
 			return nil, 0, fmt.Errorf("merge group model usage: %w", err)
@@ -232,7 +220,7 @@ func buildGroupModelUsageItems(
 	items := make([]groupModelUsageItemResponse, 0, len(ordered))
 	for _, accumulator := range ordered {
 		// 窗口内既无用量又未处于冷却的组合不下发，避免空行撑爆矩阵。
-		if !accumulator.cooling && accumulator.aggregate.RequestCount == 0 &&
+		if !accumulator.cooling && !(accumulator.dataIncomplete && accumulator.boundaryUsageEvidence) && accumulator.aggregate.RequestCount == 0 &&
 			!hasGroupModelUsageTokens(accumulator.aggregate) {
 			continue
 		}
@@ -307,6 +295,7 @@ func mapGroupModelUsageItem(
 		Model:                   accumulator.model,
 		WindowStartMS:           accumulator.windowStartMS,
 		WindowSource:            accumulator.windowSource,
+		DataComplete:            !accumulator.dataIncomplete,
 		CooldownUntilMS:         cooldownUntilMS,
 		RequestCount:            aggregate.RequestCount,
 		SuccessCount:            aggregate.SuccessCount,

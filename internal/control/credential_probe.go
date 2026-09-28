@@ -4,11 +4,13 @@ import (
 	"context"
 	cryptorand "crypto/rand"
 	"crypto/subtle"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -20,6 +22,7 @@ import (
 	"gpt-load/internal/health"
 	"gpt-load/internal/platform/epochms"
 	app_errors "gpt-load/internal/platform/errors"
+	"gpt-load/internal/platform/redact"
 	"gpt-load/internal/platform/utils"
 	"gpt-load/internal/protocol"
 	"gpt-load/internal/state"
@@ -48,14 +51,17 @@ const (
 )
 
 type CredentialProbeResponse struct {
-	Outcome      CredentialProbeOutcome `json:"outcome"`
-	Model        string                 `json:"model"`
-	Protocol     protocol.Protocol      `json:"protocol"`
-	LatencyMS    int64                  `json:"latency_ms"`
-	Reason       *CredentialProbeReason `json:"reason"`
-	CanRestore   bool                   `json:"can_restore"`
-	RestoreProof *string                `json:"restore_proof"`
-	TestedAtMS   int64                  `json:"tested_at_ms"`
+	UpstreamStatusCode *int                   `json:"upstream_status_code"`
+	ErrorSummary       *string                `json:"error_summary"`
+	RetryAfterSeconds  *int64                 `json:"retry_after_seconds"`
+	Outcome            CredentialProbeOutcome `json:"outcome"`
+	Model              string                 `json:"model"`
+	Protocol           protocol.Protocol      `json:"protocol"`
+	LatencyMS          int64                  `json:"latency_ms"`
+	Reason             *CredentialProbeReason `json:"reason"`
+	CanRestore         bool                   `json:"can_restore"`
+	RestoreProof       *string                `json:"restore_proof"`
+	TestedAtMS         int64                  `json:"tested_at_ms"`
 }
 
 type CredentialProbeRequest struct {
@@ -89,9 +95,10 @@ type credentialProbeCredential struct {
 }
 
 type credentialProbeExecution struct {
-	result   execution.AttemptResult
-	latency  time.Duration
-	protocol protocol.Protocol
+	diagnostics credentialProbeDiagnostics
+	result      execution.AttemptResult
+	latency     time.Duration
+	protocol    protocol.Protocol
 }
 
 type credentialProbeExecutor struct {
@@ -238,6 +245,7 @@ func (probe *credentialProbeExecutor) Probe(
 		latency := max(probe.now().Sub(startedAt), 0)
 		executed := credentialProbeExecution{
 			result: result, latency: latency, protocol: probeProtocol,
+			diagnostics: projectCredentialProbeDiagnostics(result, spec, startedAt),
 		}
 		if credentialProbePassed(result) || index+1 == len(probeProtocols) ||
 			!validationProbeNeedsProtocolFallback(result) {
@@ -248,6 +256,85 @@ func (probe *credentialProbeExecutor) Probe(
 		"probe",
 		app_errors.ErrInternalServer,
 	)
+}
+
+type credentialProbeDiagnostics struct {
+	status  *int
+	summary *string
+	retry   *int64
+}
+
+// Project while the attempt's known secrets are still in scope. No raw body,
+// transport error or internal preparation failure crosses this boundary.
+func projectCredentialProbeDiagnostics(result execution.AttemptResult, spec execution.AttemptSpec, now time.Time) credentialProbeDiagnostics {
+	var diagnostics credentialProbeDiagnostics
+	if result.Validate() != nil {
+		return diagnostics
+	}
+	if result.StatusCode >= 100 && result.StatusCode <= 599 {
+		value := result.StatusCode
+		diagnostics.status = &value
+	}
+	if result.Error == nil {
+		return diagnostics
+	}
+	if result.StatusCode == 0 || (result.Error.Kind != execution.ErrorKindHTTP && result.Error.Kind != execution.ErrorKindProvider) {
+		return diagnostics
+	}
+	secrets := []string{string(spec.Credential.Data()), spec.Proxy.Config.URL}
+	var fields map[string]string
+	if json.Unmarshal(spec.Credential.Data(), &fields) == nil {
+		for _, value := range fields {
+			secrets = append(secrets, value)
+		}
+	}
+	for _, values := range spec.Header {
+		secrets = append(secrets, values...)
+		for _, value := range values {
+			parts := strings.Fields(value)
+			if len(parts) == 2 && (strings.EqualFold(parts[0], "Bearer") || strings.EqualFold(parts[0], "Basic")) {
+				secrets = append(secrets, parts[1])
+			}
+		}
+	}
+	if parsed, err := url.Parse(spec.Proxy.Config.URL); err == nil && parsed.User != nil {
+		password, _ := parsed.User.Password()
+		username := parsed.User.Username()
+		secrets = append(secrets, parsed.User.String(), username, password, base64.StdEncoding.EncodeToString([]byte(username+":"+password)))
+	}
+	summary := redact.ExtractErrorMessage([]byte(result.Error.Summary))
+	// Nested message fields can still contain HTML; never expose markup or stacks.
+	if strings.ContainsAny(summary, "<>") || strings.Contains(summary, "goroutine ") || strings.Contains(summary, "Traceback (") {
+		summary = ""
+	}
+	summary = redact.New().String(summary, secrets...)
+	summary = strings.Join(strings.Fields(summary), " ")
+	if runes := []rune(summary); len(runes) > execution.MaxErrorSummaryLength {
+		summary = string(runes[:execution.MaxErrorSummaryLength-1]) + "…"
+	}
+	if summary != "" {
+		diagnostics.summary = &summary
+	}
+	delay := result.Error.RetryAfter
+	// Evidence takes precedence, matching execution's explicit upstream evidence.
+	if delay <= 0 {
+		for _, header := range []http.Header{result.Header, result.Error.Header} {
+			if until, ok := health.ParseExplicitRetryAfter(header, now); ok {
+				delay = until.Sub(now)
+				break
+			}
+		}
+	}
+	if delay > 0 {
+		seconds := int64(delay / time.Second)
+		if delay%time.Second != 0 {
+			seconds++
+		}
+		if seconds <= maxSafeInteger {
+			diagnostics.retry = &seconds
+		}
+	}
+	return diagnostics
 }
 
 func newCredentialProbeFailure(stage string, cause error) error {
@@ -391,7 +478,10 @@ func (s *Service) TestGroupCredential(
 		)
 	}
 	response := CredentialProbeResponse{
-		Outcome: outcome, Model: target.model, Protocol: executed.protocol,
+		UpstreamStatusCode: executed.diagnostics.status,
+		ErrorSummary:       executed.diagnostics.summary,
+		RetryAfterSeconds:  executed.diagnostics.retry,
+		Outcome:            outcome, Model: target.model, Protocol: executed.protocol,
 		LatencyMS:  max(executed.latency.Milliseconds(), 0),
 		Reason:     reason,
 		TestedAtMS: testedAt,
@@ -628,20 +718,24 @@ func logCredentialProbe(ref state.CredentialRef, response CredentialProbeRespons
 	if response.Reason != nil {
 		reason = string(*response.Reason)
 	}
+	fields := logrus.Fields{
+		"event": "credential_probe_completed", "credential_id": ref.ID, "group_id": ref.GroupID,
+		"outcome": response.Outcome, "reason": reason, "model": response.Model, "protocol": response.Protocol, "latency_ms": response.LatencyMS,
+	}
+	if response.UpstreamStatusCode != nil {
+		fields["upstream_status_code"] = *response.UpstreamStatusCode
+	}
+	if response.ErrorSummary != nil {
+		fields["error_summary"] = *response.ErrorSummary
+	}
+	if response.RetryAfterSeconds != nil {
+		fields["retry_after_seconds"] = *response.RetryAfterSeconds
+	}
 	utils.LogPlaneBestEffort(
 		logrus.StandardLogger(),
 		logrus.InfoLevel,
 		utils.LogPlaneControl,
-		logrus.Fields{
-			"event":         "credential_probe_completed",
-			"credential_id": ref.ID,
-			"group_id":      ref.GroupID,
-			"outcome":       response.Outcome,
-			"reason":        reason,
-			"model":         response.Model,
-			"protocol":      response.Protocol,
-			"latency_ms":    response.LatencyMS,
-		},
+		fields,
 		"Credential probe completed",
 	)
 }

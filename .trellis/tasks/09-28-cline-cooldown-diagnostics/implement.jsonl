@@ -1,0 +1,9 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端入口与边界"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"数据库快照、聚合与留存；旧整点舍弃约定由本任务设计修正"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"安全错误出口"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"诊断脱敏与控制日志"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"测试与门禁"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"两套投影与资源契约"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"三语言"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端静态门禁"}
+{"file":".trellis/tasks/09-28-cline-cooldown-diagnostics/research/findings.md","reason":"已证实根因与线上脱敏样本"}

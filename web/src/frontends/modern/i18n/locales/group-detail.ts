@@ -146,7 +146,8 @@ export const zhCN = {
   modelUsage: {
     title: '凭据 × 模型用量',
     description: '按（凭据, 上游模型）展示本额度窗口内已消耗的 token。',
-    hint: '按整点统计：{from} – {to}',
+    hint: '统计覆盖范围：{from} – {to}；各行按自身窗口统计，边界明细过期时已知数值不代表全部用量。',
+    incomplete: '统计不完整',
     truncated: '仅显示用量最高的 {shown} 行，共 {total} 行。',
     loading: '正在加载模型用量…',
     loadFailed: '无法加载模型用量。',
@@ -343,7 +344,8 @@ export const enUS: typeof zhCN = {
   modelUsage: {
     title: 'Credential × model usage',
     description: 'Tokens consumed in the current quota window, per (credential, upstream model).',
-    hint: 'Counted by whole hours: {from} – {to}',
+    hint: 'Coverage: {from} – {to}. Each row uses its own window; expired boundary details mean totals are incomplete.',
+    incomplete: 'Incomplete statistics',
     truncated: 'Showing the top {shown} rows of {total}.',
     loading: 'Loading model usage…',
     loadFailed: 'Unable to load model usage.',
@@ -536,7 +538,8 @@ export const jaJP: typeof zhCN = {
   modelUsage: {
     title: '認証情報 × モデル使用量',
     description: '（認証情報, 上流モデル）ごとに、現在の割り当て期間で消費したトークンを示します。',
-    hint: '正時単位で集計：{from} – {to}',
+    hint: '集計対象：{from} – {to}。各行の期間で集計し、境界の明細が保存期限を過ぎた場合、表示値は全使用量を表しません。',
+    incomplete: '集計が不完全',
     truncated: '使用量の多い上位 {shown} 行のみ表示しています（全 {total} 行）。',
     loading: 'モデル使用量を読み込み中…',
     loadFailed: 'モデル使用量を読み込めません。',

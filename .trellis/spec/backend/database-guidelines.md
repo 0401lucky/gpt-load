@@ -122,7 +122,17 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 - `SourceHourlyStats`：整点对齐后查 `usage_stats` 取主体，再从 `request_logs` 合并首尾**不完整的小时**做精确边界；`DataComplete` 反映边界段是否仍在 `request_logs` 留存内。**单个凭据 + 单个窗口**的形态。
 - `SourceRequestLogs`：整段走 `request_logs`，`DataComplete = requestLogWindowRetained(FromMS)`。窗口超出留存时统计不完整但**不报错** —— 调用方必须读 `DataComplete`。
 
-⚠️ 需要**多个不同窗口**（例：按 `(凭据, 模型)` 各自的重置时刻划窗）时**不能**对每行调用上面这条单窗口接口 —— 那是 N 次查询。做法是取全组最早窗口起点、整点向上对齐为一次查询下界，一次取回后在内存按行归并（先例：`internal/requestlog/group_model_usage.go` 的 `QueryGroupModelUsage`，其 `TestQueryGroupModelUsageReadsTheBucketRangeInOneRowQuery` 用 GORM 查询回调计数固定「一次取回」）。
+⚠️ 需要**多个不同窗口**（例：按 `(凭据, 模型)` 各自的重置时刻划窗）时**不能**对每行调用上面这条单窗口接口 —— 那是 N 次查询。必须批量读取小时聚合与首尾边界明细，按每行窗口归并；两种来源须在同一个 `dbtx.ReadSnapshot` 内读取。**禁止仅将起点向上取整后舍弃首小时**：额度可能在几分钟内耗尽，时间误差小于一小时仍可造成 100% token 漏算。分组用量合同见下节。
+
+### 分组模型用量的精确边界合同
+
+1. **适用范围**：按 `(credential_id, upstream_model)` 各自划窗的管理统计，入口为 `GET /api/groups/:group_id/model-usage`，实现位于 `internal/requestlog/group_model_usage.go` 和 `internal/control/group_model_usage.go`。
+2. **签名与来源**：读取当前组的凭据/模型窗口，批量使用 `usage_stats` 与 `request_logs`。不新增数据库表，不逐凭据调用 `QueryCredentialWindowUsage`。
+3. **响应合同**：`window_start_ms` 是该行真实起点，`window_source` 区分重置锚点与近 24h 兜底；`data_complete` 表示所需边界明细的留存是否完整。顶层 `counted_from_ms` / `counted_to_ms` 是整体窗口覆盖范围，每行仍用自己的起点。token 含全部缓存分项；成功以 `status = 'success'` 定义，不以 HTTP 200 代替。
+4. **校验与错误矩阵**：非法范围/损坏聚合数值 → 返回错误；首尾同小时 → 明细区间只合并一次；边界明细超留存 → 返回已知数值并标记 `data_complete=false`，不能静默宣称完整；并发写入 → 用同一 DB 快照避免混合新旧数据。
+5. **正常/基础/异常样例**：09:43 起、09:50 前耗尽的全部 token 必须计入；整点窗口直接复用完整桶；边界缺失时 UI 显示统计不完整，不能把 0 当作上游没有消耗额度。
+6. **必要测试断言**：同小时爆发用量、首尾重叠、整点、当前小时新行、多模型不同窗口、删除凭据过滤、留存不完整、批量查询数量不随 key 数逐个增长。复用现有安全整数和 `UsageAggregate` 求和校验。
+7. **错误与正确做法**：错误：`ceilHour(start)` 后只查小时桶。正确：完整小时桶 + `[start, ceilHour(start))` 和 `[floorHour(end), end)` 的精确明细，先裁到 `[start,end)` 并消除重叠；禁止用前周期的整个边界桶补数。
 
 ---
 
