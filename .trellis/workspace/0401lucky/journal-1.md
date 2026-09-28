@@ -176,3 +176,38 @@
 - push main 触发出 ghcr-main 镜像流水线（外部发布需用户确认）。
 - 生产升级按 research/production-upgrade-note.md 走常规 pull + up -d：无需改账本、无需停机；回滚仍需卷快照与旧镜像成对。
 - trellis-check 子代理本轮因 spawn_agent 持续不可用未能派发，交叉核查（blob 级比对、注册表、索引 helper 等价性）由主会话完成，证据在 rehearsal-evidence 与 baseline-tests。
+
+
+## Session 6: 修复 Cline 模型用量与测试诊断并上线
+<!-- trellis-session: v=2 fp=d84f80b4ef798465 -->
+
+**Date**: 2026-09-28
+**Task**: 修复 Cline 模型用量与测试诊断并上线
+**Branch**: `main`
+
+### Summary
+
+补齐分组模型用量窗口边界，连接测试显示脱敏上游详情；推送 main 并部署 yunyou-99 gpt-load-2 dev.12，线上样本与日志一致。
+
+### Main Changes
+
+- 批量精确边界统计、data_complete、两套测试弹窗诊断和三语同步
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `de234646` | fix: 修复模型用量窗口漏算并补全连接测试诊断 |
+
+### Testing
+
+- [OK] control/requestlog 完整测试、前端 lint/type/build、Go vet/build 通过；全量门禁既有 Windows 环境失败详见任务 verification.md
+- [OK] Main images #12 全绿；公网200、容器healthy、cac8为15,662,497 tokens、真实测试返回429原文且不改冷却
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- 部署完成；遇新上游额度问题可根据测试错误详情继续判断
