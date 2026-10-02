@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 6
-- **Last Active**: 2026-09-28
+- **Total Sessions**: 7
+- **Last Active**: 2026-10-02
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~213 | Active |
+| `journal-1.md` | ~246 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 7 | 2026-10-02 | 兼容合并上游 44 个提交并验证迁移追加升级 | `37ce4c93b2ac1802169313ef07cc86ebe28b97ba` | `main` |
 | 6 | 2026-09-28 | 修复 Cline 模型用量与测试诊断并上线 | `de234646` | `main` |
 | 5 | 2026-09-23 | 合并上游 main 33 提交：迁移编号 B 方案（上游顺延为链尾） | `0af4e399`, `9f4e7a57` | `main` |
 | 4 | 2026-09-20 | 凭据备注字段：门禁验证、端到端实测、spec 同步与提交 | `4d721020` | `feat/credential-note` |

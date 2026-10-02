@@ -211,3 +211,36 @@
 ### Next Steps
 
 - 部署完成；遇新上游额度问题可根据测试错误详情继续判断
+
+
+## Session 7: 兼容合并上游 44 个提交并验证迁移追加升级
+<!-- trellis-session: v=2 fp=c01298d5e2a8df0f -->
+
+**Date**: 2026-10-02
+**Task**: 兼容合并上游 44 个提交并验证迁移追加升级
+**Branch**: `main`
+
+### Summary
+
+将上游 addd6987 的 44 个提交兼容合并进本地 main，保留捐献、凭据备注、分组模型冷却、用量矩阵和连接诊断。16 个文本冲突已解决，上游三条迁移顺延为 0025-0027，旧 24 条冻结。本地 main 已更新，上游落后数为 0；未 push 或部署。
+
+### Main Changes
+
+- 独立实现及检查代理复核前后端契约与隐藏迁移注册表冲突，补充新旧设置和备注/RPM 共存回归。
+- 数据库 spec 同步 27 条迁移链及 RPM 留存规则；完整任务与验证记录已归档。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `37ce4c93b2ac1802169313ef07cc86ebe28b97ba` | merge: 兼容合并上游 main 至 addd6987（迁移顺延为 0025-0027） |
+
+### Testing
+
+- [OK] 前端 install/lint/format/type-check/build、Go build/vet/tidy、CPA module tidy/vet、1257 个 Go 源码格式检查通过。
+- [OK] SQLite 新库及 24→27 升级、11 张表数据和旧账本不变、重复迁移幂等测试通过；相关后端回归通过。
+- [OK] 整仓 Go 测试执行完毕；5 个 Windows 失败包同条件 LF 基线复测为完全相同的 23 个顶层失败测试，无新增失败；真实 MySQL/PostgreSQL 未实测。
+
+### Status
+
+[OK] **Completed**
