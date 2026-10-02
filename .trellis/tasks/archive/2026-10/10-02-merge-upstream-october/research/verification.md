@@ -4,6 +4,8 @@
 
 本轮合并固定输入：fork `c79bca8fcee20cec2a6306b474a8a10e3a1061c6` 与 upstream `addd69870cb58108c584d69219c44e23d4bdf3db`。上游独有 44 个提交，fork 独有 33 个提交。16 个文本冲突已解决，另修复未被 Git 标记的迁移注册表/导出符号冲突。
 
+本地合并提交：`37ce4c93b2ac1802169313ef07cc86ebe28b97ba`，双亲分别为上述两个输入。`main` 已快进至该提交，两个 `git merge-base --is-ancestor` 均退出 0；相对固定上游的落后数为 0。提交后的 Git 状态仅剩原有 `.playwright-mcp/` 与 `.trellis/tasks/09-28-credential-probe-real-chat/` 两个未跟踪目录。
+
 ## 门禁结果
 
 | 检查 | 结果 |
