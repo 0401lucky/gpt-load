@@ -10,6 +10,17 @@ import (
 	migrationfiles "gpt-load/internal/storage/migrations"
 )
 
+func migrationIndexByID(t *testing.T, id string) int {
+	t.Helper()
+	for index, entry := range migrations {
+		if entry.ID == id {
+			return index
+		}
+	}
+	t.Fatalf("migration %s is not registered", id)
+	return -1
+}
+
 func TestMigrationRegistryContainsOrderedMigrations(t *testing.T) {
 	wantIDs := []string{
 		migrationfiles.ID0001,
@@ -36,6 +47,9 @@ func TestMigrationRegistryContainsOrderedMigrations(t *testing.T) {
 		migrationfiles.ID0022,
 		migrationfiles.ID0023,
 		migrationfiles.ID0024,
+		migrationfiles.ID0025,
+		migrationfiles.ID0026,
+		migrationfiles.ID0027,
 	}
 	if len(migrations) != len(wantIDs) {
 		t.Fatalf("migration registry length = %d, want %d", len(migrations), len(wantIDs))

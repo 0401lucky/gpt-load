@@ -1,0 +1,12 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端依赖边界与改动前检查索引"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"冻结既有迁移，追加上游迁移，测试按语义 ID 定位"}
+{"file":".trellis/spec/backend/runtime-settings.md","reason":"保留冷却开关的分组作用域与配置全链契约"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"控制面 DTO 边界、依赖装配与模块归属"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"完整门禁、独立 CPA module 检查及测试边界"}
+{"file":".trellis/spec/backend/donation-integration.md","reason":"保持捐献接收、审核与来源记录契约"}
+{"file":".trellis/spec/frontend/index.md","reason":"classic/modern 前端检查清单"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"严格投影与设置保存联动，防止新增字段使页面失败"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"合并设置及文案时保持三语言一致"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端静态门禁与现有测试策略"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"配置、快照、控制面与前端跨层兼容检查"}
+{"file":".trellis/tasks/10-02-merge-upstream-october/research/recon.md","reason":"固定提交、冲突列表、隐藏迁移冲突及 fork 回归锚点"}

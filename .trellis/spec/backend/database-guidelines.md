@@ -106,13 +106,14 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 
 ## 留存与清理：哪些数据会被删
 
-清理由 `requestlog.(*Service).Sweep` 执行（`internal/requestlog/retention.go`）。**只有三张表会被裁剪**，各自留存的语义不同 —— 写历史数据分析类功能前必须先看这张表，用错数据源会静默低估：
+清理由 `requestlog.(*Service).Sweep` 执行（`internal/requestlog/retention.go`）。**四张表会被裁剪**，各自留存的语义不同 —— 写历史数据分析类功能前必须先看这张表，用错数据源会静默低估：
 
 | 表 | 留存 | 裁剪依据 |
 |---|---|---|
 | `request_logs`（逐请求明细） | `request_log_retention_days`，默认 **7 天**（`state.DefaultRuntimeSettings()`；可由系统设置改） | `completed_at_ms < cutoff` |
 | `usage_aggregation_journal`（聚合幂等日志） | **35 天** | `bucket_start_ms < cutoff` |
 | `credential_quota_histories`（订阅类渠道的百分比额度历史） | **35 天** | `observed_at_ms < cutoff` |
+| `rpm_stats`（AccessKey / 凭据的分钟请求速率） | 与 `request_log_retention_days` 相同 | `minute_ms < cutoff` |
 | **`usage_stats`（小时用量聚合）** | **永久保留，不裁剪** | — |
 
 > **Warning**：`usage_stats` 是**唯一**不受留存影响的历史用量来源（`retention.go:22-24` 的文档注释明写 "Hourly aggregates are retained indefinitely"；`retention_test.go` 有 `TestRetentionSweepKeepsUsageStats…` 固定该行为）。因此**任何跨天/跨周期的 token 用量统计都应基于 `usage_stats`**；`request_logs` 只适合「留存窗口内的逐请求精确边界」，超出留存即静默缺数据。
@@ -143,7 +144,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0020
+    // ... 至 ID0027
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -156,7 +157,7 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 - 导出符号按迁移形状分两类，**不是每个迁移都导出一整套**：
   - **建表型**：`Up000N` / `Validate000N` / `ValidateCurrent000N` / `ValidateRecoverable000N`，外加 `SchemaModels000N() []any`（确定性 DDL 顺序）与 `TableNames000N() []string`（先例 `0019_donation_manual_review.go`）。
   - **加列 / 改列型**：只需 `Up000N` / `Validate000N` / `ValidateRecoverable000N`，**不导出** `SchemaModels` / `TableNames` / `ValidateCurrent`（先例 `0005_proxy_config.go`、`0014_affinity_kind.go`、`0020_credential_note.go`）。`Up` 内先 `HasColumn` 判重再 `ALTER TABLE`，末尾 `return Validate000N(db)`。
-- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`、`0020_credential_note.go`、`0021_auto_model.go`、`0022_auto_decision_attribution.go`、`0023_client_model_overrides.go`、`0024_request_audit.go`。后四条本属上游 `0018`–`0021`，顺延原因见下面的编号约定。
+- 文件命名：`0001_initial.go` … `0014_affinity_kind.go`、`0015_group_usage_index.go`、`0016_credential_quota_history.go`、`0017_request_log_operation_index.go`、`0018_donation_intake.go`、`0019_donation_manual_review.go`、`0020_credential_note.go`、`0021_auto_model.go`、`0022_auto_decision_attribution.go`、`0023_client_model_overrides.go`、`0024_request_audit.go`、`0025_rpm_stats.go`、`0026_access_key_concurrency.go`、`0027_request_log_output_timing.go`。fork 的 `0021`–`0027` 分别来自上游 `0018`–`0024`，顺延原因见下面的编号约定。
 - 追加迁移会连带改到**断言完整链**的测试，漏改就红：`internal/storage/migration_test.go`（注册表 ID 列表）、`internal/storage/db_test.go`（`schema_migrations` ID 列表）、`internal/storage/database_integration_test.go`（账本长度 + 期望列清单）。另注意**建旧 schema 的测试**要用 `db.Omit("新列")` 建行（先例 `migrations/0003_remove_observation_fresh_until_test.go` 的 `Omit("ProxyConfig", "Note")`），否则 GORM 会往尚不存在的列里写。
 - **账本顺序即身份**：`applyMigrationsLocked` 用数组下标逐条比对 `schema_migrations` 里的 ID，任何一条对不上就拒绝启动。因此迁移只能追加在链尾，**不得插入、重排或重编号已发布的迁移**。
 - **fork 与上游的编号约定（2026-09-23 起）**：fork 自己的迁移编号**冻结不动**；上游新增迁移进入 fork 时**顺延到 fork 链尾**（例：上游 `0018`–`0021` → fork `0021`–`0024`）。这样已上线库的账本恒为注册表的**前缀**，升级退化为 `docker compose pull` + `up -d`，无需停机、无需改账本。
@@ -166,6 +167,16 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
 - **上游迁移测试常硬编码注册表下标**（`migrations[:18]`、`migrations[19]`、`migrations[:20]`）。顺延编号后这些下标会指向别的迁移：要么直接失败，要么**静默测错对象却仍然通过**。合并上游并顺延编号时，必须把这类文件改成按 ID 定位（先例：`autoDecisionAttributionMigrationIndex`、`clientModelOverrideMigrationIndex`、`requestAuditMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
+
+### 合并上游时的注册表完整性
+
+1. **适用范围**：上游新增迁移编号与 fork 已发布编号重叠时，即使 `git merge` 没有报告 `migration.go` 冲突，也必须检查完整注册表。
+2. **签名与结构**：`migrations []migration` 的 `ID`、`Up`、`Validate`、`ValidateCurrent`、`ValidateRecoverable` 都须与目标迁移对应；例如上游 `0022_rpm_stats` 在 fork 注册为 `ID0025` / `Up0025` / `Validate0025` / `ValidateRecoverable0025`。
+3. **合同**：旧账本是新链的严格前缀。已有 `ID0022` 仍属于 `auto_decision_attribution`，不能为修复同名新符号而全仓替换旧编号。只迁移新文件和它的调用者；DDL 名字保留上游形态。
+4. **校验与错误矩阵**：同名导出符号 → 编译失败；新文件存在但注册项遗漏 → 新表/列缺失；旧编号重排 → 启动时账本不匹配；迁移测试硬编码下标 → 可能测错对象却仍通过。
+5. **正常/基础/异常样例**：旧 24 条 + 新 3 条 = 27 条；没有新增迁移时旧链不变；自动合并只留下 `ID0001`–`ID0024` 却同时增加三个文件属于错误结果。
+6. **必要测试断言**：完整 ID 列表、空库迁移、带 fork 业务记录和身份数据的旧链升级、旧账本和记录不变、二次执行幂等；新测试按 ID 查找迁移边界。
+7. **错误与正确做法**：错误：消除冲突标记后直接认定迁移合并成功。正确：逐个对应「迁移文件 → 唯一导出符号 → 注册项 → 正确语义边界的测试」，并验证升级前缀与数据不变。
 
 方言分支（改迁移时最容易踩的地方）：
 

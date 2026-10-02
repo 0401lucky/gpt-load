@@ -6,12 +6,15 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"gpt-load/internal/channel"
 	"gpt-load/internal/platform/config"
 	app_errors "gpt-load/internal/platform/errors"
+	"gpt-load/internal/platform/redact"
+	"gpt-load/internal/requestlog"
 	"gpt-load/internal/storage/models"
 )
 
@@ -34,6 +37,15 @@ func TestCredentialNoteStaysOutOfClassicResponseAndHonorsOptionalSemantics(t *te
 	if err := fixture.db.Where("group_id = ?", created.GroupID).Take(&credential).Error; err != nil {
 		t.Fatal(err)
 	}
+	now := time.Now().Truncate(time.Minute)
+	fixture.service.now = func() time.Time { return now }
+	if err := fixture.db.Create(&models.RPMStat{
+		Kind: "credential", KeyID: credential.ID, MinuteMS: now.Add(-time.Minute).UnixMilli(),
+		SessionID: "credential-note", Requests: 7, Peak: 9,
+	}).Error; err != nil {
+		t.Fatal(err)
+	}
+	fixture.service.usageStats = requestlog.NewService(fixture.db, redact.New(), rpmTestRetention{})
 	engine := gin.New()
 	NewServer(&config.Config{AuthKey: "test-auth-key"}, fixture.service).RegisterRoutes(engine)
 	classicList := fmt.Sprintf("/api/groups/%d/credentials", created.GroupID)
@@ -102,10 +114,16 @@ func assertCredentialNote(
 		if exists || strings.Contains(raw, `"note":`) {
 			t.Fatalf("classic %s exposes the note key: %s", path, raw)
 		}
+		if _, exists := item["rpm_peak_hour"]; exists {
+			t.Fatalf("classic %s exposes the RPM peak: %s", path, raw)
+		}
 		return
 	}
 	if !exists || string(note) != mustJSONString(t, want) {
 		t.Fatalf("modern %s note = %s, want %q", path, note, want)
+	}
+	if list && string(item["rpm_peak_hour"]) != "9" {
+		t.Fatalf("modern %s RPM peak = %s, want 9 alongside note", path, item["rpm_peak_hour"])
 	}
 }
 

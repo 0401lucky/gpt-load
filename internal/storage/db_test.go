@@ -645,6 +645,7 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 		"credential_reset_operations",
 		"credential_attempt_stats",
 		"schema_migrations",
+		"rpm_stats",
 	}
 	for _, table := range wantTables {
 		if !db.Migrator().HasTable(table) {
@@ -684,6 +685,9 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 		"0022_auto_decision_attribution",
 		"0023_client_model_overrides",
 		"0024_request_audit",
+		"0025_rpm_stats",
+		"0026_access_key_concurrency",
+		"0027_request_log_output_timing",
 	}
 	if !reflect.DeepEqual(migrationIDs, wantMigrationIDs) {
 		t.Fatalf("schema_migrations IDs = %v, want %v", migrationIDs, wantMigrationIDs)

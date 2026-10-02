@@ -60,6 +60,16 @@ export type RequestLogOperation =
   | 'embeddings_create'
   | 'rerank'
   | 'decisions_create'
+  | 'mistral_ocr'
+  | 'mistral_fim'
+  | 'mistral_audio_transcription'
+  | 'mistral_audio_speech'
+  | 'mistral_moderation'
+  | 'mistral_chat_moderation'
+  | 'mistral_classification'
+  | 'mistral_voices'
+  | 'mistral_realtime_transcription'
+  | 'live_call'
   | 'list_models'
   | 'probe'
 export type RequestLogRouteMode = 'native' | 'converted'
@@ -80,7 +90,7 @@ export interface RequestLogFilters {
   upstream_model?: string
   access_key_id?: number
   status?: RequestLogStatus
-  audit_status?: 'warned' | 'blocked' | 'incomplete'
+  audit_status?: 'warned' | 'blocked' | 'failed'
   audit_rule?: string
   request_id?: string
   protocol?: AccessProtocol
@@ -190,6 +200,8 @@ export interface RequestLogItemDto {
   status_code: number
   stream: boolean
   first_response_ms: number | null
+  first_output_ms: number | null
+  last_output_ms: number | null
   duration_ms: number
   attempt_count: number
   error_code: string
@@ -291,6 +303,16 @@ const operations = [
   'embeddings_create',
   'rerank',
   'decisions_create',
+  'mistral_ocr',
+  'mistral_fim',
+  'mistral_audio_transcription',
+  'mistral_audio_speech',
+  'mistral_moderation',
+  'mistral_chat_moderation',
+  'mistral_classification',
+  'mistral_voices',
+  'mistral_realtime_transcription',
+  'live_call',
   'list_models',
   'probe',
 ] as const
@@ -329,6 +351,8 @@ const itemFields = [
   'status_code',
   'stream',
   'first_response_ms',
+  'first_output_ms',
+  'last_output_ms',
   'duration_ms',
   'attempt_count',
   'error_code',
@@ -671,6 +695,14 @@ function projectItemRecord(record: Record<string, unknown>): RequestLogItemDto {
     status,
     status_code: projectStatusCode(record.status_code),
     stream: projectBoolean(record.stream),
+    first_output_ms:
+      record.first_output_ms === null
+        ? null
+        : projectSafeInteger(record.first_output_ms, { minimum: 0 }),
+    last_output_ms:
+      record.last_output_ms === null
+        ? null
+        : projectSafeInteger(record.last_output_ms, { minimum: 0 }),
     first_response_ms:
       record.first_response_ms === null
         ? null

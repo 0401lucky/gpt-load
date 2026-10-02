@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { codexLiveModes, type CodexLiveMode } from '@shared/codex-live'
+import AppSelect from '@/components/ui/AppSelect.vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -107,6 +109,7 @@ const {
 const timeoutKeys = groupTimeoutKeys
 const policyCountKeys = groupPolicyCountKeys
 const policyRows = [
+  { key: 'concurrency_limit', helpKey: 'concurrencyHelp' },
   {
     key: 'blacklist_threshold',
     helpKey: 'blacklistThresholdHelp',
@@ -266,6 +269,17 @@ const affinityEnabledLabel = computed(() =>
     ? t('group.settings.runtime.enabledValue')
     : t('group.settings.runtime.disabledValue'),
 )
+const liveOptions = computed(() => [
+  { value: '', label: t('group.settings.runtime.inherited') },
+  ...codexLiveModes.map((value) => ({ value, label: t('settings.runtime.liveModes.' + value) })),
+])
+function setLiveMode(value: string): void {
+  if (!draft.value) return
+  const overrides = { ...draft.value.overrides }
+  if (value) overrides.codex_live_mode = value as CodexLiveMode
+  else delete overrides.codex_live_mode
+  draft.value = { ...draft.value, overrides }
+}
 const websocketOverridden = computed(
   () => draft.value?.overrides.responses_websocket_enabled !== undefined,
 )
@@ -288,6 +302,19 @@ const resetHintPendingRestore = computed(
 )
 const resetHintEnabledLabel = computed(() =>
   saved.value?.effective.rate_limit_reset_hint_enabled
+    ? t('group.settings.runtime.enabledValue')
+    : t('group.settings.runtime.disabledValue'),
+)
+const emptyResponseRetryOverridden = computed(
+  () => draft.value?.overrides.empty_response_retry !== undefined,
+)
+const emptyResponseRetryPendingRestore = computed(
+  () =>
+    !emptyResponseRetryOverridden.value &&
+    saved.value?.overrides.empty_response_retry !== undefined,
+)
+const emptyResponseRetryLabel = computed(() =>
+  saved.value?.effective.empty_response_retry
     ? t('group.settings.runtime.enabledValue')
     : t('group.settings.runtime.disabledValue'),
 )
@@ -494,6 +521,22 @@ function setResetHintValue(value: boolean): void {
   draft.value = {
     ...draft.value,
     overrides: { ...draft.value.overrides, rate_limit_reset_hint_enabled: value },
+  }
+}
+
+function toggleEmptyResponseRetryOverride(): void {
+  if (!draft.value || !saved.value) return
+  const overrides = { ...draft.value.overrides }
+  if (emptyResponseRetryOverridden.value) delete overrides.empty_response_retry
+  else overrides.empty_response_retry = saved.value.effective.empty_response_retry
+  draft.value = { ...draft.value, overrides }
+}
+
+function setEmptyResponseRetryValue(value: boolean): void {
+  if (!draft.value) return
+  draft.value = {
+    ...draft.value,
+    overrides: { ...draft.value.overrides, empty_response_retry: value },
   }
 }
 
@@ -741,6 +784,20 @@ onBeforeUnmount(() => {
               <p>{{ t('group.settings.runtime.description') }}</p>
             </header>
             <div class="group-settings__runtime">
+              <div v-if="draft.channel_id === 'codex'">
+                <AppSelect
+                  :model-value="draft.overrides.codex_live_mode ?? ''"
+                  :options="liveOptions"
+                  :label="t('settings.runtime.codex_live_mode')"
+                  :disabled="mutationPending"
+                  @update:model-value="setLiveMode"
+                />
+                <p>
+                  {{ t('settings.runtime.liveModeHelp') }} ·
+                  {{ t('settings.runtime.currentEffective') }}:
+                  {{ t('settings.runtime.liveModes.' + saved.effective.codex_live_mode) }}
+                </p>
+              </div>
               <SettingRow
                 :label="t('group.settings.runtime.responses_websocket_enabled')"
                 :value="
@@ -772,6 +829,40 @@ onBeforeUnmount(() => {
                     :disabled="mutationPending"
                     :label="t('group.settings.runtime.responses_websocket_enabled')"
                     @update:model-value="setWebsocketValue"
+                  />
+                </template>
+              </SettingRow>
+              <SettingRow
+                :label="t('group.settings.runtime.empty_response_retry')"
+                :value="
+                  emptyResponseRetryPendingRestore
+                    ? t('group.settings.runtime.resetPending')
+                    : emptyResponseRetryLabel
+                "
+                :help="t('group.settings.runtime.emptyResponseRetryHelp')"
+                :source-label="
+                  emptyResponseRetryOverridden
+                    ? t('group.settings.runtime.override')
+                    : emptyResponseRetryPendingRestore
+                      ? t('group.settings.runtime.pendingRestoreSource')
+                      : t('group.settings.runtime.inherited')
+                "
+                :action-label="
+                  emptyResponseRetryOverridden
+                    ? t('group.settings.runtime.useInherited')
+                    : t('group.settings.runtime.useOverride')
+                "
+                :overridden="emptyResponseRetryOverridden"
+                :pending-restore="emptyResponseRetryPendingRestore"
+                :disabled="mutationPending"
+                @toggle="toggleEmptyResponseRetryOverride"
+              >
+                <template #control>
+                  <AppSwitch
+                    :model-value="draft.overrides.empty_response_retry ?? false"
+                    :disabled="mutationPending"
+                    :label="t('group.settings.runtime.empty_response_retry')"
+                    @update:model-value="setEmptyResponseRetryValue"
                   />
                 </template>
               </SettingRow>

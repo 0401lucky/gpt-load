@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/gorm"
 
+	migrationfiles "gpt-load/internal/storage/migrations"
 	"gpt-load/internal/storage/models"
 )
 
@@ -33,7 +34,7 @@ func TestExternalModelCooldownMigrationRecoversConstraintReplacement(t *testing.
 	if db.Dialector.Name() != "mysql" {
 		t.Skip("DDL auto-commit recovery is specific to MySQL")
 	}
-	if err := applyMigrationRegistry(db, migrations[:9]); err != nil {
+	if err := applyMigrationRegistry(db, migrations[:migrationIndexByID(t, migrationfiles.ID0010)]); err != nil {
 		t.Fatal(err)
 	}
 	interrupted := false
@@ -60,14 +61,16 @@ func TestExternalModelCooldownMigrationRecoversConstraintReplacement(t *testing.
 }
 
 func testModelCooldownMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
+	t.Helper()
 	for _, scenario := range []string{"fresh", "upgrade", "interrupted", "column_added"} {
 		t.Run(scenario, func(t *testing.T) {
 			db := open(t)
+			index := migrationIndexByID(t, migrationfiles.ID0010)
 			if db.Dialector.Name() == "sqlite" {
 				t.Parallel()
 			}
 			if scenario != "fresh" {
-				if err := applyMigrationRegistry(db, migrations[:9]); err != nil {
+				if err := applyMigrationRegistry(db, migrations[:index]); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -77,7 +80,7 @@ func testModelCooldownMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 			if scenario != "fresh" {
 				if err := db.Omit(
 					"RequestAudit", "AuditCostNanoUSD", "AuditPricingCompleteness", "AffinityKind", "AutoDecision", "DecisionModel", "DecisionCostNanoUSD",
-					"DecisionPricingCompleteness", "DecisionGroupID", "DecisionChannelID", "DecisionCredentialID",
+					"DecisionPricingCompleteness", "DecisionGroupID", "DecisionChannelID", "DecisionCredentialID", "FirstOutputMs", "LastOutputMs",
 				).Create(&legacyRequest).Error; err != nil {
 					t.Fatal(err)
 				}
@@ -87,8 +90,8 @@ func testModelCooldownMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 					t.Fatal(err)
 				}
 			}
-			if (scenario == "interrupted" || scenario == "column_added") && len(migrations) > 9 {
-				entry := migrations[9]
+			if scenario == "interrupted" || scenario == "column_added" {
+				entry := migrations[index]
 				up := entry.Up
 				entry.Up = func(tx *gorm.DB) error {
 					if scenario == "column_added" {
@@ -102,7 +105,7 @@ func testModelCooldownMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 					}
 					return fmt.Errorf("interrupt after model cooldown DDL")
 				}
-				registry := append(append([]migration(nil), migrations[:9]...), entry)
+				registry := append(append([]migration(nil), migrations[:index]...), entry)
 				if err := applyMigrationRegistry(db, registry); err == nil {
 					t.Fatal("interruption succeeded")
 				}

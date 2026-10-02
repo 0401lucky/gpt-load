@@ -68,6 +68,8 @@ type requestRecorder struct {
 	clientModel          string
 	stream               bool
 	firstResponseMs      *int64
+	firstOutputMs        *int64
+	lastOutputMs         *int64
 	forwardStartedAt     time.Time
 	reasoning            reasoning.Config
 	usageApplicable      bool
@@ -155,6 +157,8 @@ func (recorder *requestRecorder) emit() {
 		ErrorSummary:          recorder.outcome.errorSummary,
 		Stream:                recorder.stream,
 		FirstResponseMs:       recorder.firstResponseMs,
+		FirstOutputMs:         recorder.firstOutputMs,
+		LastOutputMs:          recorder.lastOutputMs,
 		DurationMs:            duration.Milliseconds(),
 		AffinityHit:           recorder.affinityHit,
 		AffinityKind:          recorder.affinityKind,
@@ -168,8 +172,10 @@ func (recorder *requestRecorder) emit() {
 func (recorder *requestRecorder) freezeSensitiveInputErrorSummaries() {
 	if recorder == nil ||
 		(recorder.protocol != protocol.OpenAIImages &&
-			recorder.protocol != protocol.OpenAIEmbeddings && recorder.protocol != protocol.Rerank &&
-			recorder.protocol != protocol.Decisions) {
+			recorder.protocol != protocol.OpenAIEmbeddings && recorder.protocol != protocol.GeminiEmbeddings &&
+			recorder.protocol != protocol.Rerank &&
+			recorder.protocol != protocol.Decisions &&
+			recorder.protocol != protocol.Mistral) {
 		return
 	}
 	if recorder.outcome.errorCode != "" {
@@ -252,8 +258,29 @@ func (recorder *requestRecorder) recordFirstResponse() {
 	}
 	value := duration.Milliseconds()
 	recorder.firstResponseMs = &value
+}
+
+func (recorder *requestRecorder) recordOutput(valid bool) {
+	if recorder == nil || !recorder.stream {
+		return
+	}
+	if !valid {
+		recorder.firstOutputMs, recorder.lastOutputMs = nil, nil
+		return
+	}
+	if recorder.now == nil {
+		return
+	}
+	now := recorder.now()
+	value := max(int64(0), now.Sub(recorder.startedAt).Milliseconds())
+	if recorder.firstOutputMs != nil {
+		value = max(value, *recorder.lastOutputMs)
+		recorder.lastOutputMs = &value
+		return
+	}
+	recorder.firstOutputMs, recorder.lastOutputMs = &value, &value
 	if recorder.autoDecision != nil && !recorder.forwardStartedAt.IsZero() {
-		elapsed := recorder.now().Sub(recorder.forwardStartedAt).Milliseconds()
+		elapsed := now.Sub(recorder.forwardStartedAt).Milliseconds()
 		if elapsed >= 0 {
 			recorder.autoDecision.AnswerFirstResponseMs = &elapsed
 		}
@@ -562,6 +589,10 @@ func (recorder *requestRecorder) bindUsage(
 		pricingMode = frozen.pricingMode
 		recorder.setReasoning(frozen.reasoning)
 	}
+	// 执行层已识别最终配置时，两处日志统一采用该值，避免基准档位覆盖配置更新。
+	if attempt.Reasoning.Present() {
+		recorder.setReasoning(attempt.Reasoning)
+	}
 	if !applicable || !usageApplicable {
 		result = usage.Result{State: usage.StateNotApplicable}
 	} else if !validCapturedUsage(result) {
@@ -738,7 +769,8 @@ func upstreamErrorCode(result UpstreamResult, category health.FailureCategory) s
 			"credential_proxy_prepare_failed",
 			"group_proxy_prepare_failed",
 			"server_is_overloaded",
-			"rate_limit_exceeded":
+			"rate_limit_exceeded",
+			health.EmptyResponseCode:
 			return result.ExecutionError.Code
 		}
 	}
@@ -780,6 +812,8 @@ func upstreamErrorCode(result UpstreamResult, category health.FailureCategory) s
 
 func fixedErrorSummary(code string) string {
 	switch code {
+	case "concurrency_limit_exceeded":
+		return reasonConcurrencyLimit.Message
 	case "upstream_rate_limited":
 		return "Upstream rate limited the request."
 	case "upstream_model_unavailable":
@@ -806,6 +840,8 @@ func fixedErrorSummary(code string) string {
 		return "Upstream stream terminated before completion."
 	case "upstream_stream_idle_timeout":
 		return "Upstream stream timed out while idle."
+	case health.EmptyResponseCode:
+		return "Upstream completed without producing any content."
 	case "downstream_write_failed":
 		return "The downstream response could not be completed."
 	case "internal_error":

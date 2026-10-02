@@ -1,3 +1,4 @@
+import { codexLiveModes, type CodexLiveMode } from '@shared/codex-live'
 import type { ApiClient } from '@shared/http/client'
 import { ApiError, InvalidResponseError } from '@shared/http/errors'
 import { boolean, integer, list, oneOf, record, text } from './response'
@@ -20,6 +21,7 @@ export const credentialSorts = [
   'weight_desc',
   'weight_asc',
   'failures',
+  'rpm_peak_desc',
 ] as const
 export interface CredentialFilters {
   credential?: string
@@ -32,6 +34,7 @@ export interface CredentialFilters {
   reset: '' | 'available' | 'none' | 'unknown'
 }
 export const runtimeNumbers = [
+  'concurrency_limit',
   'first_byte_timeout',
   'request_timeout',
   'stream_idle_timeout',
@@ -41,6 +44,7 @@ export const runtimeSwitches = [
   'affinity_enabled',
   'responses_websocket_enabled',
   'rate_limit_reset_hint_enabled',
+  'empty_response_retry',
 ] as const
 export type RuntimeNumber = (typeof runtimeNumbers)[number]
 export type RuntimeSwitch = (typeof runtimeSwitches)[number]
@@ -56,6 +60,7 @@ export interface ParameterRule {
 export type RuntimeSettings = Partial<
   Record<RuntimeNumber, number> & Record<RuntimeSwitch, boolean>
 > & {
+  codex_live_mode?: CodexLiveMode
   header_rules?: HeaderRules
   parameter_overrides?: ParameterRule[]
 }
@@ -84,6 +89,8 @@ function readRuntime(value: unknown): RuntimeSettings {
   const result: RuntimeSettings = {}
   for (const key of runtimeNumbers) if (raw[key] !== undefined) result[key] = integer(raw[key])
   for (const key of runtimeSwitches) if (raw[key] !== undefined) result[key] = boolean(raw[key])
+  if (raw.codex_live_mode !== undefined)
+    result.codex_live_mode = oneOf(raw.codex_live_mode, codexLiveModes)
   if (raw.header_rules !== undefined) {
     const headers = record(raw.header_rules)
     result.header_rules = { set: stringMap(headers.set), remove: list(headers.remove).map(text) }
@@ -109,7 +116,7 @@ function readSettings(value: unknown): GroupSettings {
   const proxy = record(data.proxy)
   const effective = readRuntime(data.effective)
   if (
-    [...runtimeNumbers, ...runtimeSwitches, 'header_rules'].some(
+    [...runtimeNumbers, ...runtimeSwitches, 'codex_live_mode', 'header_rules'].some(
       (key) => effective[key as keyof RuntimeSettings] === undefined,
     )
   )
@@ -236,6 +243,7 @@ export async function discoverGroupModels(client: ApiClient, id: number, signal:
 }
 
 export interface CredentialRow {
+  rpmPeakHour?: number
   id: number
   mask: string
   account: string
@@ -281,6 +289,7 @@ export function readCredential(value: unknown): CredentialRow {
   const recovery = record(row.recovery)
   return {
     id: integer(row.credential_id, 1),
+    rpmPeakHour: row.rpm_peak_hour == null ? undefined : integer(row.rpm_peak_hour),
     mask: text(row.mask),
     account: account ? text(account.email ?? account.email_mask ?? '') : '',
     state: oneOf(row.effective_status, credentialStates),

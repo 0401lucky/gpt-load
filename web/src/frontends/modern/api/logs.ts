@@ -21,6 +21,16 @@ export const logOperations = [
   'embeddings_create',
   'rerank',
   'decisions_create',
+  'mistral_ocr',
+  'mistral_fim',
+  'mistral_audio_transcription',
+  'mistral_audio_speech',
+  'mistral_moderation',
+  'mistral_chat_moderation',
+  'mistral_classification',
+  'mistral_voices',
+  'mistral_realtime_transcription',
+  'live_call',
   'list_models',
   'probe',
 ] as const
@@ -108,6 +118,8 @@ export interface LogEntry {
   status_code: number
   stream: boolean
   first_response_ms: number | null
+  first_output_ms: number | null
+  last_output_ms: number | null
   duration_ms: number
   attempt_count: number
   error_code: string
@@ -304,6 +316,8 @@ function entry(value: unknown): LogEntry {
     status_code: integer(row.status_code),
     stream: boolean(row.stream),
     first_response_ms: optionalNumber(row.first_response_ms),
+    first_output_ms: optionalNumber(row.first_output_ms),
+    last_output_ms: optionalNumber(row.last_output_ms),
     duration_ms: integer(row.duration_ms),
     attempt_count: integer(row.attempt_count),
     error_code: text(row.error_code),

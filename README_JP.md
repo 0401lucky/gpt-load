@@ -133,26 +133,22 @@ SSH やリモートブラウザ経由で操作する場合、ブラウザの `lo
 
 ### クライアントプロトコル
 
-| プロトコル              | 主なエンドポイント                     |
-| ----------------------- | -------------------------------------- |
-| OpenAI Chat Completions | `POST /v1/chat/completions`            |
-| OpenAI Responses        | `/v1/responses` およびそのリソースパス |
-| OpenAI Images           | `POST /v1/images/...`                  |
-| OpenAI Embeddings       | `POST /v1/embeddings`                  |
-| Rerank                  | `POST /v1/rerank`                      |
-| Anthropic Messages      | `POST /v1/messages`                    |
-| Gemini                  | `/v1beta/models/...`                   |
-
-各チャネルは実行可能なプロトコルと機能を明示的に宣言します。GPT-Load はサポート対象の機能間で変換を行いますが、任意のプロトコル・任意の JSON を扱う汎用コンバーターではありません。
-
-Embeddings は初期段階では OpenAI、OpenRouter、OpenAI Compatible の API Key チャネルでのみネイティブな OpenAI 互換ワイヤーを提供し、サブスクリプションチャネルとプロトコル変換には対応していません。プロトコルフィルターを設定していない AccessKey は既存の「有効なプロトコルをすべて許可する」動作を維持するため、アップグレード後に Embeddings へのアクセス権も得ます。最小権限で運用する場合は、プロトコルフィルターを明示的に設定してください。
-
-Rerank は独立した `rerank` プロトコルを使用し、OpenAI Compatible、New API、GPT-Load の API Key チャネルで `POST /v1/rerank` に対応します。リクエストには `model`、`query`、テキストのみの `documents` 配列を指定し、`top_n` や `return_documents` などの上流パラメーターも利用できます。ストリーミング、サブスクリプション、プロトコル変換には対応しません。OpenAI Compatible には完全な API プレフィックス（例：`https://host/v1`）、New API / GPT-Load にはゲートウェイのルートを設定します。上流は互換 Rerank API を提供する必要があります。プロトコルフィルターのない AccessKey は Rerank へのアクセス権も得ます。`search_units` など Token 以外の単位のみが返る場合は未計価とし、Token 数や無料リクエストとして扱いません。
+| プロトコル              | 主なエンドポイント                                                 |
+| ----------------------- | ------------------------------------------------------------------ |
+| OpenAI Chat Completions | `POST /v1/chat/completions`                                        |
+| OpenAI Responses        | `/v1/responses` およびそのリソースパス                             |
+| OpenAI Images           | `POST /v1/images/...`                                              |
+| OpenAI Embeddings       | `POST /v1/embeddings`                                              |
+| Rerank                  | `POST /v1/rerank`                                                  |
+| Mistral ネイティブ      | `/v1/ocr`、`/v1/audio/...` |
+| Anthropic Messages      | `POST /v1/messages`                                                |
+| Gemini                  | `/v1beta/models/...`                                               |
+| Gemini Embeddings       | `POST /v1beta/models/{model}:embedContent` / `:batchEmbedContents` |
 
 ### 組み込みチャネル
 
 - **公式・クラウド**：OpenAI、Anthropic、Gemini、xAI、Azure OpenAI、AWS Bedrock、Google Vertex AI
-- **モデルサービス**：DeepSeek、Moonshot AI、SiliconFlow、Zhipu AI、Alibaba、Volcengine、OpenRouter、Groq
+- **モデルサービス**：DeepSeek、Moonshot AI、SiliconFlow、Zhipu AI、Alibaba、Volcengine、OpenRouter、Cline、Groq、Cerebras、Mistral、Nebius、Parasail、Wafer、Hugging Face（チャット）、Cohere（テキストリランキング）、OpenCode Go、OpenCode Zen
 - **サブスクリプション**：Codex、Claude、Antigravity、Grok
 - **カスタム**：OpenAI Compatible（任意の互換中継）
 
@@ -265,16 +261,18 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 
 `approve` と `reject` は実行中のテストと排他的で、保存期限を過ぎた項目は承認できず、拒否にグループのオンライン状態は不要です。自動検証を使い切ったが保存材料が残る項目は `enter_review` で明示的に手動審査へ移せます。元のバッチ、リクエスト摘要、自動試行回数、寄付者、期限はすべて保持されます。保存期間は延長されず、移行・テスト・再試行はいずれも元の 7 日期限を守ります。
 
-実装は `internal/control/donation_*.go` と `internal/storage/migrations/0016_donation_manual_review.go` を参照してください。
+実装は `internal/control/donation_*.go` と `internal/storage/migrations/0019_donation_manual_review.go` を参照してください。
 
 - 既定では `127.0.0.1` のみを待ち受けます。リモートアクセスが必要な場合は、管理されたネットワークまたは TLS 対応のリバースプロキシ経由で公開し、ACL とファイアウォールを設定してください。
 - `AUTH_KEY` と `ENCRYPTION_KEY` は厳重に管理し、実際のキーをリポジトリ、ログ、スクリーンショット、公開 Issue に含めないでください。
 - 2.0 は**単一アプリケーションインスタンス**を前提に設計されています。インスタンス間で状態を共有しないため、そのままの水平スケールには対応していません。
 - 使用量とコストはアップストリームの応答に基づく**概算**です。運用分析やリソース評価には使えますが、プロバイダーの請求書や会計上の照合結果とは一致しません。
 - サブスクリプションチャネルはアップストリームの OAuth と互換プロトコルに依存し、アップストリームの変更に伴って調整が必要になる場合があります。利用権限のあるアカウントのみを接続し、各プロバイダーの規約に従ってください。
-- Responses の `previous_response_id` による継続は、ネイティブ Responses と上流での状態管理を宣言した経路に自動で適用されます。現在は `openai`、`gpt_load`、`xai`、`newapi`、`cliproxyapi`、`sub2api` が該当します。帰属を AccessKey ごとに分離し、現在のルーティングで許可される元の認証情報へ固定します。ソフトアフィニティ設定には依存せず、状態が実際に利用できるかは上流に依存します。ステートレス応答と変換された応答は登録せず、Codex サブスクリプションの WebSocket 継続はまだ接続していません。アップグレード前やゲートウェイ外で作成されたものを含め、不明な ID は拒否されます。Group のパラメータ上書きでこのフィールドを変更することはできません。
-- 応答の帰属はメモリに最大 30 日間保持され、上限は 100,000 件および ID テキスト合計 16 MiB です。容量に達すると古い記録を削除します。通常終了時に checkpoint の保存が成功すれば、同じデータディレクトリから復元できます。クラッシュからの復元や、アップストリームの履歴が引き続き有効であることは保証しません。
-- `conversation` とその他の既存リソース ID はこの帰属ルーティングの対象外であり、単一の認証情報またはアップストリームでの認証情報間のリソース共有が引き続き必要です。
+- `responses_websocket_enabled` は既定で有効です。グループの明示値を優先し、未設定なら全体設定を継承します。無効化すると対象の WS 接続を直ちに切断し生成を中断しますが、HTTP/SSE には影響しません。再有効化しても元の接続の一時状態は復元されません。
+- `rate_limit_reset_hint_enabled` はグループ専用のスイッチで、既定では無効です。有効にすると、アップストリームの 429 がモデルのリセット時刻を示す場合（例: `Try again in 3h 18m`）、その認証情報の対象モデルを指定時刻に 1 分の余裕を加えた時刻までクールダウンします。期間は 1 分から 24 時間に制限され、ヒントがない場合や解析できない場合は既定の 1 分を使います。対象モデルの使用可能な認証情報がすべてクールダウン中なら、上流へ送らず `Retry-After` と `upstream_rate_limited` を伴う 429 を返します。このキーを認識しない旧イメージへ戻す前に設定を削除してください。
+- `empty_response_retry` は既定で無効で、グループごとに上書きできます。有効時は、内容のないストリーミング対話応答に対して共有リトライ回数の範囲で別候補を試し、認証情報をクールダウンやブラックリストへ移しません。プリウォーム、会話継続、WebSocket リクエストは対象外です。
+- `concurrency_limit` はグループのデータプレーン同時実行数上限です。未設定なら `default_group_concurrency_limit` を継承し、`0` は無制限を意味します。全体と AccessKey の上限も適用され、いずれかの上限に達すると直ちに拒否します。
+- `codex_live_mode` は `off`、`direct`（既定）、`relay` に対応し、グループで上書きできます。直結にはクライアントから上流への接続が必要です。中継には公開メディアアドレスと UDP ポートが必要です。音声を無効にしてもテキストリクエストには影響しません。
 
 ## 1.x からの移行
 

@@ -133,26 +133,22 @@ Codex、Claude、Antigravity 的 OAuth 客户端使用固定回调端口。Compo
 
 ### 客户端协议
 
-| 协议                    | 主要入口                     |
-| ----------------------- | ---------------------------- |
-| OpenAI Chat Completions | `POST /v1/chat/completions`  |
-| OpenAI Responses        | `/v1/responses` 及其资源路径 |
-| OpenAI Images           | `POST /v1/images/...`        |
-| OpenAI Embeddings       | `POST /v1/embeddings`        |
-| Rerank                  | `POST /v1/rerank`            |
-| Anthropic Messages      | `POST /v1/messages`          |
-| Gemini                  | `/v1beta/models/...`         |
-
-每个渠道会明确声明自己可执行的协议与能力。GPT-Load 在受支持的能力之间做转换，但不是任意协议、任意 JSON 的通用转换器。
-
-Embeddings 首期只在 OpenAI、OpenRouter 和 OpenAI Compatible API Key 渠道提供原生 OpenAI-compatible Wire，不支持订阅渠道或协议互转。未设置协议过滤器的 AccessKey 会按既有语义允许全部已启用协议，升级后也会获得 Embeddings 访问能力；最小权限部署请显式配置协议过滤器。
-
-Rerank 使用独立的 `rerank` 协议，在 OpenAI Compatible、New API、GPT-Load API Key 渠道支持 `POST /v1/rerank`。请求使用 `model`、`query` 和纯文本 `documents` 数组，可传 `top_n`、`return_documents` 等上游参数；不支持流式、订阅渠道或协议互转。OpenAI Compatible 的 Base URL 是完整 API 前缀（如 `https://host/v1`），New API / GPT-Load 使用网关根地址；上游必须提供兼容 Rerank 接口。未设置协议过滤器的 AccessKey 也会获得 Rerank 访问能力。仅有 `search_units` 等非 Token 计量时保持未计价，不将其视为 Token 或免费请求。
+| 协议                    | 主要入口                                                           |
+| ----------------------- | ------------------------------------------------------------------ |
+| OpenAI Chat Completions | `POST /v1/chat/completions`                                        |
+| OpenAI Responses        | `/v1/responses` 及其资源路径                                       |
+| OpenAI Images           | `POST /v1/images/...`                                              |
+| OpenAI Embeddings       | `POST /v1/embeddings`                                              |
+| Rerank                  | `POST /v1/rerank`                                                  |
+| Mistral 原生            | `/v1/ocr`、`/v1/audio/...` |
+| Anthropic Messages      | `POST /v1/messages`                                                |
+| Gemini                  | `/v1beta/models/...`                                               |
+| Gemini Embeddings       | `POST /v1beta/models/{model}:embedContent` / `:batchEmbedContents` |
 
 ### 内置渠道
 
 - **官方与云平台**：OpenAI、Anthropic、Gemini、xAI、Azure OpenAI、AWS Bedrock、Google Vertex AI
-- **常用模型服务**：DeepSeek、Moonshot AI、SiliconFlow、Zhipu AI、Alibaba、Volcengine、OpenRouter、Groq
+- **常用模型服务**：DeepSeek、Moonshot AI、SiliconFlow、Zhipu AI、Alibaba、Volcengine、OpenRouter、Cline、Groq、Cerebras、Mistral、Nebius、Parasail、Wafer、Hugging Face（聊天）、Cohere（文本重排序）、OpenCode Go、OpenCode Zen
 - **订阅渠道**：Codex、Claude、Antigravity、Grok
 - **自定义**：OpenAI Compatible（任意兼容中转）
 
@@ -265,20 +261,18 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 
 `approve` 与 `reject` 和进行中的测试互斥；超过暂存截止的条目不能通过；拒绝不要求目标分组在线。自动探测已耗尽但暂存材料仍在的条目可通过 `enter_review` 显式转审，原批次、原请求摘要、自动尝试次数、捐献人与截止时间全部保留。暂存期不续期：转审、测试与重试都沿用原七天期限。
 
-契约实现见 `internal/control/donation_*.go` 与 `internal/storage/migrations/0016_donation_manual_review.go`。
+契约实现见 `internal/control/donation_*.go` 与 `internal/storage/migrations/0019_donation_manual_review.go`。
 
 - 默认只监听 `127.0.0.1`。需要远程访问时，应通过受控网络或带 TLS 的反向代理暴露，并配置 ACL 与防火墙。
 - 妥善管理 `AUTH_KEY` 与 `ENCRYPTION_KEY`，不要把真实密钥提交到仓库、日志、截图或公开 Issue。
 - 2.0 按**单应用实例**设计，多个实例之间不共享状态，不支持直接横向扩容。
 - 用量与成本是基于上游返回数据的**估算**，用于运行分析和资源评估，不等同于服务商账单或财务对账结果。
 - 订阅渠道依赖上游 OAuth 与兼容协议，可能随上游变化调整。请只接入自己有权使用的账号，并遵守对应服务商条款。
-- HTTP Responses 的 `previous_response_id` 续接按协议及现有存储能力自动接入：原生 Responses 且声明由上游管理状态的渠道目前包括 `openai`、`gpt_load`、`xai`、`newapi`、`cliproxyapi`、`sub2api`。按 AccessKey 隔离归属，在当前路由允许时固定原凭据，不受软亲和开关影响；实际状态可用性由上游决定。无状态及转换响应不登记为持久状态。未知 ID（包括升级前或网关外创建的 ID）直接拒绝；Group 参数覆盖不能改写该字段。
-- 原生 Responses WebSocket 使用同端口 `GET /v1/responses`，按渠道声明的实际能力准入，支持 OpenAI、xAI、Codex 及符合原生合同的 CPA/sub2api、GPT-Load 端点。兼容客户端携带布尔参数 `stream:true/false`，两者均按 WS 事件流返回。每轮独立检查权限、限流、额度与当前路由，并记录用量及成本。同一连接固定上游身份；不回退 HTTP、不缓存或重放聊天历史。
 - `responses_websocket_enabled` 默认开启，分组显式设置优先于全局，未覆盖时继承全局。关闭会立即断开受影响的 WS 连接并中断生成；HTTP/SSE 不受影响。重新开启不会恢复旧连接的临时状态。
-- `rate_limit_reset_hint_enabled` 是分组级开关，默认关闭。开启后，上游 429 若写明模型重置时间（例如 `Try again in 3h 18m`），该凭据上的该模型会冷却到该时间加一分钟余量，而不是默认的一分钟；结果钳制在一分钟到 24 小时之间，缺失或无法解析时仍走默认。只影响该凭据上的该模型。当某个模型的所有可用凭据都在冷却时，分组直接返回 429 与 `Retry-After`，code 仍为 `upstream_rate_limited`，不再请求上游。回退到不认识该键的镜像前必须先关闭它，否则旧版本会拒绝加载该分组配置。
-- 完整 `stream_id` 多流与分叉用于 OpenAI 和满足端到端条件的 GPT-Load 级联；其余上述渠道串行执行并明确拒绝命名流。预热实际发送 `generate:false`。Codex 只支持原连接内续接，不能使用 `store:true` 或凭旧 ID 跨连接恢复；其他渠道的持久续接仍取决于存储能力与有效归属。[Codex SDK 的代理、读取和关闭边界](third_party/cpaembedded/README.md#codex-websocket-session)继续适用。
-- 响应归属保存在内存中，默认保留 30 天，最多 100,000 条，ID 文本合计最多 16 MiB，达到容量时淘汰旧记录。正常停机成功保存 checkpoint 后可在同一数据目录恢复；不保证崩溃恢复或上游历史仍有效。
-- `conversation` 与其他既有资源 ID 不在上述归属路由范围内，仍依赖单凭据或上游跨凭据共享资源。
+- `rate_limit_reset_hint_enabled` 是分组级开关，默认关闭。开启后，上游 429 若写明模型重置时间（例如 `Try again in 3h 18m`），该凭据上的该模型会冷却到该时间加一分钟余量，而不是默认的一分钟；结果钳制在一分钟到 24 小时之间，缺失或无法解析时仍走默认。只影响该凭据上的该模型。当某个模型的所有可用凭据都在冷却时，分组直接返回 429 与 `Retry-After`，code 仍为 `upstream_rate_limited`，不再请求上游。回退到不认识该键的镜像前必须先清除该配置键，否则旧版本会拒绝加载该分组配置。
+- `empty_response_retry` 默认关闭，可按分组覆盖。开启后，流式对话正常结束却没有内容时，可在共享重试预算内改用其他候选，不冷却或拉黑凭据。预热、会话续接与 WebSocket 请求不参与判定。
+- `concurrency_limit` 限制分组的数据面并发，未覆盖时继承 `default_group_concurrency_limit`；`0` 表示不限。全局和 AccessKey 上限仍然生效，达到任一上限时立即拒绝请求。
+- `codex_live_mode` 支持 `off`、`direct`（默认）与 `relay`，分组可覆盖。直连要求客户端能够访问上游；中继需要公网媒体地址和 UDP 端口。关闭语音不影响文本请求。
 
 ## 从 1.x 切换
 

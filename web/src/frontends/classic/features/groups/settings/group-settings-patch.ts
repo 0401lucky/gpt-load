@@ -12,7 +12,7 @@ import type {
 import { normalizePriceMultiplier } from '@/lib/price-multiplier'
 
 export type GroupTimeoutKey = 'first_byte_timeout' | 'request_timeout' | 'stream_idle_timeout'
-export type GroupPolicyCountKey = 'blacklist_threshold'
+export type GroupPolicyCountKey = 'blacklist_threshold' | 'concurrency_limit'
 
 export interface GroupSettingsDraft {
   channel_id: string
@@ -32,7 +32,10 @@ export const groupTimeoutKeys: readonly GroupTimeoutKey[] = [
   'request_timeout',
   'stream_idle_timeout',
 ]
-export const groupPolicyCountKeys: readonly GroupPolicyCountKey[] = ['blacklist_threshold']
+export const groupPolicyCountKeys: readonly GroupPolicyCountKey[] = [
+  'blacklist_threshold',
+  'concurrency_limit',
+]
 
 function cloneHeaders(value: HeaderRulesDto): HeaderRulesDto {
   return { set: { ...value.set }, remove: [...value.remove] }
@@ -74,11 +77,14 @@ function cloneOverrides(value: GroupRuntimeConfigDto): GroupRuntimeConfigDto {
   for (const key of groupTimeoutKeys) if (value[key] !== undefined) next[key] = value[key]
   for (const key of groupPolicyCountKeys) if (value[key] !== undefined) next[key] = value[key]
   if (value.header_rules) next.header_rules = cloneHeaders(value.header_rules)
+  if (value.codex_live_mode !== undefined) next.codex_live_mode = value.codex_live_mode
   if (value.affinity_enabled !== undefined) next.affinity_enabled = value.affinity_enabled
   if (value.responses_websocket_enabled !== undefined)
     next.responses_websocket_enabled = value.responses_websocket_enabled
   if (value.rate_limit_reset_hint_enabled !== undefined)
     next.rate_limit_reset_hint_enabled = value.rate_limit_reset_hint_enabled
+  if (value.empty_response_retry !== undefined)
+    next.empty_response_retry = value.empty_response_retry
   if (value.parameter_overrides?.length)
     next.parameter_overrides = cloneParameterOverrides(value.parameter_overrides)
   return next

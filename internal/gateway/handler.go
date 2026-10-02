@@ -24,11 +24,13 @@ import (
 	"gpt-load/internal/execution"
 	"gpt-load/internal/health"
 	"gpt-load/internal/httplifecycle"
+	"gpt-load/internal/platform/config"
 	"gpt-load/internal/platform/contentcoding"
 	"gpt-load/internal/platform/encryption"
 	platformheader "gpt-load/internal/platform/httpheader"
 	"gpt-load/internal/platform/utils"
 	"gpt-load/internal/pricing"
+	"gpt-load/internal/protocol"
 	"gpt-load/internal/ratelimit"
 	"gpt-load/internal/requestaudit"
 	"gpt-load/internal/requestredact"
@@ -121,6 +123,9 @@ type Handler struct {
 	responseBindings    *state.ResponseBindings
 	websocketLimits     websocketLimits
 	websocketBudget     websocketBudget
+	liveOpener          execution.LiveOpener
+	liveSessions        *liveSessions
+	liveConfig          config.CodexLiveConfig
 }
 
 func (handler *Handler) freezeAttemptPricing(
@@ -178,6 +183,7 @@ func NewHandler(
 		affinityCache:    affinity.NewCache(),
 		responseBindings: state.NewResponseBindings(),
 		websocketLimits:  defaultWebsocketLimits(),
+		liveSessions:     newLiveSessions(),
 		newRequestID:     newRequestID,
 		requestNow:       time.Now,
 		now:              time.Now,
@@ -423,13 +429,33 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 		return
 	}
 	if requestContext.selectedRoute.Kind == endpointUsage {
+		release, failure := handler.acquireRequestConcurrency(requestContext.accessKey.ID)
+		if failure != nil {
+			_ = handler.writeReason(ginContext, *failure)
+			return
+		}
+		defer release()
 		handler.handleUsage(ginContext, requestContext)
+		return
+	}
+	if requestContext.selectedRoute.Protocol == protocol.CodexLive {
+		handler.handleCodexLive(ginContext, requestContext)
+		return
+	}
+	if requestContext.selectedRoute.Kind == endpointMistralRealtime {
+		handler.handleMistralRealtime(ginContext, requestContext)
 		return
 	}
 	if websocketIntent(ginContext.Request) {
 		handler.handleWebsocket(ginContext, requestContext)
 		return
 	}
+	var releaseRequest func()
+	defer func() {
+		if releaseRequest != nil {
+			releaseRequest()
+		}
+	}()
 	requestStarted := requestContext.requestStarted
 	snapshot := requestContext.snapshot
 	accessKey := requestContext.accessKey
@@ -481,6 +507,15 @@ func (handler *Handler) Handle(ginContext *gin.Context) {
 			}
 			recorder.emit()
 		}()
+	}
+
+	if !concurrencyControlRequest(ginContext.Request, selectedRoute) {
+		var failure *reason
+		releaseRequest, failure = handler.acquireRequestConcurrency(accessKey.ID)
+		if failure != nil {
+			handler.completeReason(ginContext, recorder, *failure)
+			return
+		}
 	}
 
 	if quotaAdmission != nil && handler.accessQuota != nil {
@@ -875,6 +910,16 @@ func (handler *Handler) executeAttempts(
 ) {
 	stream := originalMetadata.Stream
 	operation := originalMetadata.Operation
+	var redactionCipher encryption.RedactionCipher
+	if !snapshot.RequestRedaction.Empty() || redactionBusinessProtocol(selectedDialect.Protocol()) {
+		var err error
+		redactionCipher, err = handler.encryption.NewRedactionCipher(recorder.accessKeyID)
+		if err != nil {
+			handler.completeReason(ginContext, recorder, reasonRedactionFailed)
+			return
+		}
+		defer handler.logUnrestoredRedactionTokens(redactionCipher, recorder.requestID)
+	}
 	type deferredAttempt struct {
 		result        UpstreamResult
 		decision      health.Decision
@@ -885,6 +930,7 @@ func (handler *Handler) executeAttempts(
 	var lastTransport *deferredAttempt
 	var lastConversion *deferredAttempt
 	var lastProviderError *deferredAttempt
+	var lastEmptyResponse *deferredAttempt
 	lastAttemptIndex := -1
 	attemptSequence := 0
 	forwardAttempts := 0
@@ -895,6 +941,7 @@ func (handler *Handler) executeAttempts(
 	var refreshRetry *credentialRefreshRetry
 	authRefreshReplayUsed := false
 	type preparedRequest struct {
+		configuredParameters  []string
 		request               *dialect.ParsedRequest
 		observations          dialect.RequestMetadata
 		observationsAvailable bool
@@ -916,7 +963,7 @@ func (handler *Handler) executeAttempts(
 		}
 		defer func() {
 			if prepared.err == nil {
-				prepared.request, prepared.err = redactOutboundRequest(snapshot.RequestRedaction, selectedDialect.Protocol(), prepared.request)
+				prepared.request, prepared.err = redactOutboundRequest(snapshot.RequestRedaction, selectedDialect.Protocol(), prepared.request, redactionCipher)
 			}
 			cachedPrepared = &prepared
 		}()
@@ -942,6 +989,7 @@ func (handler *Handler) executeAttempts(
 			cachedPrepared = &prepared
 			return prepared
 		}
+		prepared.configuredParameters = selection.Group.ParameterOverrides.ConfiguredFields(selectedDialect.Protocol(), originalMetadata.Operation, routeModel)
 		if int64(len(body)) > maxRequestBodyBytes {
 			prepared.err = errRequestTooLarge
 			cachedPrepared = &prepared
@@ -1214,10 +1262,28 @@ func (handler *Handler) executeAttempts(
 			quotaAdmission.admitted = true
 		}
 
-		if failure := handler.checkRequestAudit(ginContext.Request.Context(), snapshot, snapshot.AccessKeysByID[recorder.accessKeyID], prepared.request.Body, recorder, func() *reason { return handler.admitAutoQuota(snapshot, quotaAdmission) }); failure != nil {
-			handler.completeReason(ginContext, recorder, *failure)
+		// 取消已有响应不创建内容，不能启动新的审查调用或被审查组满额阻止。
+		if operation != execution.OperationResponsesCancel {
+			if failure := handler.checkRequestAudit(ginContext.Request.Context(), snapshot, snapshot.AccessKeysByID[recorder.accessKeyID], prepared.request.Body, recorder, func() *reason { return handler.admitAutoQuota(snapshot, quotaAdmission) }); failure != nil {
+				handler.completeReason(ginContext, recorder, *failure)
+				return
+			}
+		}
+		if ginContext.Request.Context().Err() != nil {
+			recorder.completeCanceled(ginContext.Request.Context(), 0, lastAttemptIndex)
 			return
 		}
+		releaseGroup := func() {}
+		if operation != execution.OperationResponsesCancel {
+			var failure *reason
+			releaseGroup, failure = handler.acquireGroupConcurrency(selection.GroupID)
+			if failure != nil {
+				handler.completeReason(ginContext, recorder, *failure)
+				return
+			}
+		}
+		// 异常退出也收尾；普通路径在本次执行结束后立即归还，幂等保护防止重复释放。
+		defer releaseGroup()
 		attemptSequence++
 		forwardAttempts++
 		if attemptSequence == 1 && (originalMetadata.PreviousResponseID != "" ||
@@ -1233,9 +1299,15 @@ func (handler *Handler) executeAttempts(
 		if recorder != nil && recorder.requestID != "" {
 			executionRequestID = recorder.requestID
 		}
+		restoreCipher := redactionCipher
+		if !redactionMayRestore(prepared.request, snapshot.RequestRedaction.Reversible()) {
+			restoreCipher = nil
+		}
 		input := ForwardInput{
-			Dialect: selectedDialect, ObserveUsage: attemptObservations.ObserveUsage,
-			Group: selection.Group, APIKey: normalizedCredential.apiKey,
+			ConfiguredParameters: prepared.configuredParameters,
+			Dialect:              selectedDialect, ObserveUsage: attemptObservations.ObserveUsage,
+			RedactionCipher: restoreCipher,
+			Group:           selection.Group, APIKey: normalizedCredential.apiKey,
 			CredentialSecrets: normalizedCredential.secrets, Request: prepared.request,
 			ExternalModel:            externalModel,
 			UpstreamModelID:          optionalModelValue(selection.UpstreamModelID),
@@ -1260,10 +1332,15 @@ func (handler *Handler) executeAttempts(
 			ProxyFingerprint:       proxyFingerprint,
 			ForceCredentialRefresh: forceCredentialRefresh,
 			ContinuityKey:          requestAffinity.continuityKey,
-			OnResponse:             handler.responseBindingObserver(recorder.accessKeyID, selection, ref, prepared.request, recorder.autoSelection()),
+			// 豁免依据实际发往上游的请求：分组参数覆盖可能写入 conversation 或 generate。
+			EmptyResponseRetry: stream && emptyResponseRetryEnabled(
+				selection.Group, originalMetadata, prepared.request.Body,
+			),
+			OnResponse: handler.responseBindingObserver(recorder.accessKeyID, selection, ref, prepared.request, recorder.autoSelection()),
 			OnFirstResponse: func() {
 				recorder.recordFirstResponse()
 			},
+			OnOutput: recorder.recordOutput,
 		}
 		if recorder != nil {
 			recorder.freezeNextAttemptPricing(
@@ -1282,6 +1359,7 @@ func (handler *Handler) executeAttempts(
 		} else {
 			result = handler.forwarder.Forward(ginContext.Request.Context(), input)
 		}
+		releaseGroup()
 		result = normalizeUpstreamResultContract(result)
 		if !stream && result.HasResponse() && !result.ProviderErrorBeforeCommit &&
 			result.DispatchState != execution.DispatchLocal &&
@@ -1397,6 +1475,21 @@ func (handler *Handler) executeAttempts(
 			}
 			return
 		}
+		if result.EmptyResponseBeforeCommit {
+			if decision.Retry != health.RetryNone && forwardAttempts < forwardAttemptLimit {
+				lastEmptyResponse = &deferredAttempt{
+					result:        result,
+					decision:      decision,
+					upstreamModel: optionalModelValue(selection.UpstreamModelID),
+					attemptIndex:  recordedAttempt,
+				}
+				recorder.retryIfAnotherForward(recordedAttempt)
+				continue
+			}
+			handler.completeEmptyResponse(ginContext, recorder, result, decision,
+				optionalModelValue(selection.UpstreamModelID), recordedAttempt)
+			return
+		}
 		if result.ProviderErrorBeforeCommit {
 			if decision.Retry != health.RetryNone {
 				lastProviderError = &deferredAttempt{
@@ -1460,12 +1553,27 @@ func (handler *Handler) executeAttempts(
 		}
 		value := transportReason(result)
 		recorder.completeTransport(value, optionalModelValue(selection.UpstreamModelID), recordedAttempt)
+		if value.Code == reasonResponseRedactionFailed.Code {
+			// 下游还原失败不代表上游未计费；沿用已冻结的该次尝试报价。
+			recorder.bindUsage(recordedAttempt, result.Usage, true)
+		}
 		if err := handler.writeReason(ginContext, value); err != nil {
 			handler.completeWriteTerminal(ginContext, recorder, value.Status)
 		}
 		return
 	}
 
+	if lastEmptyResponse != nil {
+		handler.completeEmptyResponse(
+			ginContext,
+			recorder,
+			lastEmptyResponse.result,
+			lastEmptyResponse.decision,
+			lastEmptyResponse.upstreamModel,
+			lastEmptyResponse.attemptIndex,
+		)
+		return
+	}
 	if lastProviderError != nil {
 		recorder.completeProviderError(
 			lastProviderError.result,
@@ -1556,6 +1664,8 @@ func transportReason(result UpstreamResult) reason {
 		return reasonInvalidProtocolRequest
 	case errors.Is(result.Err, ErrUpstreamProtocol):
 		return reasonUpstreamProtocol
+	case errors.Is(result.Err, errRedactionStream), errors.Is(result.Err, errUnaryRestore):
+		return reasonResponseRedactionFailed
 	case isTimeoutError(result.Err):
 		return reasonUpstreamTimeout
 	default:
@@ -1615,4 +1725,25 @@ func (handler *Handler) writeBufferedResponse(
 		return fmt.Errorf("flush downstream response: %w", err)
 	}
 	return nil
+}
+
+// completeEmptyResponse 把一次判定为空回的尝试原样交付给客户端。重试已经用尽
+// 或被判定为不可重试时，客户端仍应拿到上游真实返回的那条空流，而不是网关错误。
+func (handler *Handler) completeEmptyResponse(
+	ginContext *gin.Context,
+	recorder *requestRecorder,
+	result UpstreamResult,
+	decision health.Decision,
+	upstreamModel string,
+	attemptIndex int,
+) {
+	recorder.completeResponse(result, decision, upstreamModel, attemptIndex)
+	if err := handler.writeBufferedResponse(
+		ginContext,
+		result.StatusCode,
+		result.Header,
+		result.Body,
+	); err != nil {
+		handler.completeWriteTerminal(ginContext, recorder, result.StatusCode)
+	}
 }

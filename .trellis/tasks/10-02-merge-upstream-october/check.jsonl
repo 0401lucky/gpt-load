@@ -1,0 +1,12 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端完整性与依赖边界核查"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"核对旧 24 条不变、新三条追加以及升级与幂等证据"}
+{"file":".trellis/spec/backend/runtime-settings.md","reason":"复核冷却、上游并发与重试配置的作用域和往返"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"复核共享 DTO 未泄漏 modern 专有字段及分层约束"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"核查门禁每项结果和 CPA 独立检查，逐用例比较环境基线"}
+{"file":".trellis/spec/backend/donation-integration.md","reason":"复核捐献集成未被自动合并破坏"}
+{"file":".trellis/spec/frontend/index.md","reason":"两套前端兼容性审查清单"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"核查 DTO、白名单、投影、克隆与保存同步"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"检查合并后三语言文案完整性"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"确认前端 lint、format、type-check/build 验证范围"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"跨层核查新旧字段共存和用量数据归属"}
+{"file":".trellis/tasks/10-02-merge-upstream-october/research/recon.md","reason":"独立复核固定上游范围、16 个冲突和隐性迁移问题"}

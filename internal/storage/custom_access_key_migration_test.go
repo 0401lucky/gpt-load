@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
+	migrationfiles "gpt-load/internal/storage/migrations"
 	"gpt-load/internal/storage/models"
 )
 
@@ -24,9 +25,11 @@ func TestExternalCustomAccessKeyMigrationContract(t *testing.T) {
 }
 
 func testCustomAccessKeyMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
+	t.Helper()
 	for _, scenario := range []string{"fresh", "upgrade", "interrupted"} {
 		t.Run(scenario, func(t *testing.T) {
 			db := open(t)
+			index := migrationIndexByID(t, migrationfiles.ID0011)
 			if db.Dialector.Name() == "sqlite" {
 				t.Parallel()
 			}
@@ -34,11 +37,11 @@ func testCustomAccessKeyMigration(t *testing.T, open func(*testing.T) *gorm.DB) 
 			var rule models.AccessKeyCostLimitRule
 			var deletedID uint
 			if scenario != "fresh" {
-				if err := applyMigrationRegistry(db, migrations[:10]); err != nil {
+				if err := applyMigrationRegistry(db, migrations[:index]); err != nil {
 					t.Fatal(err)
 				}
 				key = models.AccessKey{Name: "existing", KeyValue: "encrypted-test-value", KeyHash: "existing-hash", KeySuffix: "cafe", Status: "active", Filters: models.JSON(`{}`)}
-				if err := db.Omit("KeyPrefix").Create(&key).Error; err != nil {
+				if err := db.Omit("KeyPrefix", "ConcurrencyLimit").Create(&key).Error; err != nil {
 					t.Fatal(err)
 				}
 				rule = models.AccessKeyCostLimitRule{AccessKeyID: key.ID, Kind: models.AccessKeyCostLimitKindTotal, LimitNanoUSD: 100, RuleRevision: 1}
@@ -51,7 +54,7 @@ func testCustomAccessKeyMigration(t *testing.T, open func(*testing.T) *gorm.DB) 
 				}
 				// 删除过的较大 ID 也不能因重建表而被再次分配。
 				deleted := models.AccessKey{Name: "deleted", KeyValue: "cipher", KeyHash: "deleted-hash", KeySuffix: "dead", Status: "active", Filters: models.JSON(`{}`)}
-				if err := db.Omit("KeyPrefix").Create(&deleted).Error; err != nil {
+				if err := db.Omit("KeyPrefix", "ConcurrencyLimit").Create(&deleted).Error; err != nil {
 					t.Fatal(err)
 				}
 				deletedID = deleted.ID
@@ -59,8 +62,8 @@ func testCustomAccessKeyMigration(t *testing.T, open func(*testing.T) *gorm.DB) 
 					t.Fatal(err)
 				}
 			}
-			if scenario == "interrupted" && len(migrations) > 10 {
-				entry := migrations[10]
+			if scenario == "interrupted" {
+				entry := migrations[index]
 				up := entry.Up
 				entry.Up = func(tx *gorm.DB) error {
 					if err := up(tx); err != nil {
@@ -68,7 +71,7 @@ func testCustomAccessKeyMigration(t *testing.T, open func(*testing.T) *gorm.DB) 
 					}
 					return fmt.Errorf("interrupt after custom access key DDL")
 				}
-				registry := append(append([]migration(nil), migrations[:10]...), entry)
+				registry := append(append([]migration(nil), migrations[:index]...), entry)
 				if err := applyMigrationRegistry(db, registry); err == nil {
 					t.Fatal("interruption succeeded")
 				}

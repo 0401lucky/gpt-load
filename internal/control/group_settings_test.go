@@ -250,6 +250,10 @@ func TestUpdateGroupSettingsOverridesRateLimitResetHint(t *testing.T) {
 		{name: "inherit", override: config.Settings{}, want: false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
+			// 上游新增设置与分组冷却开关必须可在同一次保存中共存。
+			test.override[state.SettingEmptyResponseRetry] = true
+			test.override[state.SettingCodexLiveMode] = string(state.CodexLiveRelay)
+			test.override[state.SettingConcurrencyLimit] = json.Number("3")
 			if _, err := fixture.service.UpdateGroupSettings(t.Context(), groupID, GroupSettingsUpdateRequest{
 				Overrides: optionalField[config.Settings]{Set: true, Value: test.override},
 			}); err != nil {
@@ -263,8 +267,14 @@ func TestUpdateGroupSettingsOverridesRateLimitResetHint(t *testing.T) {
 			if got.Effective.RateLimitResetHintEnabled != test.want {
 				t.Fatalf("effective switch = %t, want %t", got.Effective.RateLimitResetHintEnabled, test.want)
 			}
+			if !got.Effective.EmptyResponseRetry || got.Effective.CodexLiveMode != state.CodexLiveRelay || got.Effective.ConcurrencyLimit != 3 {
+				t.Fatalf("upstream settings lost during cooldown update: %#v", got.Effective)
+			}
 			if view := fixture.manager.Current().Groups[groupID]; view.RateLimitResetHintEnabled != test.want {
 				t.Fatalf("snapshot switch = %t, want %t", view.RateLimitResetHintEnabled, test.want)
+			}
+			if view := fixture.manager.Current().Groups[groupID]; !view.EmptyResponseRetry || view.CodexLiveMode != state.CodexLiveRelay || view.ConcurrencyLimit != 3 {
+				t.Fatalf("snapshot lost upstream settings: %#v", view)
 			}
 			persisted, exists := got.Overrides[state.SettingRateLimitResetHintEnabled]
 			if _, overridden := test.override[state.SettingRateLimitResetHintEnabled]; !overridden {
