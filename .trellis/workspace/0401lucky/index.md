@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 7
-- **Last Active**: 2026-10-02
+- **Total Sessions**: 8
+- **Last Active**: 2026-10-03
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~246 | Active |
+| `journal-1.md` | ~268 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 8 | 2026-10-03 | 模型用量周期修复与缺失提示 | `42adbdaf` | `main` |
 | 7 | 2026-10-02 | 兼容合并上游 44 个提交并验证迁移追加升级 | `37ce4c93b2ac1802169313ef07cc86ebe28b97ba` | `main` |
 | 6 | 2026-09-28 | 修复 Cline 模型用量与测试诊断并上线 | `de234646` | `main` |
 | 5 | 2026-09-23 | 合并上游 main 33 提交：迁移编号 B 方案（上游顺延为链尾） | `0af4e399`, `9f4e7a57` | `main` |

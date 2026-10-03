@@ -244,3 +244,25 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 8: 模型用量周期修复与缺失提示
+<!-- trellis-session: v=2 fp=c3e16c6c523e9bea -->
+
+**Date**: 2026-10-03
+**Task**: 模型用量周期修复与缺失提示
+**Branch**: `main`
+
+### Summary
+
+分离默认冷却与可信额度重置，旧检查点回退24h并保留健康状态，两套UI暴露缺失计数。相关回归与构建通过；Windows完整门禁限制已记录，TCP失败在原版复现。用户已授权推送main并部署gpt-load-2，部署待镜像构建完成。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `42adbdaf` | fix(usage): 隔离模型冷却与额度周期并提示用量缺失 |
+
+### Status
+
+[OK] **Completed**
