@@ -41,6 +41,34 @@ func TestInferenceRateLimitsCooldownOnlyTheirModel(t *testing.T) {
 	}
 }
 
+func TestQuotaResetRequiresDailyQuotaEvidenceAndKeepsRetryDeadline(t *testing.T) {
+	now := time.Now()
+	for _, summary := range []string{"rate limited", "Try again in 30s", "Daily free limit reached on model fixture. Try again in 3h 18m"} {
+		for _, enabled := range []bool{false, true} {
+			for _, status := range []int{0, 200, 429} {
+				result := JudgeExecution(ExecutionAttempt{DispatchState: execution.DispatchMaybeSent, StatusCode: status, Now: now,
+					Evidence: &execution.ErrorEvidence{Kind: execution.ErrorKindProvider, Hint: execution.FailureHintRateLimited,
+						Summary: summary, RetryAfter: time.Minute}},
+					DecisionContext{Operation: execution.OperationChatCompletion, RateLimitResetHint: enabled})
+				if !result.CooldownUntil.Equal(now.Add(time.Minute)) {
+					t.Fatalf("retry scheduling changed: %+v", result)
+				}
+				wantReset := enabled && summary != "rate limited" && summary != "Try again in 30s"
+				if wantReset {
+					if result.QuotaResetSource != "reset_hint" || !result.QuotaResetAt.Equal(now.Add(3*time.Hour+18*time.Minute)) {
+						t.Fatalf("reset swallowed or included retry margin: %+v", result)
+					}
+				} else if !result.QuotaResetAt.IsZero() || result.QuotaResetSource != "" {
+					t.Fatalf("untrusted evidence produced quota reset: %+v", result)
+				}
+				if err := result.Validate(); err != nil {
+					t.Fatal(err)
+				}
+			}
+		}
+	}
+}
+
 func TestModelCooldownHonorsLongExplicitRetryAfter(t *testing.T) {
 	now := time.Now()
 	result := JudgeExecution(ExecutionAttempt{DispatchState: execution.DispatchMaybeSent, StatusCode: 429, Now: now,

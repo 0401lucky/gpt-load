@@ -41,6 +41,8 @@ const groupModelUsageItemFields = [
   'request_count',
   'success_count',
   'failure_count',
+  'usage_missing_count',
+  'usage_partial_count',
   'uncached_input_tokens',
   'cache_read_tokens',
   'cache_write_5m_tokens',
@@ -55,6 +57,12 @@ const groupModelWindowSources = ['reset', 'fallback_24h'] as const
 function projectGroupModelUsageItem(value: unknown): GroupModelUsageItemDto {
   const record = projectRecord(value)
   assertNoSecretLikeFields(record, groupModelUsageItemFields)
+  const requestCount = projectSafeInteger(record.request_count, { minimum: 0 })
+  const missingCount = projectSafeInteger(record.usage_missing_count, { minimum: 0 })
+  const partialCount = projectSafeInteger(record.usage_partial_count, { minimum: 0 })
+  if (partialCount > requestCount || missingCount > requestCount - partialCount) {
+    throw new InvalidResponseError()
+  }
   return {
     data_complete: projectBoolean(record.data_complete),
     credential_id: projectSafeInteger(record.credential_id, { minimum: 1 }),
@@ -62,9 +70,11 @@ function projectGroupModelUsageItem(value: unknown): GroupModelUsageItemDto {
     window_start_ms: projectEpochMilliseconds(record.window_start_ms),
     window_source: projectEnum(record.window_source, groupModelWindowSources),
     cooldown_until_ms: projectNullableEpochMilliseconds(record.cooldown_until_ms),
-    request_count: projectSafeInteger(record.request_count, { minimum: 0 }),
+    request_count: requestCount,
     success_count: projectSafeInteger(record.success_count, { minimum: 0 }),
     failure_count: projectSafeInteger(record.failure_count, { minimum: 0 }),
+    usage_missing_count: missingCount,
+    usage_partial_count: partialCount,
     uncached_input_tokens: projectSafeInteger(record.uncached_input_tokens, { minimum: 0 }),
     cache_read_tokens: projectSafeInteger(record.cache_read_tokens, { minimum: 0 }),
     cache_write_5m_tokens: projectSafeInteger(record.cache_write_5m_tokens, { minimum: 0 }),

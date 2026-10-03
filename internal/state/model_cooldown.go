@@ -12,7 +12,16 @@ const modelCycleRetention = 48 * time.Hour
 
 // SetModelCooldown 只接受当前目标、当前恢复代次的结果；并发限制只延长期限。
 func (r *CredentialRegistry) SetModelCooldown(ref CredentialRef, model string, until, now time.Time) (bool, bool) {
+	return r.SetModelCooldownWithReset(ref, model, until, time.Time{}, now)
+}
+
+// SetModelCooldownWithReset atomically records scheduling cooldown and an independently
+// verified quota reset hint. A zero reset leaves quota anchors unchanged.
+func (r *CredentialRegistry) SetModelCooldownWithReset(ref CredentialRef, model string, until, reset, now time.Time) (bool, bool) {
 	if model == "" || strings.TrimSpace(model) != model || !until.After(now) {
+		return false, false
+	}
+	if !reset.IsZero() && !reset.After(now) {
 		return false, false
 	}
 	r.mu.Lock()
@@ -23,11 +32,16 @@ func (r *CredentialRegistry) SetModelCooldown(ref CredentialRef, model string, u
 		return false, false
 	}
 	pruneModelCooldowns(entry.ModelCooldowns, now)
-	if !until.After(entry.ModelCooldowns[model]) {
-		return true, false
+	changed := false
+	if until.After(entry.ModelCooldowns[model]) {
+		if entry.ModelCooldowns == nil {
+			entry.ModelCooldowns = make(map[string]time.Time)
+		}
+		entry.ModelCooldowns[model] = until
+		changed = true
 	}
-	if entry.ModelCooldowns == nil {
-		entry.ModelCooldowns = make(map[string]time.Time)
+	if reset.IsZero() {
+		return true, changed
 	}
 	// 最近一次已知的重置时刻若已经发生，它就是本组合新的周期起点。
 	// 该锚点只在能确认重置已发生时迁移，冷却期间的重复 429 不会改写它。
@@ -40,10 +54,14 @@ func (r *CredentialRegistry) SetModelCooldown(ref CredentialRef, model string, u
 	if entry.ModelNextResets == nil {
 		entry.ModelNextResets = make(map[string]time.Time)
 	}
-	entry.ModelNextResets[model] = until
+	// Repeated hints in the same cycle may extend the known reset, but cannot
+	// shorten it or move the current cycle start before that reset occurs.
+	if reset.After(entry.ModelNextResets[model]) {
+		entry.ModelNextResets[model] = reset
+		changed = true
+	}
 	pruneModelCycles(entry.ModelCycleStarts, entry.ModelNextResets, now)
-	entry.ModelCooldowns[model] = until
-	return true, true
+	return true, changed
 }
 
 func (r *CredentialRegistry) ModelCooldowns(credentialID uint, now time.Time) map[string]time.Time {

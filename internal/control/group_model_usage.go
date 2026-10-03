@@ -51,6 +51,8 @@ type groupModelUsageItemResponse struct {
 	RequestCount            int64  `json:"request_count"`
 	SuccessCount            int64  `json:"success_count"`
 	FailureCount            int64  `json:"failure_count"`
+	UsageMissingCount       int64  `json:"usage_missing_count"`
+	UsagePartialCount       int64  `json:"usage_partial_count"`
 	UncachedInputTokens     int64  `json:"uncached_input_tokens"`
 	CacheReadTokens         int64  `json:"cache_read_tokens"`
 	CacheWrite5MTokens      int64  `json:"cache_write_5m_tokens"`
@@ -300,6 +302,8 @@ func mapGroupModelUsageItem(
 		RequestCount:            aggregate.RequestCount,
 		SuccessCount:            aggregate.SuccessCount,
 		FailureCount:            aggregate.FailureCount,
+		UsageMissingCount:       aggregate.UsageMissingCount,
+		UsagePartialCount:       aggregate.PartialCount,
 		UncachedInputTokens:     aggregate.UncachedInputTokens,
 		CacheReadTokens:         aggregate.CacheReadTokens,
 		CacheWrite5MTokens:      aggregate.CacheWrite5MTokens,
@@ -318,6 +322,8 @@ func validateGroupModelUsageIntegers(aggregate requestlog.UsageAggregate, window
 		aggregate.RequestCount,
 		aggregate.SuccessCount,
 		aggregate.FailureCount,
+		aggregate.UsageMissingCount,
+		aggregate.PartialCount,
 		aggregate.UncachedInputTokens,
 		aggregate.CacheReadTokens,
 		aggregate.CacheWrite5MTokens,
@@ -332,10 +338,15 @@ func validateGroupModelUsageIntegers(aggregate requestlog.UsageAggregate, window
 	for _, field := range [...]int64{
 		aggregate.SuccessCount,
 		aggregate.FailureCount,
+		aggregate.UsageMissingCount,
+		aggregate.PartialCount,
 	} {
 		if field > aggregate.RequestCount {
 			return fmt.Errorf("map group model usage: inconsistent counts")
 		}
+	}
+	if aggregate.UsageMissingCount > aggregate.RequestCount-aggregate.PartialCount {
+		return fmt.Errorf("map group model usage: inconsistent usage counts")
 	}
 	return nil
 }

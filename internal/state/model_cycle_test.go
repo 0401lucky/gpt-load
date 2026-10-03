@@ -9,6 +9,71 @@ type modelCycleRegistry interface {
 	GroupModelCycles(uint, time.Time) map[uint][]CredentialModelCycleView
 }
 
+func TestOrdinaryModelCooldownNeverEstablishesCycle(t *testing.T) {
+	r, api, now := modelCooldownFixture(t)
+	ref, _ := r.CredentialRef(1)
+	for i := 0; i < 3; i++ {
+		at := now.Add(time.Duration(i) * time.Minute)
+		api.SetModelCooldown(ref, "model-a", at.Add(time.Minute), at)
+		cycle, _ := modelCycleOf(t, r, 10, 1, "model-a", at)
+		if !cycle.CycleStart.IsZero() || !cycle.NextReset.IsZero() {
+			t.Fatalf("ordinary retry established quota cycle: %+v", cycle)
+		}
+	}
+}
+
+func TestModelResetEvidenceSurvivesLongerExistingCooldown(t *testing.T) {
+	r, api, now := modelCooldownFixture(t)
+	ref, _ := r.CredentialRef(1)
+	cooldown, reset := now.Add(4*time.Hour), now.Add(time.Hour)
+	api.SetModelCooldown(ref, "model-a", cooldown, now)
+	if accepted, changed := r.SetModelCooldownWithReset(ref, "model-a", reset, reset, now); !accepted || !changed {
+		t.Fatal("shorter cooldown swallowed independent quota evidence")
+	}
+	if _, changed := r.SetModelCooldownWithReset(ref, "model-a", reset, reset, now); changed {
+		t.Fatal("duplicate hint changed cycle")
+	}
+	cycle, _ := modelCycleOf(t, r, 10, 1, "model-a", now)
+	if !cycle.NextReset.Equal(reset) || !cycle.CooldownUntil.Equal(cooldown) || !cycle.CycleStart.IsZero() {
+		t.Fatalf("independent deadlines = %+v", cycle)
+	}
+	r.ClearModelCooldowns(1)
+	if accepted, _ := r.SetModelCooldownWithReset(ref, "model-a", cooldown, cooldown, now); accepted {
+		t.Fatal("stale generation wrote quota evidence")
+	}
+}
+
+func TestModelResetRejectsNonFutureEvidenceWithoutMutation(t *testing.T) {
+	for _, offset := range []time.Duration{-time.Minute, 0} {
+		r, _, now := modelCooldownFixture(t)
+		ref, _ := r.CredentialRef(1)
+		if accepted, changed := r.SetModelCooldownWithReset(ref, "model-a", now.Add(time.Hour), now.Add(offset), now); accepted || changed {
+			t.Fatalf("non-future reset accepted: offset=%v, accepted=%t, changed=%t", offset, accepted, changed)
+		}
+		if cycles := r.GroupModelCycles(10, now); len(cycles[1]) != 0 {
+			t.Fatalf("invalid evidence mutated model state: %+v", cycles)
+		}
+	}
+}
+
+func TestLegacyModelCyclesAreDiscardedWithoutLosingHealth(t *testing.T) {
+	for _, version := range []int{0, 2} {
+		r, _, now := modelCooldownFixture(t)
+		until := now.Add(time.Hour)
+		checkpoint := CredentialRuntimeCheckpoint{ID: 1, GroupID: 10, IdentityGeneration: 1,
+			Blacklisted: true, FailureCount: 3, CooldownUntil: until, ModelCycleVersion: version,
+			ModelCooldowns:   map[string]time.Time{"model-a": until},
+			ModelCycleStarts: map[string]time.Time{"model-a": now.Add(-time.Hour)},
+			ModelNextResets:  map[string]time.Time{"model-a": until}}
+		r.RestoreRuntimeCheckpoint([]CredentialRuntimeCheckpoint{checkpoint})
+		got := r.CaptureRuntimeCheckpoint()[0]
+		if !got.Blacklisted || got.FailureCount != 3 || !got.CooldownUntil.Equal(until) ||
+			!got.ModelCooldowns["model-a"].Equal(until) || len(got.ModelCycleStarts) != 0 || len(got.ModelNextResets) != 0 {
+			t.Fatalf("legacy restore changed health or trusted old cycle: %+v", got)
+		}
+	}
+}
+
 func modelCycleOf(t *testing.T, registry *CredentialRegistry, groupID, credentialID uint, model string, now time.Time) (CredentialModelCycleView, bool) {
 	t.Helper()
 	api, ok := any(registry).(modelCycleRegistry)
@@ -24,11 +89,11 @@ func modelCycleOf(t *testing.T, registry *CredentialRegistry, groupID, credentia
 }
 
 func TestModelCycleStartMovesOnlyAfterTheRecordedResetHasHappened(t *testing.T) {
-	r, api, now := modelCooldownFixture(t)
+	r, _, now := modelCooldownFixture(t)
 	ref, _ := r.CredentialRef(1)
 
 	firstReset := now.Add(3 * time.Hour)
-	if accepted, changed := api.SetModelCooldown(ref, "model-a", firstReset, now); !accepted || !changed {
+	if accepted, changed := r.SetModelCooldownWithReset(ref, "model-a", firstReset, firstReset, now); !accepted || !changed {
 		t.Fatal("first cooldown was not recorded")
 	}
 	cycle, ok := modelCycleOf(t, r, 10, 1, "model-a", now)
@@ -42,7 +107,7 @@ func TestModelCycleStartMovesOnlyAfterTheRecordedResetHasHappened(t *testing.T) 
 
 	// 冷却尚未过期时的延长只更新下一次重置时刻，不得迁移周期起点。
 	laterReset := firstReset.Add(30 * time.Minute)
-	if _, changed := api.SetModelCooldown(ref, "model-a", laterReset, now.Add(time.Minute)); !changed {
+	if _, changed := r.SetModelCooldownWithReset(ref, "model-a", laterReset, laterReset, now.Add(time.Minute)); !changed {
 		t.Fatal("longer cooldown was not recorded")
 	}
 	cycle, _ = modelCycleOf(t, r, 10, 1, "model-a", now.Add(time.Minute))
@@ -53,7 +118,7 @@ func TestModelCycleStartMovesOnlyAfterTheRecordedResetHasHappened(t *testing.T) 
 	// 重置时刻已经发生后的新 429 才把该时刻变成新的周期起点。
 	afterReset := laterReset.Add(time.Minute)
 	nextReset := afterReset.Add(4 * time.Hour)
-	if accepted, changed := api.SetModelCooldown(ref, "model-a", nextReset, afterReset); !accepted || !changed {
+	if accepted, changed := r.SetModelCooldownWithReset(ref, "model-a", nextReset, nextReset, afterReset); !accepted || !changed {
 		t.Fatal("post-reset cooldown was not recorded")
 	}
 	cycle, _ = modelCycleOf(t, r, 10, 1, "model-a", afterReset)
@@ -69,7 +134,7 @@ func TestModelCycleAnchorSurvivesCooldownExpiry(t *testing.T) {
 	r, api, now := modelCooldownFixture(t)
 	ref, _ := r.CredentialRef(1)
 	reset := now.Add(2 * time.Hour)
-	api.SetModelCooldown(ref, "model-a", reset, now)
+	r.SetModelCooldownWithReset(ref, "model-a", reset, reset, now)
 
 	expired := reset.Add(time.Minute)
 	r.ExpireModelCooldowns(expired)
@@ -88,12 +153,12 @@ func TestModelCycleAnchorSurvivesCooldownExpiry(t *testing.T) {
 }
 
 func TestModelCycleCheckpointRoundTripRestoresAnchors(t *testing.T) {
-	r, api, now := modelCooldownFixture(t)
+	r, _, now := modelCooldownFixture(t)
 	ref, _ := r.CredentialRef(1)
 	firstReset := now.Add(time.Hour)
-	api.SetModelCooldown(ref, "model-a", firstReset, now)
+	r.SetModelCooldownWithReset(ref, "model-a", firstReset, firstReset, now)
 	secondReset := firstReset.Add(2 * time.Hour)
-	api.SetModelCooldown(ref, "model-a", secondReset.Add(time.Hour), secondReset)
+	r.SetModelCooldownWithReset(ref, "model-a", secondReset.Add(time.Hour), secondReset.Add(time.Hour), secondReset)
 	checkpoint := r.CaptureRuntimeCheckpoint()
 
 	restoredRegistry := NewCredentialRegistry()
@@ -124,9 +189,9 @@ func TestModelCycleCheckpointFromOlderFormatRestoresEmpty(t *testing.T) {
 }
 
 func TestModelCyclePruningKeepsAnchorsUntilTheyAreStale(t *testing.T) {
-	r, api, now := modelCooldownFixture(t)
+	r, _, now := modelCooldownFixture(t)
 	ref, _ := r.CredentialRef(1)
-	api.SetModelCooldown(ref, "model-a", now.Add(time.Hour), now)
+	r.SetModelCooldownWithReset(ref, "model-a", now.Add(time.Hour), now.Add(time.Hour), now)
 
 	// 冷却过期本身不清理锚点。
 	r.ExpireModelCooldowns(now.Add(2 * time.Hour))
@@ -136,7 +201,7 @@ func TestModelCyclePruningKeepsAnchorsUntilTheyAreStale(t *testing.T) {
 
 	// 仍在保留期内：其他模型的冷却不会误删已有锚点。
 	withinRetention := now.Add(40 * time.Hour)
-	api.SetModelCooldown(ref, "model-b", withinRetention.Add(time.Hour), withinRetention)
+	r.SetModelCooldownWithReset(ref, "model-b", withinRetention.Add(time.Hour), withinRetention.Add(time.Hour), withinRetention)
 	cycles := r.GroupModelCycles(10, withinRetention)
 	if len(cycles[1]) != 2 {
 		t.Fatalf("model cycles = %+v, want model-a and model-b", cycles[1])
@@ -144,7 +209,7 @@ func TestModelCyclePruningKeepsAnchorsUntilTheyAreStale(t *testing.T) {
 
 	// 超过保留期：陈旧锚点被清理，较新的锚点保留。
 	beyondRetention := now.Add(53 * time.Hour)
-	api.SetModelCooldown(ref, "model-c", beyondRetention.Add(time.Hour), beyondRetention)
+	r.SetModelCooldownWithReset(ref, "model-c", beyondRetention.Add(time.Hour), beyondRetention.Add(time.Hour), beyondRetention)
 	cycles = r.GroupModelCycles(10, beyondRetention)
 	if len(cycles[1]) != 2 {
 		t.Fatalf("model cycles = %+v, want a bounded set of two models", cycles[1])
@@ -158,10 +223,10 @@ func TestModelCyclePruningKeepsAnchorsUntilTheyAreStale(t *testing.T) {
 }
 
 func TestModelCycleFollowsCredentialIdentityPreservation(t *testing.T) {
-	r, api, now := modelCooldownFixture(t)
+	r, _, now := modelCooldownFixture(t)
 	ref, _ := r.CredentialRef(1)
 	reset := now.Add(time.Hour)
-	api.SetModelCooldown(ref, "model-a", reset, now)
+	r.SetModelCooldownWithReset(ref, "model-a", reset, reset, now)
 
 	entries := []CredentialEntry{{ID: 1, GroupID: 10, Version: 2, IdentityGeneration: 1,
 		Status: CredentialStatusDisabled, Fingerprint: "new-secret", EncryptedValue: "new-secret"}}

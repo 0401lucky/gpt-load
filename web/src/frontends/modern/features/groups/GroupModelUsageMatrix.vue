@@ -121,6 +121,10 @@ function rowKey(row: GroupModelUsageRow): string {
 function tokensDetail(row: GroupModelUsageRow): string {
   const cacheWrite = row.cacheWrite5mTokens + row.cacheWrite1hTokens + row.cacheWriteUnknownTokens
   return [
+    t('groupDetail.modelUsage.usageCoverage', {
+      missing: n(row.usageMissingCount),
+      partial: n(row.usagePartialCount),
+    }),
     t('groupDetail.modelUsage.tokensDetail.label', {
       input: n(row.uncachedInputTokens + row.cacheReadTokens + cacheWrite),
       output: n(row.outputTokens),
@@ -326,8 +330,16 @@ function credentialHint(row: GroupModelUsageRow): string {
                 <td class="modern-model-usage-number">
                   <AppTooltip :label="tokensDetail(row)"
                     ><span tabindex="0">{{
-                      formatCompactNumber(row.totalTokens, locale)
+                      row.requestCount > 0 && row.usageMissingCount === row.requestCount
+                        ? t('groupDetail.modelUsage.unknownTokens')
+                        : formatCompactNumber(row.totalTokens, locale)
                     }}</span></AppTooltip
+                  >
+                  <AppBadge
+                    v-if="row.usageMissingCount > 0 || row.usagePartialCount > 0"
+                    size="xs"
+                    tone="warning"
+                    >{{ t('groupDetail.modelUsage.missingTokens') }}</AppBadge
                   >
                 </td>
                 <td class="modern-model-usage-number">

@@ -1939,7 +1939,7 @@ func newModelListHandlerEngineWithLimit(
 
 type panicRuntimeRegistry struct{}
 
-func (panicRuntimeRegistry) SetModelCooldown(state.CredentialRef, string, time.Time, time.Time) (bool, bool) {
+func (panicRuntimeRegistry) SetModelCooldownWithReset(state.CredentialRef, string, time.Time, time.Time, time.Time) (bool, bool) {
 	panic("model endpoint mutated cooldown")
 }
 

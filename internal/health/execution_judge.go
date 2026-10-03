@@ -637,6 +637,14 @@ func rateLimitDecision(attempt ExecutionAttempt, decisionContext DecisionContext
 		effect,
 		ruleID,
 	)
+	// Retry deadlines and quota resets are independent evidence. Preserve a
+	// trusted reset even when Retry-After takes precedence for scheduling.
+	if modelScoped && decisionContext.RateLimitResetHint && result.Origin == execution.ErrorOriginUpstream {
+		if hint, ok := ParseQuotaResetHint(attempt.Evidence.Summary); ok {
+			result.QuotaResetAt = attempt.Now.Add(hint)
+			result.QuotaResetSource = "reset_hint"
+		}
+	}
 	if attempt.Evidence.RetryAfter > 0 {
 		result.CooldownUntil = attempt.Now.Add(attempt.Evidence.RetryAfter)
 		result.RuleID = "rate_limit.retry_after"
@@ -737,6 +745,9 @@ func constrainCommittedDecision(result Decision, attempt ExecutionAttempt) Decis
 		result.RuleID = "rate_limit.credential.committed"
 	} else if originalRetry != result.Retry || originalEffect != result.Effect {
 		result.RuleID = "safety.committed"
+	}
+	if result.Effect != EffectCooldownModel {
+		result.QuotaResetAt, result.QuotaResetSource = time.Time{}, ""
 	}
 	return result
 }

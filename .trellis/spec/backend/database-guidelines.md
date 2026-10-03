@@ -129,13 +129,21 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 
 1. **适用范围**：按 `(credential_id, upstream_model)` 各自划窗的管理统计，入口为 `GET /api/groups/:group_id/model-usage`，实现位于 `internal/requestlog/group_model_usage.go` 和 `internal/control/group_model_usage.go`。
 2. **签名与来源**：读取当前组的凭据/模型窗口，批量使用 `usage_stats` 与 `request_logs`。不新增数据库表，不逐凭据调用 `QueryCredentialWindowUsage`。
-3. **响应合同**：`window_start_ms` 是该行真实起点，`window_source` 区分重置锚点与近 24h 兜底；`data_complete` 表示所需边界明细的留存是否完整。顶层 `counted_from_ms` / `counted_to_ms` 是整体窗口覆盖范围，每行仍用自己的起点。token 含全部缓存分项；成功以 `status = 'success'` 定义，不以 HTTP 200 代替。
+3. **响应合同**：`window_start_ms` 是该行真实起点，`window_source` 区分重置锚点与近 24h 兜底；`data_complete` 表示所需边界明细的留存是否完整，不能代表上游 token 完整。`usage_missing_count` / `usage_partial_count` 分别统计缺少用量和部分用量的请求，小时桶与边界明细统一归并；失败请求也可能 missing，不能宣称每个 missing 请求都产生了实际消耗。顶层 `counted_from_ms` / `counted_to_ms` 是整体窗口覆盖范围，每行仍用自己的起点。token 含全部缓存分项；成功以 `status = 'success'` 定义，不以 HTTP 200 代替。
 4. **校验与错误矩阵**：非法范围/损坏聚合数值 → 返回错误；首尾同小时 → 明细区间只合并一次；边界明细超留存 → 返回已知数值并标记 `data_complete=false`，不能静默宣称完整；并发写入 → 用同一 DB 快照避免混合新旧数据。
 5. **正常/基础/异常样例**：09:43 起、09:50 前耗尽的全部 token 必须计入；整点窗口直接复用完整桶；边界缺失时 UI 显示统计不完整，不能把 0 当作上游没有消耗额度。
 6. **必要测试断言**：同小时爆发用量、首尾重叠、整点、当前小时新行、多模型不同窗口、删除凭据过滤、留存不完整、批量查询数量不随 key 数逐个增长。复用现有安全整数和 `UsageAggregate` 求和校验。
 7. **错误与正确做法**：错误：`ceilHour(start)` 后只查小时桶。正确：完整小时桶 + `[start, ceilHour(start))` 和 `[floorHour(end), end)` 的精确明细，先裁到 `[start,end)` 并消除重叠；禁止用前周期的整个边界桶补数。
 
 ---
+
+### 模型冷却与额度周期的证据边界
+
+- **触发场景**：限流后的调度等待到期不等于额度重置。不能将 `CooldownUntil` 无条件写入 `ModelNextResets`，否则每次默认 60 秒冷却都可能过滤掉此前用量。
+- **写入契约**：`health.Decision.QuotaResetAt` / `QuotaResetSource` 独立表达可信额度证据，gateway 经 `SetModelCooldownWithReset(ref, model, until, reset, now)` 原子更新状态；普通 `SetModelCooldown` 只更新冷却。身份/代次必须匹配，重置必须晚于当前时间；冷却期限不延长也不能吞掉新的可信证据。
+- **可信来源**：当前 `ParseQuotaResetHint` 仅接受已实测的 `Daily free limit reached on model … Try again in …` 格式。一般 `Try again in`、默认等待和 `Retry-After` 不是额度证明。调度用 `ParseResetHint` 的一分钟安全余量及钳制不能作为真实周期边界；仅因 HTTP 200/0 也不能排除响应体中的限流证据。
+- **检查点兼容**：只有 `model_cycle_version=1` 的周期锚点可以恢复。旧版/未知版本保留冷却、健康状态，但不信任旧周期，界面退回 `fallback_24h`；不得按冷却时长猜测或改写历史 token。
+- **用例与回归**：普通冷却跨过终点后用量仍可见；可信重置到期后才进入新周期；重复提示不提前截断当前周期；旧检查点保留调度、新检查点恢复可信周期；验证 buffer 与统计时间分离。完整已知 token 可为零，而 missing 必须在 UI 明示，不能以均值补账。
 
 ## 迁移
 

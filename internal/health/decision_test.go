@@ -1,6 +1,34 @@
 package health
 
-import "testing"
+import (
+	"testing"
+	"time"
+
+	"gpt-load/internal/execution"
+)
+
+func TestDecisionValidatesQuotaResetEvidence(t *testing.T) {
+	valid := Decision{Category: FailureCategoryRateLimited, Origin: execution.ErrorOriginUpstream,
+		Scope: execution.ErrorScopeModel, Retry: RetryNone, Effect: EffectCooldownModel,
+		CooldownUntil: time.Now().Add(time.Minute), QuotaResetAt: time.Now().Add(time.Hour),
+		QuotaResetSource: "reset_hint", RuleID: "rate_limit.retry_after"}
+	if err := valid.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	for _, mutate := range []func(*Decision){
+		func(d *Decision) { d.QuotaResetSource = "retry_after" },
+		func(d *Decision) { d.QuotaResetSource = "" },
+		func(d *Decision) { d.QuotaResetAt = time.Time{} },
+		func(d *Decision) { d.Effect = EffectCooldownCredential },
+		func(d *Decision) { d.Origin = execution.ErrorOriginInternal },
+	} {
+		invalid := valid
+		mutate(&invalid)
+		if err := invalid.Validate(); err == nil {
+			t.Fatalf("accepted invalid evidence: %+v", invalid)
+		}
+	}
+}
 
 func TestDecisionShouldRetry(t *testing.T) {
 	tests := []struct {

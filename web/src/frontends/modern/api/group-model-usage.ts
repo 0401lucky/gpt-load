@@ -17,6 +17,8 @@ export interface GroupModelUsageRow {
   requestCount: number
   successCount: number
   failureCount: number
+  usageMissingCount: number
+  usagePartialCount: number
   uncachedInputTokens: number
   cacheReadTokens: number
   cacheWrite5mTokens: number
@@ -37,6 +39,12 @@ export interface GroupModelUsage {
 
 function readRow(value: unknown): GroupModelUsageRow {
   const row = record(value)
+  const requestCount = integer(row.request_count)
+  const missingCount = integer(row.usage_missing_count)
+  const partialCount = integer(row.usage_partial_count)
+  if (partialCount > requestCount || missingCount > requestCount - partialCount) {
+    throw new InvalidResponseError()
+  }
   return {
     dataComplete: boolean(row.data_complete),
     credentialID: integer(row.credential_id, 1),
@@ -44,9 +52,11 @@ function readRow(value: unknown): GroupModelUsageRow {
     windowStart: integer(row.window_start_ms),
     windowSource: oneOf(row.window_source, windowSources),
     cooldownUntil: row.cooldown_until_ms === null ? null : integer(row.cooldown_until_ms),
-    requestCount: integer(row.request_count),
+    requestCount,
     successCount: integer(row.success_count),
     failureCount: integer(row.failure_count),
+    usageMissingCount: missingCount,
+    usagePartialCount: partialCount,
     uncachedInputTokens: integer(row.uncached_input_tokens),
     cacheReadTokens: integer(row.cache_read_tokens),
     cacheWrite5mTokens: integer(row.cache_write_5m_tokens),

@@ -118,6 +118,36 @@ func groupModelUsageStat(credentialID uint, model string, bucket time.Time, requ
 	return row
 }
 
+func TestGroupModelWindowUsageCountsMissingAndPartialAcrossBoundaries(t *testing.T) {
+	db := openRequestLogQueryDB(t)
+	service := newRequestLogTestService(db)
+	start := time.Date(2026, 9, 28, 9, 43, 0, 0, time.UTC)
+	end := start.Add(2 * time.Hour)
+	service.now = func() time.Time { return end }
+	for i, at := range []time.Time{start.Add(-time.Millisecond), start, end.Add(-time.Millisecond), end} {
+		row := requestLogWindowRow(fmt.Sprintf("00000000-0000-4000-8000-%012d", i+7000), 31, at, 0)
+		row.UpstreamModel = "coverage"
+		row.OutputTokens = 0
+		row.UsageState = "missing"
+		row.CostState, row.PricingCompleteness = "unpriced", "unavailable"
+		if i == 2 {
+			row.UsageState = "partial"
+			row.OutputTokens = 4
+		}
+		createRequestLogQueryRow(t, db, row)
+	}
+	bucket := groupModelUsageStat(31, "coverage", start.Add(time.Hour).Truncate(time.Hour), 3)
+	bucket.UsageMissingCount, bucket.PartialCount = 1, 1
+	createUsageStats(t, db, bucket)
+	rows, err := service.QueryGroupModelWindowUsage(t.Context(), 17, start.UnixMilli(), end.UnixMilli(), nil, map[uint]bool{31: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 || rows[0].RequestCount != 5 || rows[0].UsageMissingCount != 2 || rows[0].PartialCount != 2 || rows[0].DataIncomplete {
+		t.Fatalf("coverage counted outside window, duplicated boundary, or lost bucket: %+v", rows)
+	}
+}
+
 func TestGroupModelWindowUsageUsesOneReadSnapshot(t *testing.T) {
 	db, dsn := openRequestLogFileDB(t)
 	service := newRequestLogTestService(db)

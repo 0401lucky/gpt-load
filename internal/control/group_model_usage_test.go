@@ -18,6 +18,26 @@ import (
 
 const groupModelUsageModelGLM = "z-ai/glm-5.3-flash"
 
+func TestGroupModelUsageMissingCountsRemainSeparateFromRetention(t *testing.T) {
+	item, err := mapGroupModelUsageItem(&groupModelUsageAccumulator{windowStartMS: 1,
+		aggregate: requestlog.UsageAggregate{RequestCount: 3, UsageMissingCount: 1, PartialCount: 1, OutputTokens: 5}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item.UsageMissingCount != 1 || item.UsagePartialCount != 1 || item.TotalTokens != 5 || !item.DataComplete {
+		t.Fatalf("coverage lost or conflated with retention: %+v", item)
+	}
+	for _, aggregate := range []requestlog.UsageAggregate{
+		{RequestCount: 1, UsageMissingCount: -1},
+		{RequestCount: 1, PartialCount: 2},
+		{RequestCount: 1, UsageMissingCount: 1, PartialCount: 1},
+	} {
+		if err := validateGroupModelUsageIntegers(aggregate, 1); err == nil {
+			t.Fatalf("invalid coverage accepted: %+v", aggregate)
+		}
+	}
+}
+
 type groupModelUsageRow struct {
 	CredentialID        uint   `json:"credential_id"`
 	Model               string `json:"model"`
@@ -89,7 +109,7 @@ func mustSetGroupModelCooldown(
 	if !ok {
 		t.Fatalf("credential %d is missing from the registry", credentialID)
 	}
-	if accepted, changed := registry.SetModelCooldown(ref, model, until, now); !accepted || !changed {
+	if accepted, changed := registry.SetModelCooldownWithReset(ref, model, until, until, now); !accepted || !changed {
 		t.Fatalf("SetModelCooldown(%d, %q, %s, %s) = %t, %t, want accepted change",
 			credentialID, model, until, now, accepted, changed)
 	}
@@ -293,6 +313,7 @@ func TestGetGroupModelUsageResponseContractFields(t *testing.T) {
 		"data_complete",
 		"credential_id", "model", "window_start_ms", "window_source", "cooldown_until_ms",
 		"request_count", "success_count", "failure_count",
+		"usage_missing_count", "usage_partial_count",
 		"uncached_input_tokens", "cache_read_tokens", "cache_write_5m_tokens",
 		"cache_write_1h_tokens", "cache_write_unknown_tokens", "output_tokens", "total_tokens",
 	})

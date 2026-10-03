@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"门禁"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"窗口汇总"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"字段契约"}
+{"file":".trellis/tasks/10-03-model-usage-cycle-fix/prd.md","reason":"逐项验收"}

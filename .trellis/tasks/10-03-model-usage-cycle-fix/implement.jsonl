@@ -1,0 +1,6 @@
+{"file":".trellis/spec/backend/directory-structure.md","reason":"层间边界"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"用量与历史"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"测试门禁"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"投影契约"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"三语言提示"}
+{"file":".trellis/tasks/10-03-model-usage-cycle-fix/design.md","reason":"修复方案"}

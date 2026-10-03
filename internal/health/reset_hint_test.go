@@ -5,6 +5,21 @@ import (
 	"time"
 )
 
+func TestQuotaResetHintRejectsGenericRetriesAndClampedDurations(t *testing.T) {
+	for _, summary := range []string{
+		"Try again in 30s", "Rate limit exceeded. Try again in 1h",
+		"Daily free limit reached on model fixture. Try again in 2d",
+		"Daily free limit reached on model fixture. Try again in 999999999999999999h",
+	} {
+		if _, ok := ParseQuotaResetHint(summary); ok {
+			t.Fatalf("trusted %q", summary)
+		}
+	}
+	if duration, ok := ParseQuotaResetHint("Error 429: Daily free limit reached on model fixture. Try again in 10h 3m"); !ok || duration != 10*time.Hour+3*time.Minute {
+		t.Fatalf("quota hint = %v, %t", duration, ok)
+	}
+}
+
 func TestParseResetHintExtractsUpstreamRetryDelay(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -750,7 +750,11 @@ export default {
     usage: {
       title: '凭据 × 模型用量',
       hint: '统计覆盖范围：{from} – {to}；各行按自身窗口统计，边界明细过期时已知数值不代表全部用量。',
-      incomplete: '统计不完整',
+      incomplete: '日志保留不完整',
+      unknownTokens: '未知',
+      missingTokens: '用量缺失',
+      usageCoverage:
+        '用量缺失 {missing} 次，部分缺失 {partial} 次；仅汇总已知 token，缺失不代表一定产生消耗。',
       truncated: '仅显示用量最高的 {shown} 行，共 {total} 行。',
       loading: '正在加载模型用量…',
       loadFailed: '无法加载模型用量。',

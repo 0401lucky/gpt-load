@@ -184,6 +184,8 @@ export interface GroupModelUsageItemDto {
   request_count: number
   success_count: number
   failure_count: number
+  usage_missing_count: number
+  usage_partial_count: number
   uncached_input_tokens: number
   cache_read_tokens: number
   cache_write_5m_tokens: number

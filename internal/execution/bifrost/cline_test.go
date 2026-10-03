@@ -68,6 +68,28 @@ func TestClineNativeCompletion(t *testing.T) {
 	}
 }
 
+func TestClineNonStreamingMissingUsageRemainsUnknown(t *testing.T) {
+	for _, rawUsage := range []string{"", `,"usage":null`, `,"usage":{"prompt_tokens":"invalid"}`} {
+		t.Run(rawUsage, func(t *testing.T) {
+			body := `{"id":"fixture","choices":[{"message":{"role":"assistant","content":"pong"}}]` + rawUsage + `}`
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = io.WriteString(w, `{"success":true,"data":`+body+`}`)
+			}))
+			t.Cleanup(server.Close)
+			runtime := newRuntimeForTest(t, testRuntimeOptions{allowPrivateNetwork: true})
+			spec := openAIChatAttempt(t, channel.ID("cline"), server.URL+"/api/v1", "fixture-key")
+			result := runtime.Execute(t.Context(), spec)
+			if result.Error != nil || result.StatusCode != http.StatusOK {
+				t.Fatalf("result = %+v", result)
+			}
+			if result.Usage != nil && result.Usage.Normalized.State != usage.StateMissing {
+				t.Fatalf("missing/invalid upstream usage became known: %+v", result.Usage)
+			}
+		})
+	}
+}
+
 func TestClineConvertedCompletion(t *testing.T) {
 	for _, value := range []protocol.Protocol{protocol.OpenAIResponses, protocol.Anthropic, protocol.Gemini} {
 		t.Run(string(value), func(t *testing.T) {

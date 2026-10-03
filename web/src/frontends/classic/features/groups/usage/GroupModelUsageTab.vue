@@ -146,6 +146,10 @@ function tokensDetail(row: GroupModelUsageItemDto): string {
   const cacheWrite =
     row.cache_write_5m_tokens + row.cache_write_1h_tokens + row.cache_write_unknown_tokens
   return [
+    t('group.usage.usageCoverage', {
+      missing: n(row.usage_missing_count),
+      partial: n(row.usage_partial_count),
+    }),
     t('group.usage.tokensDetail.label', {
       input: n(row.uncached_input_tokens + row.cache_read_tokens + cacheWrite),
       output: n(row.output_tokens),
@@ -361,9 +365,17 @@ function credentialHint(row: GroupModelUsageItemDto): string {
               <td class="group-usage__number">
                 <AppTooltip :content="tokensDetail(row)">
                   <span class="group-usage__mono" tabindex="0">{{
-                    formatTokens(row.total_tokens, locale)
+                    row.request_count > 0 && row.usage_missing_count === row.request_count
+                      ? t('group.usage.unknownTokens')
+                      : formatTokens(row.total_tokens, locale)
                   }}</span>
                 </AppTooltip>
+                <StatusBadge
+                  v-if="row.usage_missing_count > 0 || row.usage_partial_count > 0"
+                  tone="warning"
+                  size="compact"
+                  >{{ t('group.usage.missingTokens') }}</StatusBadge
+                >
               </td>
               <td class="group-usage__number" data-column-priority="low">
                 <span class="group-usage__mono">{{

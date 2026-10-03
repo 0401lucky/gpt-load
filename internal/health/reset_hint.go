@@ -29,6 +29,24 @@ var (
 // [minResetHintCooldown, maxResetHintCooldown]。未命中时返回 false，调用方必须
 // 回退到默认冷却，不产生任何新副作用。
 func ParseResetHint(summary string) (time.Duration, bool) {
+	total, ok := parseResetHintDuration(summary)
+	if !ok {
+		return 0, false
+	}
+	return clampResetHintCooldown(total + resetHintMargin), true
+}
+
+// ParseQuotaResetHint only trusts the observed daily quota exhaustion format.
+// Scheduling margins and clamps are not quota reset evidence.
+func ParseQuotaResetHint(summary string) (time.Duration, bool) {
+	if !strings.Contains(strings.ToLower(summary), "daily free limit reached on model ") {
+		return 0, false
+	}
+	duration, ok := parseResetHintDuration(summary)
+	return duration, ok && duration < maxResetHintCooldown
+}
+
+func parseResetHintDuration(summary string) (time.Duration, bool) {
 	anchor := resetHintAnchor.FindStringIndex(summary)
 	if anchor == nil {
 		return 0, false
@@ -52,7 +70,7 @@ func ParseResetHint(summary string) (time.Duration, bool) {
 	if !matched || total <= 0 {
 		return 0, false
 	}
-	return clampResetHintCooldown(total + resetHintMargin), true
+	return total, true
 }
 
 func resetHintSegmentDuration(amount string, unit string) time.Duration {

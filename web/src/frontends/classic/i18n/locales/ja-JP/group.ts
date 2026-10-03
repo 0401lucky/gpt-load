@@ -791,7 +791,11 @@ export default {
     usage: {
       title: '認証情報 × モデル使用量',
       hint: '集計対象：{from} – {to}。各行の期間で集計し、境界の明細が保存期限を過ぎた場合、表示値は全使用量を表しません。',
-      incomplete: '集計が不完全',
+      incomplete: 'ログ保持が不完全',
+      unknownTokens: '不明',
+      missingTokens: '使用量欠落',
+      usageCoverage:
+        '使用量欠落 {missing} 件、一部欠落 {partial} 件。既知のトークンのみ集計し、欠落は消費があったことを意味しません。',
       truncated: '使用量の多い上位 {shown} 行のみ表示しています（全 {total} 行）。',
       loading: 'モデル使用量を読み込み中…',
       loadFailed: 'モデル使用量を読み込めません。',

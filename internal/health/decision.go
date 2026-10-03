@@ -69,13 +69,15 @@ type DecisionContext struct {
 
 // Decision is the complete business decision for one execution attempt.
 type Decision struct {
-	Category      FailureCategory
-	Origin        execution.ErrorOrigin
-	Scope         execution.ErrorScope
-	Retry         RetryDirective
-	Effect        Effect
-	CooldownUntil time.Time
-	RuleID        RuleID
+	Category         FailureCategory
+	Origin           execution.ErrorOrigin
+	Scope            execution.ErrorScope
+	Retry            RetryDirective
+	Effect           Effect
+	CooldownUntil    time.Time
+	QuotaResetAt     time.Time
+	QuotaResetSource string
+	RuleID           RuleID
 }
 
 func (decision Decision) ShouldRetry() bool {
@@ -102,6 +104,13 @@ func (decision Decision) LegacyAction() Action {
 
 // Validate checks the compact decision contract shared by Judge and Gateway.
 func (decision Decision) Validate() error {
+	if decision.QuotaResetSource != "" || !decision.QuotaResetAt.IsZero() {
+		if decision.QuotaResetSource != "reset_hint" || decision.QuotaResetAt.IsZero() ||
+			decision.Effect != EffectCooldownModel || decision.Scope != execution.ErrorScopeModel ||
+			decision.Category != FailureCategoryRateLimited || decision.Origin != execution.ErrorOriginUpstream {
+			return fmt.Errorf("quota reset requires explicit upstream model reset evidence")
+		}
+	}
 	if !decision.Category.Valid() {
 		return fmt.Errorf("failure category is invalid")
 	}

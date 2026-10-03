@@ -783,7 +783,11 @@ export default {
     usage: {
       title: 'Credential × model usage',
       hint: 'Coverage: {from} – {to}. Each row uses its own window; expired boundary details mean totals are incomplete.',
-      incomplete: 'Incomplete statistics',
+      incomplete: 'Incomplete log retention',
+      unknownTokens: 'Unknown',
+      missingTokens: 'Missing usage',
+      usageCoverage:
+        'Usage missing for {missing} requests, partial for {partial}. Only known tokens are summed; missing usage does not imply consumption.',
       truncated: 'Showing the top {shown} rows of {total}.',
       loading: 'Loading model usage…',
       loadFailed: 'Unable to load model usage.',
