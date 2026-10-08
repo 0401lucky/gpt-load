@@ -266,3 +266,25 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 9: 兼容合并上游 main 至 a5c691bb
+<!-- trellis-session: v=2 fp=604e55d148155cba -->
+
+**Date**: 2026-10-08
+**Task**: 兼容合并上游 main 至 a5c691bb
+**Branch**: `main`
+
+### Summary
+
+合入17个上游提交，冻结旧27条迁移并追加0028-0032；保留备注、捐献、模型用量与可信周期，修复捐献代理引用及别名保存备注缓存。构建、静态检查、storage/control与CPA验证通过；完整Go测试64包通过，23个Windows基线失败已同条件复现，无新增失败。已合入本地main，未push或部署。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b2cbb156` | merge: 兼容合并上游 main 至 a5c691bb（迁移顺延为 0028-0032） |
+
+### Status
+
+[OK] **Completed**
