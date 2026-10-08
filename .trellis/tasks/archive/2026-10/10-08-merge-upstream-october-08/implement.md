@@ -11,5 +11,7 @@
 - [x] 完整门禁已逐项执行；64包通过、8无测试/跳过、5包存在23个本轮基线可复现失败，不能表述全绿，详见 research/verification.md。
 - [x] CPA 独立 module：go mod tidy -diff、go vet ./... 均通过。
 - [x] 新失败修复；按顶层及子测试比较新增失败集合为空，环境错误逐用例核对，详见 research/baseline.md。
-- [ ] 更新迁移规范与验证/升级说明，提交本地 merge 并将 main 快进，验证 ancestry 和用户原有文件。
-- [ ] 归档任务并记录工作日志。
+- [x] 更新迁移规范与验证/升级说明，提交本地 merge 并将 main 快进，验证 ancestry 和用户原有文件。
+- [x] 移交 trellis-finish-work 归档任务并记录工作日志。
+
+合并提交：`b2cbb156b347495d822a607590f4633c153de4ae`。本地main已快进，两个固定输入的祖先检查均为0，上游待合并数为0。提交后只剩两项用户原有未跟踪目录。

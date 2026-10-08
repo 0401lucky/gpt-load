@@ -44,7 +44,7 @@
 - container 两边均得到 Mode:direct / Source:default；合并输出多出上游 ProxyID:0 字段但失败语义相同。
 - gateway 两边均在 stream_integration_test.go:780 收到 writeUpstreamResponse() error=nil。
 - webui 多数为 Bash 不识别 Windows 路径（exit 127），另有直接执行 .sh 的 Win32 格式错误、Python 命令 exit 9009，以及相同 promotion/Windows smoke 子进程失败。
-- 首轮 MySQL shards 的一个子进程输出受并发 WSL 启动影响，已在两边顺序定向复验该测试；原始日志为临时目录的 baseline-shards.jsonl / merged-shards.jsonl。
+- 首轮 MySQL shards 的一个子进程输出受并发 WSL 启动影响，已在两边顺序定向复验该测试，均复现 exit 127、Bash 不识别 Windows 临时脚本路径；原始日志为临时目录的 baseline-shards.jsonl / merged-shards.jsonl。
 
 ## 原始证据
 
