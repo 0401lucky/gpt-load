@@ -34,6 +34,7 @@
 - 初次 POST 的 `Idempotency-Key` 等于 batch_id；重试动作使用新的 UUID v4 幂等键。同标识同语义请求读取原结果，改变内容冲突。
 - 单批 100 项、单 key 4096 字节、请求体 1 MiB。边界从 capabilities 提供，是单次请求限制，不是用户累计捐献或领奖上限。
 - `target_revision` 不依赖显示名称；目标从分组渠道、验证模型/协议及有效配置解析。符合配置的空组可选，不能用是否有库存 key 判断能否接收。
+- 集中代理目录的 `proxy_id` 引用必须在 `buildDonationTarget` 当前读快照中经 `s.resolvedProxyOverride(ctx, tx, row.ProxyConfig)` 展开，再交给 `state.Compile`。只解密引用不能得到有效代理 URL。自动/人工目标修订绑定生效代理地址；代理改名不改变修订，地址改变则旧修订被拒，停用代理沿既有继承语义回退。
 - `DonationItemResponse` 返回 item_id、state、reason_code、credential_id、accepted_at_ms、retryable。仅 accepted 返回成功凭据引用；响应不含 key、暂存密文或集成 token。
 - key 只去首尾空白，保留大小写；逐项格式失败不回滚其他项。请求摘要先以 HMAC 替代 key，不串入明文序列化比较器。
 
@@ -67,6 +68,7 @@
 
 - `donations_test.go`：暂存不进入调度、混合结果、逐项稳定关联与无明文泄露。
 - `donation_probe_integration_test.go`：用本地 Gemini HTTP 上游走生产 probe/runtime，断言实际 key、模型路径及没有库存 key 回退。
+- `donation_catalog_test.go` 的 `TestDonationCatalogResolvesManagedProxyAndBindsEffectiveTarget`：代理引用组可自动探测/人工审核，实际 AttemptSpec 使用解析后 URL；改名修订不变、改 URL 两类修订变化、旧修订拒绝及停用继承回退。
 - `donation_recovery_test.go` / `donation_concurrency_test.go`：提交中断、租约失效、重试预算、暂存过期、删除后历史、多连接资格争用和管理导入竞态。
 - `donation_database_integration_test.go`：真实 MySQL/PostgreSQL 的带库存升级与启动回填、独立连接批次竞争、重试动作重放、资源归属、提交回滚和长期回执；只有数据库 DSN 未配置时跳过。
 - `donation_http_test.go`：受限鉴权、禁用模块、来源隔离、严格请求解析、token 轮换和指纹秘密变化。

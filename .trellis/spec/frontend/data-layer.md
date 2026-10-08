@@ -186,6 +186,16 @@ if (!isCurrent(owner, controller)) return      // 过期响应直接丢弃
 
 ## 反模式
 
+### Modern 凭据别名与备注共存
+
+1. **触发**：modern 页面使用 classic `PUT /api/groups/:group_id/credentials/:credential_id` 更新别名或设置。
+2. **签名**：更新 patch 的 `name?: string` 与 `note?: string | null` 独立；modern `CredentialRow` 同时持有二者。
+3. **合同**：classic 更新响应有 `name`，不返回 modern 专属 `note`；name-only 响应写入详情/列表缓存时保留已知持久备注，不能把解析器缺省空串当作服务端清空。显式 `note:null` 或 `note:''` 均按请求回填为空串。
+4. **错误矩阵**：响应缺 note → 保留；显式清空 → 空串；别名保存失败 → 不改备注；别名有未保存更改/正在保存 → 设置表单不可绕过提交。
+5. **样例**：单改别名保留备注草稿与持久缓存；保存备注按请求值回填；缺字段造成备注闪空属于错误行为。
+6. **验证**：`CredentialDetailPanel.vue` 和 `GroupCredentials.vue` 两个名称保存入口均检查缓存和草稿；后端 `TestCredentialNameAndNoteUpdatesPreserveIdentityHealthAndModelCycles` 覆盖响应区别及组合写入。前端沿用 lint/type-check/build 门禁。
+7. **错误/正确**：直接缓存 classic 响应投影会丢失 modern 专属字段；正确做法在明确已知当前字段的边界合并缓存，保持两套 DTO 各自严格。
+
 - ❌ 用 `as` 断言 DTO —— 必须走 projector。
 - ❌ 在组件里手写 `invalidateQueries` —— 去 `invalidation.ts` 登记。
 - ❌ 把未归一化的 filters 对象塞进 query key。

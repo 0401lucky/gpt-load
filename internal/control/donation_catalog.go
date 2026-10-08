@@ -221,7 +221,7 @@ func (s *Service) buildDonationTarget(ctx context.Context, tx *gorm.DB, row mode
 	if err != nil {
 		return donationTarget{}, "", app_errors.ErrInternalServer
 	}
-	group.Proxy, err = decryptProxyOverride(s.encryption, row.ProxyConfig)
+	group.Proxy, err = s.resolvedProxyOverride(ctx, tx, row.ProxyConfig)
 	if err != nil {
 		return donationTarget{}, "", app_errors.ErrInternalServer
 	}

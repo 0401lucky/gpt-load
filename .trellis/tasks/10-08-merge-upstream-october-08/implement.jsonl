@@ -1,0 +1,5 @@
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"迁移冻结与升级前缀、精确模型用量"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"门禁与测试约定"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"DTO 投影与失效约定"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端静态门禁"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"跨层字段与兼容性"}

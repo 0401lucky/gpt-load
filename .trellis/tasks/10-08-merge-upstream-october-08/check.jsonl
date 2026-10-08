@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"迁移与 fork 数据保存"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"完整验收"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"前后端投影契约"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端门禁"}

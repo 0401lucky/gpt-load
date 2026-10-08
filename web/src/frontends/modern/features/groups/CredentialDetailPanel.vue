@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CredentialDisplay from '@modern/components/CredentialDisplay.vue'
 import { Info } from '@lucide/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
@@ -24,7 +25,8 @@ import {
 } from '@modern/components/ui'
 import { useApiClient } from '@shared/http/client-context'
 import { credentialStatus, credentialTime } from './credential-presentation'
-import { validProxyURL } from '@modern/app/proxy'
+import { validProxySelection } from '@shared/proxies/api'
+import ProxySelect from '../proxies/ProxySelect.vue'
 import GroupWorkspacePanel from './GroupWorkspacePanel.vue'
 import CredentialAccountInfo from './CredentialAccountInfo.vue'
 import CredentialTrends from './CredentialTrends.vue'
@@ -43,10 +45,12 @@ const query = useQuery({
 const item = computed(() => query.data.value ?? props.row)
 const state = computed(() => credentialStatus(item.value))
 const saved = ref<CredentialRow>()
+const nameDirty = ref(false)
+const namePending = ref(false)
 const weight = ref('')
 const note = ref('')
 const proxyMode = ref('inherit')
-const proxyURL = ref('')
+const proxyID = ref('')
 const saving = ref(false)
 const completed = ref(false)
 const attempted = ref(false)
@@ -56,10 +60,11 @@ const dirty = computed(
   () =>
     !completed.value &&
     Boolean(saved.value) &&
-    (weight.value !== String(saved.value!.weightManual ?? '') ||
+    (nameDirty.value ||
+      weight.value !== String(saved.value!.weightManual ?? '') ||
       note.value !== saved.value!.note ||
       proxyMode.value !== saved.value!.proxy.mode ||
-      Boolean(proxyURL.value)),
+      (Boolean(proxyID.value) && Number(proxyID.value) !== saved.value?.proxy.id)),
 )
 watch(
   query.data,
@@ -69,7 +74,7 @@ watch(
     weight.value = String(value.weightManual ?? '')
     note.value = value.note
     proxyMode.value = value.proxy.mode
-    proxyURL.value = ''
+    proxyID.value = ''
   },
   { immediate: true },
 )
@@ -81,15 +86,20 @@ const weightInvalid = computed(
       Number(weight.value) > 100),
 )
 const proxyChanged = computed(
-  () => proxyMode.value !== saved.value?.proxy.mode || Boolean(proxyURL.value),
+  () =>
+    proxyMode.value !== saved.value?.proxy.mode ||
+    (Boolean(proxyID.value) && Number(proxyID.value) !== saved.value?.proxy.id),
 )
 const proxyInvalid = computed(
-  () => proxyChanged.value && proxyMode.value === 'custom' && !validProxyURL(proxyURL.value.trim()),
+  () =>
+    proxyChanged.value &&
+    proxyMode.value === 'custom' &&
+    !validProxySelection(proxyID.value.trim()),
 )
 const proxyOptions = computed(() => [
   { value: 'inherit', label: t('credentialCards.proxyMode.inherit') },
   { value: 'direct', label: t('groupCreate.proxyDirect') },
-  { value: 'custom', label: t('groupCreate.proxyCustom') },
+  { value: 'custom', label: t('proxies.select') },
 ])
 function failure(): string {
   if (!item.value.failures) return '—'
@@ -99,7 +109,7 @@ function failure(): string {
     .join(' · ')
 }
 async function save(): Promise<void> {
-  if (!saved.value || !dirty.value || saving.value) return
+  if (!saved.value || !dirty.value || saving.value || nameDirty.value || namePending.value) return
   attempted.value = true
   if (weightInvalid.value || proxyInvalid.value) return
   const patch: Parameters<typeof updateCredential>[3] = {}
@@ -112,7 +122,7 @@ async function save(): Promise<void> {
         ? null
         : proxyMode.value === 'direct'
           ? { mode: 'direct' }
-          : { mode: 'custom', url: proxyURL.value.trim() }
+          : { mode: 'custom', proxy_id: Number(proxyID.value) }
   saving.value = true
   error.value = ''
   try {
@@ -126,13 +136,31 @@ async function save(): Promise<void> {
     )
     if (controller.signal.aborted) return
     completed.value = true
-    emit('saved', result)
+    emit('saved', { ...result, note: note.value })
     emit('close')
   } catch {
     if (!controller.signal.aborted) error.value = t('groups.edit.saveFailed')
   } finally {
     saving.value = false
   }
+}
+async function saveName(name: string): Promise<void> {
+  await cache.cancelQueries({ queryKey: credentialDetailKey(props.group.id, props.row.id) })
+  const result = await updateCredential(
+    client,
+    props.group.id,
+    props.row.id,
+    { name },
+    controller.signal,
+  )
+  if (controller.signal.aborted) return
+  if (saved.value) saved.value = { ...saved.value, name: result.name, label: result.label }
+  cache.setQueryData(credentialDetailKey(props.group.id, props.row.id), {
+    ...item.value,
+    name: result.name,
+    label: result.label,
+  })
+  emit('saved', { ...result, note: saved.value?.note ?? item.value.note })
 }
 onScopeDispose(() => controller.abort())
 useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : undefined))
@@ -149,11 +177,12 @@ useMessageSource(() =>
 <template>
   <GroupWorkspacePanel
     :title="t('groupDetail.credentialDetails')"
-    :description="row.account || row.mask"
+    :description="item.label"
+    hide-description
     :dirty="dirty"
-    :pending="saving"
+    :pending="saving || namePending"
     :loading="query.isFetching.value"
-    :save-disabled="!saved"
+    :save-disabled="!saved || nameDirty"
     @close="emit('close')"
     @save="save"
   >
@@ -165,6 +194,18 @@ useMessageSource(() =>
       ><AppButton @click="query.refetch()">{{ t('ui.retry') }}</AppButton></AppCollectionState
     >
     <template v-else>
+      <CredentialDisplay
+        :name="item.name"
+        :value="item.account || item.mask"
+        :subscription="group.connectionType === 'subscription'"
+        detail
+        :reveal="group.connectionType === 'subscription'"
+        :save-name="saveName"
+        edit-button
+        :disabled="saving"
+        @dirty="nameDirty = $event"
+        @pending="namePending = $event"
+      />
       <CredentialTrends
         :subscription="group.connectionType === 'subscription'"
         :group="group.id"
@@ -291,18 +332,15 @@ useMessageSource(() =>
             :disabled="saving"
           />
         </div>
-        <AppTextField
+        <ProxySelect
           v-if="channel?.proxy && proxyMode === 'custom'"
-          v-model="proxyURL"
-          :label="t('groupCreate.proxyURL')"
-          :placeholder="saved?.proxy.mode === 'custom' ? saved.proxy.display : undefined"
-          :description="
-            saved?.proxy.mode === 'custom' ? t('groupDetail.proxyUnchanged') : undefined
-          "
-          size="sm"
+          v-model="proxyID"
+          :saved-id="saved?.proxy.id"
+          :saved-name="saved?.proxy.name"
+          :saved-address="saved?.proxy.display"
+          :reference-state="saved?.proxy.referenceState"
           :disabled="saving"
-          :error="attempted && proxyInvalid ? t('groupCreate.proxyError') : undefined"
-          autocomplete="off"
+          :error="attempted && proxyInvalid ? t('proxies.selectHelp') : undefined"
         />
       </section>
     </template>

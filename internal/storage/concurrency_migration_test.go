@@ -11,6 +11,8 @@ import (
 )
 
 func TestConcurrencyMigrationContract(t *testing.T) {
+	t.Parallel()
+
 	testConcurrencyMigration(t, openInternalMigrationTestDatabase)
 }
 func TestExternalConcurrencyMigrationContract(t *testing.T) {
@@ -25,6 +27,9 @@ func testConcurrencyMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 	for _, scenario := range []string{"fresh", "upgrade", "interrupted"} {
 		t.Run(scenario, func(t *testing.T) {
 			db := open(t)
+			if db.Dialector.Name() == "sqlite" {
+				t.Parallel()
+			}
 			index := migrationIndexByID(t, migrationfiles.ID0026)
 			if scenario != "fresh" {
 				if err := applyMigrationRegistry(db, migrations[:index]); err != nil {

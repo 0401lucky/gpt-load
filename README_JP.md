@@ -238,6 +238,8 @@ Windows の一般ユーザーは代わりに `gpt-load-windows-setup.exe` を利
 | `AUTH_KEY` | 空、`${DATA_DIR}/auth.key` を読み込むか生成 | 管理画面と `/api` 管理 API の Bearer キー。データプレーンの AccessKey とは異なります。 |
 | `DONATION_INTEGRATION_TOKEN` | 空、寄付連携を無効化 | `/integrations/donations/v1` 専用の 32–256 バイトの可視 ASCII Bearer シークレット。管理キーや AccessKey と異なる値を使用し、変更後に再起動してください。 |
 | `ENCRYPTION_KEY` | 空、`${DATA_DIR}/encryption.key` を読み込むか生成 | チャネル認証情報を暗号化します。変更または紛失すると既存の認証情報を復号できないため、データベースと一緒にバックアップしてください。 |
+| `CLIENT_IP_HEADER` | 空、接続元 IP を使用 | `X-Forwarded-For` や `CF-Connecting-IP` などのクライアント IP ヘッダー。欠落・無効時は接続元 IP に戻ります。ログや AccessKey の IP 制限などで共用し、IPv4/IPv6 に対応。変更後は再起動が必要です。 |
+| `TRUSTED_PROXIES` | 空 | 任意のプロキシ IP または CIDR（カンマ区切り）。`CLIENT_IP_HEADER` 指定時のみ有効。空の場合は選択したヘッダーを直接信頼するため、デプロイ環境で信頼性を確保してください。指定時は接続元が一致した場合のみヘッダーを使用し、不一致なら接続元 IP を使用します。`X-Forwarded-For` は右から最初の非信頼 IP を採用（すべて信頼済みなら左端）、リスト未指定時は左端を採用。他のヘッダーは単一 IP のみ受け付けます。変更後は再起動が必要です。 |
 | `HTTP_PROXY` | 空 | HTTP アップストリームリクエストの環境プロキシ。 |
 | `HTTPS_PROXY` | 空 | HTTPS アップストリームリクエストの環境プロキシ。 |
 | `NO_PROXY` | 空 | 環境プロキシをバイパスするホスト、ドメイン、IP のカンマ区切りリスト。 |

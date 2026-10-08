@@ -11,6 +11,8 @@ import (
 )
 
 func TestOutputTimingMigrationContract(t *testing.T) {
+	t.Parallel()
+
 	testOutputTimingMigration(t, openInternalMigrationTestDatabase)
 }
 
@@ -27,6 +29,9 @@ func testOutputTimingMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 	for _, scenario := range []string{"fresh", "upgrade", "interrupted_first_column", "interrupted_complete"} {
 		t.Run(scenario, func(t *testing.T) {
 			db := open(t)
+			if db.Dialector.Name() == "sqlite" {
+				t.Parallel()
+			}
 			index := migrationIndexByID(t, migrationfiles.ID0027)
 			if scenario != "fresh" {
 				if err := applyMigrationRegistry(db, migrations[:index]); err != nil {
@@ -56,7 +61,7 @@ func testOutputTimingMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 					t.Fatal("expected migration interruption")
 				}
 			}
-			if err := AutoMigrate(db); err != nil {
+			if err := applyMigrationRegistry(db, migrations[:index+1]); err != nil {
 				t.Fatal(err)
 			}
 			for _, name := range []string{"first_output_ms", "last_output_ms"} {
@@ -84,9 +89,15 @@ func testOutputTimingMigration(t *testing.T, open func(*testing.T) *gorm.DB) {
 					}
 				}
 			}
+			if err := applyMigrationRegistry(db, migrations[:index+1]); err != nil {
+				t.Fatal(err)
+			}
+			// 同时覆盖在旧迁移中断后直接升级到当前版本。
 			if err := AutoMigrate(db); err != nil {
 				t.Fatal(err)
 			}
+			assertOutputTimingRemoved(t, db)
+
 		})
 	}
 }

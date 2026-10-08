@@ -152,7 +152,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0027
+    // ... 至 ID0032
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -173,6 +173,7 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
   - **不改上游迁移内部会落进 DDL 的名字**（`auto_decision_usage_stats_0019`、`chk_auto_decision_usage_0019_*`、`autoLog0019` / `autoUsage0019` 等）：改名会让 fork 库 schema 与上游永久分叉，上游后续迁移按名引用时会错位。文件顶部加一行来源注释即可。
   - 反例：把 fork 迁移整体顺延到上游之后（2026-09-20 曾采用）会让已上线库的账本中段与注册表错位，每次合并都要停机 + 删账本行 + 重放迁移。
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
+- 2026-10-08 新链尾：上游 `0025_proxy_catalog`、`0026_credential_names`、`0027_remove_request_log_output_timing`、`0028_request_log_client_ip`、`0029_group_priority` 分别顺延为 fork `0028`–`0032`；旧 `0001`–`0027` 生产迁移文件保持原样。
 - **上游迁移测试常硬编码注册表下标**（`migrations[:18]`、`migrations[19]`、`migrations[:20]`）。顺延编号后这些下标会指向别的迁移：要么直接失败，要么**静默测错对象却仍然通过**。合并上游并顺延编号时，必须把这类文件改成按 ID 定位（先例：`autoDecisionAttributionMigrationIndex`、`clientModelOverrideMigrationIndex`、`requestAuditMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
@@ -185,6 +186,16 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 5. **正常/基础/异常样例**：旧 24 条 + 新 3 条 = 27 条；没有新增迁移时旧链不变；自动合并只留下 `ID0001`–`ID0024` 却同时增加三个文件属于错误结果。
 6. **必要测试断言**：完整 ID 列表、空库迁移、带 fork 业务记录和身份数据的旧链升级、旧账本和记录不变、二次执行幂等；新测试按 ID 查找迁移边界。
 7. **错误与正确做法**：错误：消除冲突标记后直接认定迁移合并成功。正确：逐个对应「迁移文件 → 唯一导出符号 → 注册项 → 正确语义边界的测试」，并验证升级前缀与数据不变。
+
+### 清理列迁移与旧版本校验
+
+1. **触发**：后续迁移删除旧迁移创建的列，例如 `0030_remove_request_log_output_timing` 删除 `first_output_ms` / `last_output_ms`。
+2. **签名**：新文件定义 `ValidateCurrent0027(*gorm.DB) error`；注册表将其挂在旧 `ID0027` 的 `ValidateCurrent`，旧文件与严格 `Validate0027` 保持冻结。
+3. **合同**：仅账本有 `ID0030` 时允许按新结构校验；MySQL 的 `ID0030#building` 可进入恢复校验。上游旧 `0024` 的所有校验引用在 fork 指向 `0027`，不可误指 `0024_request_audit`。
+4. **错误矩阵**：无清理账本但缺列 → 拒绝；有孤立约束或错误删除顺序 → 拒绝；合法清理完成 → 重启成功；MySQL 合法中断 → 继续恢复。
+5. **样例**：27→32 保留业务数据并移除两列；新库直接到32；仅手工删除旧列不构成升级证据。
+6. **断言**：`fork_upgrade_migration_test.go` 覆盖24/27→32及幂等，`remove_output_timing_migration_test.go` 覆盖无证据缺列、错误顺序与恢复。SQL查询预算按完整fork schema校准，重启元数据门槛仍需保留。
+7. **错误/正确**：只重编号新 `ID0030` 会留下旧校验引用错位；正确做法同时映射跨迁移引用和 `ValidateCurrent` 注册，并验证重复启动。
 
 方言分支（改迁移时最容易踩的地方）：
 

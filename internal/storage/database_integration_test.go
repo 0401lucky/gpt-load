@@ -93,7 +93,7 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		"credential_reset_operations", "credential_attempt_stats", "schema_migrations",
 		"access_key_cost_limit_rules", "access_key_cost_limit_states",
 		"auto_decision_usage_stats",
-		"rpm_stats",
+		"rpm_stats", "proxies",
 	} {
 		if !db.Migrator().HasTable(table) {
 			t.Fatalf("table %q is missing", table)
@@ -103,8 +103,8 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		t.Fatal("automatic model migration created an unnecessary shared binding table")
 	}
 	for table, columns := range map[string][]string{
-		"groups":      {"connection_type", "proxy_config", "price_multiplier_micros"},
-		"credentials": {"identity_fingerprint", "secret_version", "auth_state", "auth_error_code", "proxy_config", "note"},
+		"groups":      {"connection_type", "proxy_config", "price_multiplier_micros", "priority"},
+		"credentials": {"identity_fingerprint", "secret_version", "auth_state", "auth_error_code", "proxy_config", "note", "name"},
 		"access_keys": {"expires_at_ms", "price_multiplier_micros", "concurrency_limit"},
 		"request_log_attempts": {
 			"upstream_protocol", "failure_origin", "failure_scope",
@@ -116,7 +116,7 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 			"auto_decision", "decision_model", "decision_cost_nano_usd",
 			"decision_pricing_completeness", "decision_group_id",
 			"decision_channel_id", "decision_credential_id",
-			"first_output_ms", "last_output_ms",
+			"first_response_ms", "client_ip",
 		},
 	} {
 		for _, column := range columns {
@@ -163,9 +163,14 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		"0025_rpm_stats",
 		"0026_access_key_concurrency",
 		"0027_request_log_output_timing",
+		"0028_proxy_catalog",
+		"0029_credential_names",
+		"0030_remove_request_log_output_timing",
+		"0031_request_log_client_ip",
+		"0032_group_priority",
 	}
 	if !slices.Equal(migrationIDs, wantMigrationIDs) {
-		t.Fatalf("migration ledger = %v, want complete 0001-0027 chain", migrationIDs)
+		t.Fatalf("migration ledger = %v, want complete 0001-0032 chain", migrationIDs)
 	}
 	if !db.Migrator().HasIndex("usage_stats", "idx_usage_stats_group_bucket") {
 		t.Fatal("usage_stats group activity index is missing")

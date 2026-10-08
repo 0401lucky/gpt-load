@@ -117,7 +117,12 @@ var migrations = []migration{
 	{ID: migrationfiles.ID0024, Up: migrationfiles.Up0024, Validate: migrationfiles.Validate0024, ValidateRecoverable: migrationfiles.ValidateRecoverable0024},
 	{ID: migrationfiles.ID0025, Up: migrationfiles.Up0025, Validate: migrationfiles.Validate0025, ValidateRecoverable: migrationfiles.ValidateRecoverable0025},
 	{ID: migrationfiles.ID0026, Up: migrationfiles.Up0026, Validate: migrationfiles.Validate0026, ValidateRecoverable: migrationfiles.ValidateRecoverable0026},
-	{ID: migrationfiles.ID0027, Up: migrationfiles.Up0027, Validate: migrationfiles.Validate0027, ValidateRecoverable: migrationfiles.ValidateRecoverable0027},
+	{ID: migrationfiles.ID0027, Up: migrationfiles.Up0027, Validate: migrationfiles.Validate0027, ValidateCurrent: migrationfiles.ValidateCurrent0027, ValidateRecoverable: migrationfiles.ValidateRecoverable0027},
+	{ID: migrationfiles.ID0028, Up: migrationfiles.Up0028, Validate: migrationfiles.Validate0028, ValidateRecoverable: migrationfiles.ValidateRecoverable0028},
+	{ID: migrationfiles.ID0029, Up: migrationfiles.Up0029, Validate: migrationfiles.Validate0029, ValidateRecoverable: migrationfiles.ValidateRecoverable0029},
+	{ID: migrationfiles.ID0030, Up: migrationfiles.Up0030, Validate: migrationfiles.Validate0030, ValidateRecoverable: migrationfiles.ValidateRecoverable0030},
+	{ID: migrationfiles.ID0031, Up: migrationfiles.Up0031, Validate: migrationfiles.Validate0031, ValidateRecoverable: migrationfiles.ValidateRecoverable0031},
+	{ID: migrationfiles.ID0032, Up: migrationfiles.Up0032, Validate: migrationfiles.Validate0032, ValidateRecoverable: migrationfiles.ValidateRecoverable0032},
 }
 
 func applyMigrations(db *gorm.DB) error {

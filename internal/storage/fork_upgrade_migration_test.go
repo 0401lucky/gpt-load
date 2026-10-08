@@ -13,19 +13,40 @@ import (
 
 func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 	t.Parallel()
+	for _, test := range []struct {
+		name   string
+		nextID string
+		count  int
+	}{
+		{name: "24_to_32", nextID: migrationfiles.ID0025, count: 24},
+		{name: "27_to_32", nextID: migrationfiles.ID0028, count: 27},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			testForkMigrationUpgrade(t, test.nextID, test.count)
+		})
+	}
+}
+
+func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
+	t.Helper()
 	db := openInternalMigrationTestDatabase(t)
-	index := migrationIndexByID(t, migrationfiles.ID0025)
-	if index != 24 {
-		t.Fatalf("published migration prefix length = %d, want 24", index)
+	index := migrationIndexByID(t, nextID)
+	if index != publishedCount {
+		t.Fatalf("published migration prefix length = %d, want %d", index, publishedCount)
 	}
 	if err := applyMigrationRegistry(db, migrations[:index]); err != nil {
 		t.Fatalf("create published fork schema: %v", err)
 	}
-	if db.Migrator().HasTable("rpm_stats") ||
-		db.Migrator().HasColumn("access_keys", "concurrency_limit") ||
-		db.Migrator().HasColumn("request_logs", "first_output_ms") ||
-		db.Migrator().HasColumn("request_logs", "last_output_ms") {
+	if db.Migrator().HasTable("proxies") ||
+		db.Migrator().HasColumn("credentials", "name") ||
+		db.Migrator().HasColumn("groups", "priority") ||
+		db.Migrator().HasColumn("request_logs", "client_ip") {
 		t.Fatal("published schema already contains pending upstream migrations")
+	}
+	if publishedCount == 27 && (!db.Migrator().HasColumn("request_logs", "first_output_ms") ||
+		!db.Migrator().HasColumn("request_logs", "last_output_ms")) {
+		t.Fatal("published 0027 schema is missing its output timing columns")
 	}
 
 	credentialID, itemID, acceptedAtMS := uint(29), uint(37), int64(123456)
@@ -71,7 +92,14 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 		},
 	}
 	for _, fixture := range fixtures {
-		if err := db.Create(fixture).Error; err != nil {
+		query := db
+		switch fixture.(type) {
+		case *models.Group:
+			query = db.Omit("Priority")
+		case *models.Credential:
+			query = db.Omit("Name")
+		}
+		if err := query.Create(fixture).Error; err != nil {
 			t.Fatalf("create legacy %T: %v", fixture, err)
 		}
 	}
@@ -84,22 +112,36 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 		Protocol: "openai-responses", ClientModel: "test-model", UpstreamModel: "test-model", Status: "success", StatusCode: 200,
 		DurationMs: 900, OutputTokens: 23,
 	}
-	if err := db.Omit("FirstOutputMs", "LastOutputMs").Create(&request).Error; err != nil {
+	if err := db.Omit("ClientIP").Create(&request).Error; err != nil {
 		t.Fatalf("create legacy request: %v", err)
+	}
+	if publishedCount == 27 {
+		if err := db.Table("request_logs").Where("id = ?", request.ID).
+			Updates(map[string]any{"first_output_ms": 100, "last_output_ms": 800}).Error; err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := db.Table("request_log_attempts").Create(map[string]any{
+		"request_id": request.ID, "sequence": 1, "completed_at_ms": request.CompletedAtMS,
+		"group_id": 17, "group_name": "fork group", "credential_id": credentialID,
+		"status_code": 200, "duration_ms": 900, "failure_category": "ok", "action": "terminate",
+		"error_summary": "", "pricing_receipt": `{"preserved":true}`,
+	}).Error; err != nil {
+		t.Fatalf("create legacy request attempt: %v", err)
 	}
 
 	var oldLedger []string
 	if err := db.Table(migrationLedgerTable).Order("id").Pluck("id", &oldLedger).Error; err != nil {
 		t.Fatal(err)
 	}
-	if len(oldLedger) != 24 {
-		t.Fatalf("old ledger length = %d, want 24", len(oldLedger))
+	if len(oldLedger) != publishedCount {
+		t.Fatalf("old ledger length = %d, want %d", len(oldLedger), publishedCount)
 	}
-	// Preserve every original column, including identity, ciphertext, timestamps,
-	// notes, immutable donation receipts and cached-token usage components.
+	// Preserve all original columns except the explicitly retired output timing,
+	// including identity, ciphertext, timestamps, notes, donation receipts and usage.
 	snapshots := make(map[string]forkUpgradeTableSnapshot)
 	for _, table := range []string{
-		"groups", "credentials", "access_keys", "request_logs", "usage_stats",
+		"groups", "credentials", "access_keys", "request_logs", "request_log_attempts", "usage_stats", "schema_migrations",
 		"donation_identities", "donation_batches", "donation_items", "donation_resources",
 		"donation_review_actions", "donation_retries",
 	} {
@@ -109,14 +151,21 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 		}
 		var names []string
 		for _, column := range columns {
+			if table == "request_logs" && (column.Name() == "first_output_ms" || column.Name() == "last_output_ms") {
+				continue
+			}
 			names = append(names, column.Name())
 		}
 		snapshots[table] = forkUpgradeTableSnapshot{columns: names, rows: readForkUpgradeRows(t, db, table, names)}
-		if len(snapshots[table].rows) != 1 {
+		if table != "schema_migrations" && len(snapshots[table].rows) != 1 {
 			t.Fatalf("fixture %s does not contain exactly one row", table)
 		}
 	}
-	wantLedger := append(slices.Clone(oldLedger), "0025_rpm_stats", "0026_access_key_concurrency", "0027_request_log_output_timing")
+	wantLedger := slices.Clone(oldLedger)
+	if publishedCount == 24 {
+		wantLedger = append(wantLedger, "0025_rpm_stats", "0026_access_key_concurrency", "0027_request_log_output_timing")
+	}
+	wantLedger = append(wantLedger, "0028_proxy_catalog", "0029_credential_names", "0030_remove_request_log_output_timing", "0031_request_log_client_ip", "0032_group_priority")
 	for run := range 2 {
 		if err := AutoMigrate(db); err != nil {
 			t.Fatalf("migration run %d: %v", run+1, err)
@@ -129,7 +178,11 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 			t.Fatalf("migration run %d ledger = %v, want %v", run+1, ledger, wantLedger)
 		}
 		for table, snapshot := range snapshots {
-			if rows := readForkUpgradeRows(t, db, table, snapshot.columns); !reflect.DeepEqual(rows, snapshot.rows) {
+			query := db
+			if table == "schema_migrations" {
+				query = db.Where("id IN ?", oldLedger)
+			}
+			if rows := readForkUpgradeRows(t, query, table, snapshot.columns); !reflect.DeepEqual(rows, snapshot.rows) {
 				t.Errorf("migration run %d changed existing %s rows", run+1, table)
 			}
 		}
@@ -139,15 +192,22 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 		}
 		var defaults struct {
 			ConcurrencyLimit *int64
-			FirstOutputMs    *int64
-			LastOutputMs     *int64
+			Name             string
+			Priority         int32
+			ClientIP         *string
 		}
-		if err := db.Raw(`SELECT concurrency_limit, first_output_ms, last_output_ms
-			FROM access_keys JOIN request_logs ON request_logs.access_key_id = access_keys.id`).Scan(&defaults).Error; err != nil {
+		if err := db.Raw(`SELECT access_keys.concurrency_limit, credentials.name, groups.priority, request_logs.client_ip
+			FROM request_logs JOIN access_keys ON request_logs.access_key_id = access_keys.id
+			JOIN credentials ON request_logs.credential_id = credentials.id
+			JOIN groups ON credentials.group_id = groups.id`).Scan(&defaults).Error; err != nil {
 			t.Fatal(err)
 		}
-		if defaults.ConcurrencyLimit != nil || defaults.FirstOutputMs != nil || defaults.LastOutputMs != nil {
-			t.Fatalf("migration run %d invented legacy concurrency or output timing: %+v", run+1, defaults)
+		if defaults.ConcurrencyLimit != nil || defaults.Name != "" || defaults.Priority != 0 || defaults.ClientIP != nil {
+			t.Fatalf("migration run %d invented legacy values: %+v", run+1, defaults)
+		}
+		assertOutputTimingRemoved(t, db)
+		if !db.Migrator().HasTable("proxies") {
+			t.Fatal("proxy catalog is missing")
 		}
 	}
 }
@@ -160,6 +220,9 @@ type forkUpgradeTableSnapshot struct {
 func readForkUpgradeRows(t *testing.T, db *gorm.DB, table string, columns []string) []map[string]any {
 	t.Helper()
 	var rows []map[string]any
+	if table == migrationLedgerTable {
+		db = db.Order("id")
+	}
 	if err := db.Table(table).Select(columns).Find(&rows).Error; err != nil {
 		t.Fatalf("read %s: %v", table, err)
 	}
