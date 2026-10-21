@@ -1,0 +1,14 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端层准则和必读路由"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"已发布迁移冻结、上游编号顺延、可信额度周期与精确用量边界"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"gateway/state/health/control 依赖边界和装配"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"固定质量门禁、独立 CPA module、测试约定"}
+{"file":".trellis/spec/backend/runtime-settings.md","reason":"上游错误规则与 fork 分组冷却开关的配置边界"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"控制面和网关错误出口"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"请求体记录、诊断和敏感信息日志边界"}
+{"file":".trellis/spec/frontend/index.md","reason":"两套 Vue 前端准则与必读路由"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"备注/别名及批量测试 API 投影、缓存与竞态保护"}
+{"file":".trellis/spec/frontend/design-system.md","reason":"mobile 与代理表单合并遵循既有 UI 组件"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端 lint/styles、format、build 与禁止额外测试框架"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"保留 fork 和上游三语言文案"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"持久化、状态、API、前端字段与恢复合同"}
+{"file":".trellis/tasks/archive/2026-10/10-21-merge-upstream-october-21/research/recon.md","reason":"固定输入、冲突 owner、编号映射及易漏触点"}

@@ -1,0 +1,15 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端规范合规"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"完整门禁及独立 CPA 检查"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"迁移前缀、数据保存、可信周期与恢复的交叉验证"}
+{"file":".trellis/spec/backend/directory-structure.md","reason":"包依赖边界"}
+{"file":".trellis/spec/backend/runtime-settings.md","reason":"配置投影和分组作用域"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"API 错误出口与诊断"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"请求日志和诊断敏感字段"}
+{"file":".trellis/spec/backend/container-publishing.md","reason":"保留 fork GHCR 和开发版本发布合同"}
+{"file":".trellis/spec/frontend/index.md","reason":"前端合规路由"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"name/note 保存、缓存与批量测试交互"}
+{"file":".trellis/spec/frontend/design-system.md","reason":"移动布局和组件合同"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"静态门禁和生命周期清理"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"三语言文案一致"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"跨层合同和自动合并审查"}
+{"file":".trellis/tasks/archive/2026-10/10-21-merge-upstream-october-21/research/recon.md","reason":"合并输入、17 冲突与专项验收依据"}
