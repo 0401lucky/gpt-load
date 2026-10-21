@@ -11,6 +11,7 @@ import (
 
 	"gpt-load/internal/dialect"
 	"gpt-load/internal/execution"
+	"gpt-load/internal/health"
 	"gpt-load/internal/platform/config"
 	"gpt-load/internal/protocol"
 	"gpt-load/internal/state"
@@ -170,6 +171,183 @@ func TestRateLimitResetHintCooldownFollowsGroupSwitch(t *testing.T) {
 			if elapsed := until.Sub(issued); elapsed < test.want-30*time.Second || elapsed > test.want+30*time.Second {
 				t.Fatalf("cooldown = %v from request time, want about %v", elapsed, test.want)
 			}
+			checkpoint := registry.CaptureRuntimeCheckpoint()[0]
+			if len(checkpoint.ModelCooldowns) != 0 || !checkpoint.QuotaModelCooldowns["gpt-4o"].Equal(until) {
+				t.Fatalf("builtin model limit was stored as ordinary cooldown: %+v", checkpoint)
+			}
+			cycles := registry.GroupModelCycles(1, time.Now())[1]
+			if len(cycles) != 1 || !cycles[0].CycleStart.IsZero() {
+				t.Fatalf("first quota rejection rewrote current cycle: %+v", cycles)
+			}
+			reset := cycles[0].NextReset
+			if test.enabled {
+				if elapsed := reset.Sub(issued); elapsed < 3*time.Hour+18*time.Minute-30*time.Second || elapsed > 3*time.Hour+18*time.Minute+30*time.Second {
+					t.Fatalf("trusted quota reset included the retry margin: %v", elapsed)
+				}
+			} else if !reset.IsZero() {
+				t.Fatalf("disabled hint established a quota cycle: %+v", cycles)
+			}
+			if !registry.RestoreQuotaCooldowns(1) || len(registry.ModelCooldowns(1, time.Now())) != 0 {
+				t.Fatal("quota recovery left a duplicate ordinary cooldown")
+			}
+			cycles = registry.GroupModelCycles(1, time.Now())[1]
+			if test.enabled && (len(cycles) != 1 || !cycles[0].NextReset.Equal(reset) || !cycles[0].CooldownUntil.IsZero()) {
+				t.Fatalf("quota recovery changed trusted model cycle: %+v", cycles)
+			}
 		})
+	}
+}
+
+func TestQuotaRecoveryAllowsGatewayRequestsAgain(t *testing.T) {
+	forwarder := &scriptedForwarder{results: []UpstreamResult{
+		{StatusCode: 429, Header: http.Header{"Retry-After": {"172800"}}, Body: []byte(`{"error":{"type":"usage_limit_reached"}}`),
+			RequestWritten: true, DispatchState: execution.DispatchMaybeSent, ExecutionError: &execution.ErrorEvidence{
+				Kind: execution.ErrorKindHTTP, Hint: execution.FailureHintRateLimited, StatusCode: 429, Type: "usage_limit_reached"}},
+		successfulAffinityResult(),
+	}}
+	engine, _, _, registry := newRequestLogHandlerTestRuntime(t, forwarder, &recordingAccessKeyRPMLimiter{}, &recordingRequestLogSink{}, "sk-one")
+	for index, want := range []int{429, 200} {
+		if index == 1 {
+			registry.RestoreQuotaCooldowns(1)
+		}
+		request := httptest.NewRequest(http.MethodPost, "/v1/chat/completions", strings.NewReader(`{"model":"gpt-4o","messages":[]}`))
+		request.Header.Set("Authorization", "Bearer gl-client")
+		response := httptest.NewRecorder()
+		engine.ServeHTTP(response, request)
+		if response.Code != want {
+			t.Fatalf("request %d returned %d, want %d: %s", index, response.Code, want, response.Body.String())
+		}
+	}
+	if len(forwarder.inputs) != 2 {
+		t.Fatalf("attempts = %d, want 2", len(forwarder.inputs))
+	}
+}
+
+func TestModelQuotaCooldownWithoutModelDoesNotCooldownAccount(t *testing.T) {
+	handler, _, registry := newHandlerForTest(t, &scriptedForwarder{})
+	if err := registry.ReplaceCredentials([]state.CredentialEntry{{ID: 1, GroupID: 1,
+		Version: 1, IdentityGeneration: 1, Status: state.CredentialStatusActive,
+		Fingerprint: "fixture", EncryptedValue: "fixture"}}); err != nil {
+		t.Fatal(err)
+	}
+	now := time.Now()
+	ref, _ := registry.CredentialRef(1)
+	handler.applyDecisionEffectWithBlacklistPolicy(ref, 0, health.Decision{
+		Category: health.FailureCategoryRateLimited, Effect: health.EffectCooldownModel,
+		CooldownUntil: now.Add(time.Hour), RuleID: "rate_limit.retry_after", QuotaCooldown: true,
+	}, 429, now, 0, "")
+	view := registry.Snapshot()[0]
+	if !view.CooldownUntil.IsZero() || len(view.ModelCooldowns) != 0 {
+		t.Fatalf("missing model created a cooldown: %#v", view)
+	}
+}
+
+func TestQuotaRecoveryPreservesCustomAndRefreshCooldowns(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		model     string
+		custom    bool
+		committed bool
+		refresh   bool
+	}{
+		{name: "builtin account"},
+		{name: "builtin committed model", model: "model", committed: true},
+		{name: "custom unsafe account", custom: true},
+		{name: "custom unsafe model", model: "model", custom: true},
+		{name: "custom committed account", custom: true, committed: true},
+		{name: "custom committed model", model: "model", custom: true, committed: true},
+		{name: "token refresh", refresh: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			handler, _, registry := newHandlerForTest(t, &scriptedForwarder{})
+			if err := registry.ReplaceCredentials([]state.CredentialEntry{{ID: 1, GroupID: 1, Version: 1, IdentityGeneration: 1,
+				Status: state.CredentialStatusActive, Fingerprint: "fixture", EncryptedValue: "fixture"}}); err != nil {
+				t.Fatal(err)
+			}
+			now := time.Now().UTC().Truncate(time.Millisecond)
+			effect, scope := health.EffectCooldownCredential, execution.ErrorScopeCredential
+			if test.model != "" {
+				effect, scope = health.EffectCooldownModel, execution.ErrorScopeModel
+			}
+			ctx := health.DecisionContext{Method: http.MethodPost, Operation: execution.OperationChatCompletion}
+			if test.custom {
+				var err error
+				ctx.ErrorRules, err = health.CompileErrorRules([]health.ErrorRule{{StatusCodes: []int{200, 429},
+					Retry: health.RetryNextCandidate, Effect: effect, CooldownSeconds: 600}}, "group")
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			attempt := health.ExecutionAttempt{DispatchState: execution.DispatchMaybeSent, StatusCode: 429, Now: now,
+				DownstreamCommitted: test.committed, Evidence: &execution.ErrorEvidence{Kind: execution.ErrorKindHTTP,
+					StatusCode: 429, Hint: execution.FailureHintRateLimited, OriginHint: execution.ErrorOriginUpstream,
+					ScopeHint: scope, ReplaySafety: execution.ReplaySafetyUnknown}}
+			if test.committed {
+				attempt.StatusCode, attempt.Evidence.Kind = 200, execution.ErrorKindProvider
+				attempt.Evidence.ReplaySafety = execution.ReplaySafetyRejectedBeforeProcessing
+			}
+			if test.refresh {
+				attempt.DispatchState, attempt.Evidence.Hint = execution.DispatchNotSent, execution.FailureHintRefreshUnavailable
+			}
+			decision := health.JudgeExecution(attempt, ctx)
+			if decision.Effect != effect {
+				t.Fatalf("effect = %s, want %s", decision.Effect, effect)
+			}
+			ref, _ := registry.CredentialRef(1)
+			handler.applyDecisionEffectWithBlacklistPolicy(ref, 0, decision, attempt.StatusCode, now, 0, test.model)
+			registry.RestoreObservedQuotaCooldowns(1, now.Add(time.Second).UnixMilli())
+			view := registry.Snapshot()[0]
+			until := view.CooldownUntil
+			if test.model != "" {
+				until = view.ModelCooldowns[test.model]
+			}
+			if wantCleared := !test.custom && !test.refresh; until.IsZero() != wantCleared {
+				t.Fatalf("rule %s: cooldown cleared = %t, want %t", decision.RuleID, until.IsZero(), wantCleared)
+			}
+		})
+	}
+}
+
+func TestGatewayRejectsTrustedResetFromResponseBeforeQuotaRecovery(t *testing.T) {
+	for _, custom := range []bool{false, true} {
+		handler, _, registry := newHandlerForTest(t, &scriptedForwarder{})
+		if err := registry.ReplaceCredentials([]state.CredentialEntry{{ID: 1, GroupID: 1, Version: 1, IdentityGeneration: 1,
+			Status: state.CredentialStatusActive, Fingerprint: "fixture", EncryptedValue: "fixture"}}); err != nil {
+			t.Fatal(err)
+		}
+		now := time.Now().UTC().Truncate(time.Millisecond)
+		ctx := health.DecisionContext{Method: http.MethodPost, Operation: execution.OperationChatCompletion, RateLimitResetHint: true}
+		if custom {
+			var err error
+			ctx.ErrorRules, err = health.CompileErrorRules([]health.ErrorRule{{StatusCodes: []int{429},
+				Retry: health.RetryNone, Effect: health.EffectCooldownModel, CooldownSeconds: 60}}, "group")
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		decision := health.JudgeExecution(health.ExecutionAttempt{DispatchState: execution.DispatchMaybeSent, StatusCode: 429, Now: now,
+			Evidence: &execution.ErrorEvidence{Kind: execution.ErrorKindHTTP, StatusCode: 429,
+				OriginHint: execution.ErrorOriginUpstream, Hint: execution.FailureHintRateLimited,
+				Summary: "Daily free limit reached on model model-a. Try again in 3h 18m"}}, ctx)
+		if decision.Effect != health.EffectCooldownModel || decision.QuotaResetAt.IsZero() {
+			t.Fatalf("fixture did not produce trusted model reset: %+v", decision)
+		}
+		before, _ := registry.CredentialRef(1)
+		registry.RestoreQuotaCooldowns(1)
+		handler.applyDecisionEffectWithBlacklistPolicy(before, 0, decision, 429, now, 0, "model-a")
+		if cycles := registry.GroupModelCycles(1, now)[1]; len(cycles) != 0 {
+			t.Fatalf("custom=%t: stale response reintroduced quota evidence: %+v", custom, cycles)
+		}
+		after, _ := registry.CredentialRef(1)
+		handler.applyDecisionEffectWithBlacklistPolicy(after, 0, decision, 429, now, 0, "model-a")
+		cycles := registry.GroupModelCycles(1, now)[1]
+		if len(cycles) != 1 || !cycles[0].NextReset.Equal(decision.QuotaResetAt) || !cycles[0].CooldownUntil.Equal(decision.CooldownUntil) {
+			t.Fatalf("post-recovery response did not save both fields: %+v", cycles)
+		}
+		registry.RestoreQuotaCooldowns(1)
+		cycles = registry.GroupModelCycles(1, now)[1]
+		if len(cycles) != 1 || !cycles[0].NextReset.Equal(decision.QuotaResetAt) || cycles[0].CooldownUntil.IsZero() != !custom {
+			t.Fatalf("custom=%t: recovery changed cycle or wrong cooldown cause: %+v", custom, cycles)
+		}
 	}
 }

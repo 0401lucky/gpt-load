@@ -139,11 +139,13 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 
 ### 模型冷却与额度周期的证据边界
 
-- **触发场景**：限流后的调度等待到期不等于额度重置。不能将 `CooldownUntil` 无条件写入 `ModelNextResets`，否则每次默认 60 秒冷却都可能过滤掉此前用量。
-- **写入契约**：`health.Decision.QuotaResetAt` / `QuotaResetSource` 独立表达可信额度证据，gateway 经 `SetModelCooldownWithReset(ref, model, until, reset, now)` 原子更新状态；普通 `SetModelCooldown` 只更新冷却。身份/代次必须匹配，重置必须晚于当前时间；冷却期限不延长也不能吞掉新的可信证据。
-- **可信来源**：当前 `ParseQuotaResetHint` 仅接受已实测的 `Daily free limit reached on model … Try again in …` 格式。一般 `Try again in`、默认等待和 `Retry-After` 不是额度证明。调度用 `ParseResetHint` 的一分钟安全余量及钳制不能作为真实周期边界；仅因 HTTP 200/0 也不能排除响应体中的限流证据。
-- **检查点兼容**：只有 `model_cycle_version=1` 的周期锚点可以恢复。旧版/未知版本保留冷却、健康状态，但不信任旧周期，界面退回 `fallback_24h`；不得按冷却时长猜测或改写历史 token。
-- **用例与回归**：普通冷却跨过终点后用量仍可见；可信重置到期后才进入新周期；重复提示不提前截断当前周期；旧检查点保留调度、新检查点恢复可信周期；验证 buffer 与统计时间分离。完整已知 token 可为零，而 missing 必须在 UI 明示，不能以均值补账。
+1. **触发场景**：限流后的调度等待到期不等于额度重置；订阅额度恢复可能提前解除额度冷却，不能因此重置用量窗口。
+2. **签名**：`health.Decision` 独立携带 `QuotaCooldown`、`QuotaResetAt`、`QuotaResetSource`。gateway 对额度模型冷却调用 `SetQuotaCooldownWithReset(ref, model, until, reset, now) (accepted, changed bool)`，普通/custom 模型冷却调用 `SetModelCooldownWithReset`；账号额度冷却调用 `SetQuotaCooldown(ref, "", until, now)`。`RestoreQuotaCooldowns(id)` / `RestoreObservedQuotaCooldowns(id, observedAtMS)` 只恢复额度冷却。
+3. **状态合同**：`QuotaCooldownUntil` / `QuotaModelCooldowns` 保存额度冷却，`CooldownUntil` / `ModelCooldowns` 保存其他冷却；`ModelCycleStarts` / `ModelNextResets` 保存可信周期。写入在 registry 同一锁内校验组、身份和模型恢复代次；额度冷却及任何非零 trusted reset 还需匹配 `QuotaCooldownGeneration`。恢复只清额度地图并推进该代次，即使没有现存冷却也要拒绝恢复前的在途额度结果；保留普通冷却、黑名单、失败状态和周期。`RuntimeView` / `ModelCooldowns` / `GroupModelCycles` 合并两类有效期限，统计只读可信周期。重建后 `SchedulingState` 必须同步实际保留后的 buckets，不能使用尚未保留运行时状态的原始输入 entries。
+4. **校验矩阵**：模型为空/含外围空白、期限不晚于 now、非零 reset 不晚于 now、身份或恢复代次不匹配 → 拒绝模型状态写入。普通无 reset 冷却不因额度恢复而被拒绝。额度观察时间不严格晚于最近额度拒绝 → 不解除冷却。只有 `model_cycle_version=1` 恢复周期；旧/未知 checkpoint 版本保留健康冷却、丢弃周期并回退 `fallback_24h`。
+5. **正常/基础/异常样例**：较长冷却中收到较短冷却但新的可信 reset，仍保存 reset；额度恢复后用量窗口/token 不变，普通冷却仍有效；重复提示不提前截断周期。可信来源仅为已验证的 `Daily free limit reached on model … Try again in …`；一般 `Try again in`、默认 60 秒及 `Retry-After` 均不产生周期。`ParseResetHint` 的一分钟余量/钳制只用于调度，不能进入统计边界；HTTP 200/0 的正文仍可能提供限流证据。
+6. **必要回归**：`quota_model_cycle_test.go` 覆盖两套地图与可信 reset、恢复后的旧在途写回拒绝、精确快照/重建/checkpoint/身份变化、`ReplaceCredentials` 调度投影；`gateway/model_cooldown_test.go` 覆盖配置链与余量分离，`health/model_cooldown_test.go` 覆盖内置/custom/已提交作用域，`control/group_model_usage_test.go` 验证恢复不截断真实用量。旧版 checkpoint 和 missing/partial 用量提示仍须覆盖。
+7. **错误/正确**：错误：把 `CooldownUntil` 当作周期证据，或先写普通冷却再补额度冷却。正确：按决策选择一种冷却地图，并在同一身份/代次校验与锁内独立保存可信 reset；恢复额度时保持周期和其他健康状态。
 
 ## 迁移
 
@@ -152,7 +154,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0032
+    // ... 至 ID0033
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -174,6 +176,7 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
   - 反例：把 fork 迁移整体顺延到上游之后（2026-09-20 曾采用）会让已上线库的账本中段与注册表错位，每次合并都要停机 + 删账本行 + 重放迁移。
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
 - 2026-10-08 新链尾：上游 `0025_proxy_catalog`、`0026_credential_names`、`0027_remove_request_log_output_timing`、`0028_request_log_client_ip`、`0029_group_priority` 分别顺延为 fork `0028`–`0032`；旧 `0001`–`0027` 生产迁移文件保持原样。
+- 2026-10-21 当前链尾：上游 `0030_request_body_recording` 追加为 fork `0033_request_body_recording`；旧 `0001`–`0032` 生产迁移 Git blob 保持不变。`accessKey0030`、`requestLogBody0030` 和实际表/约束名字保留上游形态。
 - **上游迁移测试常硬编码注册表下标**（`migrations[:18]`、`migrations[19]`、`migrations[:20]`）。顺延编号后这些下标会指向别的迁移：要么直接失败，要么**静默测错对象却仍然通过**。合并上游并顺延编号时，必须把这类文件改成按 ID 定位（先例：`autoDecisionAttributionMigrationIndex`、`clientModelOverrideMigrationIndex`、`requestAuditMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
@@ -193,8 +196,8 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 2. **签名**：新文件定义 `ValidateCurrent0027(*gorm.DB) error`；注册表将其挂在旧 `ID0027` 的 `ValidateCurrent`，旧文件与严格 `Validate0027` 保持冻结。
 3. **合同**：仅账本有 `ID0030` 时允许按新结构校验；MySQL 的 `ID0030#building` 可进入恢复校验。上游旧 `0024` 的所有校验引用在 fork 指向 `0027`，不可误指 `0024_request_audit`。
 4. **错误矩阵**：无清理账本但缺列 → 拒绝；有孤立约束或错误删除顺序 → 拒绝；合法清理完成 → 重启成功；MySQL 合法中断 → 继续恢复。
-5. **样例**：27→32 保留业务数据并移除两列；新库直接到32；仅手工删除旧列不构成升级证据。
-6. **断言**：`fork_upgrade_migration_test.go` 覆盖24/27→32及幂等，`remove_output_timing_migration_test.go` 覆盖无证据缺列、错误顺序与恢复。SQL查询预算按完整fork schema校准，重启元数据门槛仍需保留。
+5. **样例**：27→33 保留业务数据并由既有0030移除两列；32→33只追加请求体记录；新库直接到33；仅手工删除旧列不构成升级证据。
+6. **断言**：`fork_upgrade_migration_test.go` 覆盖24/27/32→33及关闭重开幂等，`remove_output_timing_migration_test.go` 覆盖无证据缺列、错误顺序与恢复。SQL查询预算按完整fork schema校准，重启元数据门槛仍需保留。
 7. **错误/正确**：只重编号新 `ID0030` 会留下旧校验引用错位；正确做法同时映射跨迁移引用和 `ValidateCurrent` 注册，并验证重复启动。
 
 方言分支（改迁移时最容易踩的地方）：
@@ -203,6 +206,16 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 - **MySQL**（`migration_recovery.go`）：DDL 隐式提交，用 `<id>#building` **恢复标记** + `ValidateRecoverable` 门禁，最后在真事务里 delete 标记、insert 正式 ID。
 - **网络库迁移锁**（`migration_lock.go`）：`SELECT GET_LOCK('gpt-load:schema-migrations:v2', 60)` / `pg_try_advisory_lock(hashtext(?))`，带 100ms 重试循环。
 - **迁移后完整性**：`migration_validation.go` 跑 `PRAGMA foreign_key_check`（仅 SQLite）。
+
+### 请求体记录与追加迁移 0033
+
+1. **适用范围**：访问密钥显式开启客户端请求体记录；与错误诊断摘要的脱敏链分开，由 gateway/telemetry/requestlog/control 传递。
+2. **签名与结构**：`AccessKey.RecordRequestBody bool` ↔ `record_request_body`，默认 false；`ID0033` 注册 `Up0033` / `Validate0033` / `ValidateRecoverable0033`。`request_log_bodies(request_id PK/FK → request_logs.id ON DELETE CASCADE, state, original_bytes, body)` 保存记录，`GET /api/logs/:request_id` 的 `request_body` 为 null 或 `{state, original_bytes, body}`。
+3. **合同**：仅开启开关的访问密钥记录客户端原始 HTTP 正文及 WebSocket turn frame；不开启时不记录。管理员和该访问密钥本人可在既有日志可见范围内查看，读取正文前必须先确认日志归属。正文表随请求日志删除，永久小时用量不受影响。原样正文最多 256 KiB；较大合法 JSON 仅截断字符串值，仍放不下则只留状态/原始大小；待写正文预算为 64 MiB。详情格式化不得超过 1 MiB，超出时返回存储文本。
+4. **校验与错误矩阵**：`original` / `truncated` 必须有正文；`non_json` / `too_large` / `queue_full` 正文必须 null；非法 state、负 original_bytes、孤立 request_id 均由数据库约束拒绝。未记录 → request_body=null；越权请求 ID → 既有 unauthorized/not-found 出口，不能直接读取正文绕过归属。
+5. **正常/基础/异常样例**：旧32条链升级只追加0033且开关关闭；显式开启后保存请求正文，二次启动保持开关/正文；未开启、非法JSON、过大或队列预算不足按对应状态处理。旧 fixture 用当前模型建行时 `Omit("RecordRequestBody")`，避免写入尚不存在的列。
+6. **必要回归**：`request_body_recording_migration_test.go` 按 `ID0033` 定位 fresh/upgrade/interrupted 边界、FK/check/cascade；`fork_upgrade_migration_test.go` 核对旧账本严格前缀与业务/身份/备注/捐献逐列数据保留；gateway 断言 opt-in HTTP/WebSocket，control 断言 admin/owner 读取与格式化预算，requestlog 断言持久化/留存/队列预算。真实 MySQL/PostgreSQL 未配置 DSN 时必须注明未实测。
+7. **错误/正确**：错误：用上游0030覆盖 fork 已发布0030，或按 `migrations[:29]` 测试错误边界。正确：只追加0033，保持内部DDL名称与旧32个迁移 blob，并以语义ID定位升级测试、验证关闭重开及重复执行。
 
 ---
 

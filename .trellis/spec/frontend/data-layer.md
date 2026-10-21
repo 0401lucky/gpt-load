@@ -196,6 +196,16 @@ if (!isCurrent(owner, controller)) return      // 过期响应直接丢弃
 6. **验证**：`CredentialDetailPanel.vue` 和 `GroupCredentials.vue` 两个名称保存入口均检查缓存和草稿；后端 `TestCredentialNameAndNoteUpdatesPreserveIdentityHealthAndModelCycles` 覆盖响应区别及组合写入。前端沿用 lint/type-check/build 门禁。
 7. **错误/正确**：直接缓存 classic 响应投影会丢失 modern 专属字段；正确做法在明确已知当前字段的边界合并缓存，保持两套 DTO 各自严格。
 
+### Modern 单项诊断与批量凭据测试
+
+1. **触发**：`CredentialTestDialog.vue` 同时服务单凭据测试和上游批量 API key 测试，异步响应必须属于当前对象及当前模型/协议。
+2. **签名**：props `{groupId: number; row?: CredentialRow; batchCount?: number}`；批量 emit `start(options: CredentialTestOptions)`，单项经资源/API 函数 `testCredential(..., signal)` / `restoreTestedCredential(..., proof, signal)`。
+3. **合同**：批量只 emit start，由共享 `useCredentialTestBatch` 管理轮次/取消；单项先捕获组、凭据ID和恢复proof，再创建 owner/controller。请求完成后只有 `mounted && owner === requestOwner && controller === requestController && !signal.aborted` 能写结果或emit。保留单项上游状态、错误摘要和重试等待文本插值；batch结果不显示单项恢复按钮。
+4. **校验矩阵**：row缺失或恢复proof缺失 → 不发单项请求；模型/协议/group/credential/batchCount变化或卸载 → 增加owner、abort并清除旧结果；旧成功/失败/finally → 不修改当前结果和pending。
+5. **正常/基础/异常样例**：选择1个凭据展示其诊断；批量模式在row为空时可正常启动；切换对象期间旧429返回不能覆盖新对象结果。恢复不能重复提交，也不能复用其他凭据的proof。
+6. **验证**：复核父级调用、共享批次控制器及诊断投影；执行前端 lint/styles、format、build/type-check，配合后端 `credential_probe` 诊断合同回归。沿用项目既有静态门禁，不引入前端测试框架。
+7. **错误/正确**：错误：直接访问 optional row，或等待请求后读取可能已变化的props写回。正确：请求前捕获身份/参数，废弃依赖变化后的owner，再在每个异步出口检查当前请求所有权。
+
 - ❌ 用 `as` 断言 DTO —— 必须走 projector。
 - ❌ 在组件里手写 `invalidateQueries` —— 去 `invalidation.ts` 登记。
 - ❌ 把未归一化的 filters 对象塞进 query key。

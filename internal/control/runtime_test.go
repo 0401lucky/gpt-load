@@ -152,6 +152,69 @@ func TestRuntimeRunsOperationRecoveryUntilCancellation(t *testing.T) {
 	awaitSignal(t, done)
 }
 
+type controlledModelCatalog struct {
+	started  chan struct{}
+	returned chan struct{}
+}
+
+func (catalog *controlledModelCatalog) Run(ctx context.Context) {
+	close(catalog.started)
+	<-ctx.Done()
+	close(catalog.returned)
+}
+
+type controlledDonationRecovery struct {
+	started  chan struct{}
+	release  chan struct{}
+	returned chan struct{}
+}
+
+func (recovery *controlledDonationRecovery) RunDonationRecovery(ctx context.Context) {
+	close(recovery.started)
+	<-ctx.Done()
+	<-recovery.release
+	close(recovery.returned)
+}
+
+func TestRuntimeKeepsDonationRecoveryAndCPAModelCatalogAliveTogether(t *testing.T) {
+	t.Parallel()
+	catalog := &controlledModelCatalog{started: make(chan struct{}), returned: make(chan struct{})}
+	recovery := &controlledDonationRecovery{
+		started: make(chan struct{}), release: make(chan struct{}), returned: make(chan struct{}),
+	}
+	runtime, _, created := newRuntimeHarness(newFakeValidationSweep(false), time.Now)
+	runtime.donationRecovery = recovery
+	runtime.cpaModelCatalog = catalog
+	cancel, done := startRuntime(t, runtime)
+	t.Cleanup(func() { close(recovery.release) })
+	awaitTickers(t, created)
+	awaitSignal(t, recovery.started)
+	awaitSignal(t, catalog.started)
+	cancel()
+	awaitSignal(t, catalog.returned)
+	select {
+	case <-done:
+		t.Fatal("runtime returned while donation recovery was still running")
+	default:
+	}
+	recovery.release <- struct{}{}
+	awaitSignal(t, recovery.returned)
+	awaitSignal(t, done)
+}
+
+func TestRuntimeRunsCPAModelCatalogUntilCancellation(t *testing.T) {
+	t.Parallel()
+	catalog := &controlledModelCatalog{started: make(chan struct{}), returned: make(chan struct{})}
+	runtime, _, created := newRuntimeHarness(newFakeValidationSweep(false), time.Now)
+	runtime.cpaModelCatalog = catalog
+	cancel, done := startRuntime(t, runtime)
+	awaitTickers(t, created)
+	awaitSignal(t, catalog.started)
+	cancel()
+	awaitSignal(t, catalog.returned)
+	awaitSignal(t, done)
+}
+
 func TestRuntimeSweepsRequestLogsImmediatelyAndHourlyWithoutOverlap(t *testing.T) {
 	t.Parallel()
 	base := time.Date(2026, time.July, 24, 12, 0, 0, 0, time.UTC)

@@ -21,7 +21,9 @@ type CredentialRuntimeCheckpoint struct {
 	ModelCycleStarts map[string]time.Time `json:"model_cycle_starts,omitempty"`
 	ModelNextResets  map[string]time.Time `json:"model_next_resets,omitempty"`
 	// Version 1 anchors originate exclusively from explicit quota reset hints.
-	ModelCycleVersion int `json:"model_cycle_version,omitempty"`
+	ModelCycleVersion   int                  `json:"model_cycle_version,omitempty"`
+	QuotaCooldownUntil  time.Time            `json:"quota_cooldown_until,omitempty"`
+	QuotaModelCooldowns map[string]time.Time `json:"quota_model_cooldowns,omitempty"`
 }
 
 // CaptureRuntimeCheckpoint returns detached runtime health state in stable
@@ -33,16 +35,18 @@ func (r *CredentialRegistry) CaptureRuntimeCheckpoint() []CredentialRuntimeCheck
 	for _, bucket := range r.buckets {
 		for _, entry := range bucket {
 			checkpoints = append(checkpoints, CredentialRuntimeCheckpoint{
-				ID:                 entry.ID,
-				GroupID:            entry.GroupID,
-				CooldownUntil:      entry.CooldownUntil,
-				Blacklisted:        entry.Blacklisted,
-				FailureCount:       entry.FailureCount,
-				IdentityGeneration: entry.IdentityGeneration,
-				ModelCooldowns:     cloneModelTimes(entry.ModelCooldowns),
-				ModelCycleStarts:   cloneModelTimes(entry.ModelCycleStarts),
-				ModelNextResets:    cloneModelTimes(entry.ModelNextResets),
-				ModelCycleVersion:  1,
+				ID:                  entry.ID,
+				GroupID:             entry.GroupID,
+				CooldownUntil:       entry.CooldownUntil,
+				Blacklisted:         entry.Blacklisted,
+				FailureCount:        entry.FailureCount,
+				IdentityGeneration:  entry.IdentityGeneration,
+				ModelCooldowns:      cloneModelTimes(entry.ModelCooldowns),
+				ModelCycleStarts:    cloneModelTimes(entry.ModelCycleStarts),
+				ModelNextResets:     cloneModelTimes(entry.ModelNextResets),
+				ModelCycleVersion:   1,
+				QuotaCooldownUntil:  entry.QuotaCooldownUntil,
+				QuotaModelCooldowns: cloneModelTimes(entry.QuotaModelCooldowns),
 			})
 		}
 	}
@@ -81,6 +85,9 @@ func (r *CredentialRegistry) RestoreRuntimeCheckpoint(checkpoints []CredentialRu
 		entry.FailureCount = checkpoint.FailureCount
 		if checkpoint.IdentityGeneration == entry.IdentityGeneration {
 			entry.ModelCooldowns = cloneModelTimes(checkpoint.ModelCooldowns)
+			entry.QuotaCooldownUntil = checkpoint.QuotaCooldownUntil
+			entry.QuotaModelCooldowns = cloneModelTimes(checkpoint.QuotaModelCooldowns)
+			pruneModelCooldowns(entry.QuotaModelCooldowns, time.Now())
 			pruneModelCooldowns(entry.ModelCooldowns, time.Now())
 			// 恢复路径只能做过期清理，不能复用 pruneModelCooldowns 的语义：
 			// 冷却此刻可能已经过期，但周期锚点必须活着。

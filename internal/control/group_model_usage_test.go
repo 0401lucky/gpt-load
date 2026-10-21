@@ -255,6 +255,37 @@ func TestGetGroupModelUsageKeepsCoolingRowsWithoutUsage(t *testing.T) {
 	}
 }
 
+func TestGroupModelUsageKeepsTrustedWindowAfterQuotaRecovery(t *testing.T) {
+	t.Parallel()
+	fixture, group, now := newGroupModelUsageFixture(t)
+	registerGroupModelUsageCredentials(t, fixture.registry, group.ID, 523)
+	ref, _ := fixture.registry.CredentialRef(523)
+	start, reset := hourBucket(now.Add(-3*time.Hour)), now.Add(3*time.Hour)
+	if accepted, changed := fixture.registry.SetQuotaCooldownWithReset(ref, groupModelUsageModelGLM, start, start, now.Add(-6*time.Hour)); !accepted || !changed {
+		t.Fatal("previous trusted reset was not recorded")
+	}
+	if accepted, changed := fixture.registry.SetQuotaCooldownWithReset(ref, groupModelUsageModelGLM, reset.Add(time.Minute), reset, now); !accepted || !changed {
+		t.Fatal("quota cooldown and current trusted reset were not recorded")
+	}
+	createGroupModelUsageStat(t, fixture, group.ID, 523, groupModelUsageModelGLM, start.Add(-time.Hour), 9)
+	createGroupModelUsageStat(t, fixture, group.ID, 523, groupModelUsageModelGLM, start.Add(time.Hour), 5)
+	engine := gin.New()
+	NewServer(&config.Config{AuthKey: authTestKey}, fixture.service).RegisterRoutes(engine)
+	before := requestGroupModelUsage(t, engine, group.ID)
+	if len(before.Items) != 1 || before.Items[0].WindowStartMS != start.UnixMilli() || before.Items[0].WindowSource != "reset" ||
+		before.Items[0].TotalTokens != 60 || before.Items[0].CooldownUntilMS == nil || *before.Items[0].CooldownUntilMS != reset.Add(time.Minute).UnixMilli() {
+		t.Fatalf("quota cooldown usage = %+v", before.Items)
+	}
+	if !fixture.registry.RestoreObservedQuotaCooldowns(523, now.Add(time.Second).UnixMilli()) {
+		t.Fatal("quota recovery was not applied")
+	}
+	after := requestGroupModelUsage(t, engine, group.ID)
+	if len(after.Items) != 1 || after.Items[0].WindowStartMS != before.Items[0].WindowStartMS || after.Items[0].WindowSource != "reset" ||
+		after.Items[0].TotalTokens != before.Items[0].TotalTokens || after.Items[0].RequestCount != before.Items[0].RequestCount || after.Items[0].CooldownUntilMS != nil {
+		t.Fatalf("quota recovery truncated or reset known usage: before=%+v, after=%+v", before.Items, after.Items)
+	}
+}
+
 func TestGetGroupModelUsageDropsRowsWithoutUsageOrCooldown(t *testing.T) {
 	t.Parallel()
 	fixture, group, now := newGroupModelUsageFixture(t)

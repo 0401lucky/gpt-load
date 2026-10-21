@@ -614,7 +614,7 @@ func credentialProbeRef(entry state.CredentialEntry) state.CredentialRef {
 func credentialProbeCredentialFromEntry(entry state.CredentialEntry) credentialProbeCredential {
 	return credentialProbeCredential{
 		ref:           credentialProbeRef(entry),
-		cooldownUntil: entry.CooldownUntil,
+		cooldownUntil: entry.RuntimeView().CooldownUntil,
 	}
 }
 

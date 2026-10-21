@@ -37,13 +37,17 @@ func TestCredentialNameAndNoteUpdatesPreserveIdentityHealthAndModelCycles(t *tes
 	if !exists {
 		t.Fatal("missing credential ref")
 	}
-	for _, observation := range []struct {
+	for index, observation := range []struct {
 		at, cooldown, reset time.Time
 	}{
 		{now.Add(-2 * time.Hour), now.Add(-time.Hour), now.Add(-time.Hour)},
 		{now, now.Add(time.Hour), now.Add(2 * time.Hour)},
 	} {
-		if accepted, changed := fixture.registry.SetModelCooldownWithReset(ref, "model-a", observation.cooldown, observation.reset, observation.at); !accepted || !changed {
+		setCooldown := fixture.registry.SetModelCooldownWithReset
+		if index == 1 {
+			setCooldown = fixture.registry.SetQuotaCooldownWithReset
+		}
+		if accepted, changed := setCooldown(ref, "model-a", observation.cooldown, observation.reset, observation.at); !accepted || !changed {
 			t.Fatal("record model cooldown and credible reset")
 		}
 	}

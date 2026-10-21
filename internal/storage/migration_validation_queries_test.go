@@ -58,7 +58,7 @@ func verifyMigrationValidationQueryLimits(t *testing.T, db *gorm.DB) {
 	initialLimit := 1000
 	if db.Dialector.Name() == "sqlite" {
 		// The fork also initializes donation intake, manual review and credential
-		// notes. Its 32-migration chain uses 1131 statements; retain modest headroom
+		// notes. Its 33-migration chain uses 1160 statements; retain modest headroom
 		// for that schema without weakening the repeated-startup guard below.
 		initialLimit = 1200
 	}

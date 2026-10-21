@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useMobileLayout } from '@modern/app/use-mobile-layout'
 import CredentialDisplay from '@modern/components/CredentialDisplay.vue'
 import { Info } from '@lucide/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 import { useMessageSource } from '@modern/app/messages'
 import { useI18n } from 'vue-i18n'
 import {
@@ -17,9 +18,10 @@ import {
   AppBadge,
   AppButton,
   AppCollectionState,
+  AppFormSection,
   AppIcon,
   AppOverflowText,
-  AppSegmentedField,
+  AppSegmentedControl,
   AppTextField,
   AppTooltip,
 } from '@modern/components/ui'
@@ -33,6 +35,9 @@ import CredentialTrends from './CredentialTrends.vue'
 import RPMTrend from '../rpm/RPMTrend.vue'
 import CredentialWindowUsage from './CredentialWindowUsage.vue'
 
+const isMobile = useMobileLayout()
+const mobileSection = ref('runtime')
+const settingsSection = ref<HTMLElement>()
 const props = defineProps<{ group: GroupRow; row: CredentialRow; channel?: GroupChannel }>()
 const emit = defineEmits<{ close: []; saved: [row: CredentialRow] }>()
 const { t, n, locale, te } = useI18n()
@@ -55,7 +60,21 @@ const saving = ref(false)
 const completed = ref(false)
 const attempted = ref(false)
 const error = ref('')
-const controller = new AbortController()
+let mounted = true
+let requestOwner = 0
+let requestController: AbortController | undefined
+const groupID = props.group.id
+const credentialID = props.row.id
+function isCurrent(owner: number, controller: AbortController): boolean {
+  return (
+    mounted &&
+    requestOwner === owner &&
+    requestController === controller &&
+    !controller.signal.aborted &&
+    props.group.id === groupID &&
+    props.row.id === credentialID
+  )
+}
 const dirty = computed(
   () =>
     !completed.value &&
@@ -69,7 +88,7 @@ const dirty = computed(
 watch(
   query.data,
   (value) => {
-    if (!value || dirty.value || saving.value) return
+    if (!value || dirty.value || saving.value || namePending.value || requestController) return
     saved.value = value
     weight.value = String(value.weightManual ?? '')
     note.value = value.note
@@ -97,21 +116,40 @@ const proxyInvalid = computed(
     !validProxySelection(proxyID.value.trim()),
 )
 const proxyOptions = computed(() => [
-  { value: 'inherit', label: t('credentialCards.proxyMode.inherit') },
+  { value: 'inherit', label: t('groupCreate.proxyInherit') },
   { value: 'direct', label: t('groupCreate.proxyDirect') },
-  { value: 'custom', label: t('proxies.select') },
+  { value: 'custom', label: t('settingsForm.proxy.custom') },
 ])
 function failure(): string {
-  if (!item.value.failures) return '—'
+  if (item.value.lastFailureSummary) return item.value.lastFailureSummary
+  if (item.value.lastStatusCode === null && item.value.failureCategory === 'ambiguous') return '—'
   const key = 'credentialCards.failures.' + item.value.failureCategory
   return [te(key) ? t(key) : item.value.failureCategory, item.value.lastStatusCode]
     .filter(Boolean)
     .join(' · ')
 }
 async function save(): Promise<void> {
-  if (!saved.value || !dirty.value || saving.value || nameDirty.value || namePending.value) return
+  if (
+    !mounted ||
+    !saved.value ||
+    !dirty.value ||
+    saving.value ||
+    nameDirty.value ||
+    namePending.value ||
+    requestController
+  )
+    return
   attempted.value = true
-  if (weightInvalid.value || proxyInvalid.value) return
+  if (weightInvalid.value || proxyInvalid.value) {
+    if (isMobile.value) {
+      mobileSection.value = 'settings'
+      await nextTick()
+      const invalid = settingsSection.value?.querySelector<HTMLElement>('[aria-invalid="true"]')
+      invalid?.focus({ preventScroll: true })
+      invalid?.scrollIntoView({ block: 'center' })
+    }
+    return
+  }
   const patch: Parameters<typeof updateCredential>[3] = {}
   if (weight.value !== String(saved.value.weightManual ?? ''))
     patch.weight_manual = weight.value ? Number(weight.value) : null
@@ -123,46 +161,63 @@ async function save(): Promise<void> {
         : proxyMode.value === 'direct'
           ? { mode: 'direct' }
           : { mode: 'custom', proxy_id: Number(proxyID.value) }
+  const persistedNote = note.value
+  const owner = ++requestOwner
+  const controller = new AbortController()
+  requestController = controller
   saving.value = true
   error.value = ''
   try {
-    await cache.cancelQueries({ queryKey: credentialDetailKey(props.group.id, props.row.id) })
-    const result = await updateCredential(
-      client,
-      props.group.id,
-      props.row.id,
-      patch,
-      controller.signal,
-    )
-    if (controller.signal.aborted) return
+    await cache.cancelQueries({ queryKey: credentialDetailKey(groupID, credentialID), exact: true })
+    if (!isCurrent(owner, controller)) return
+    const result = await updateCredential(client, groupID, credentialID, patch, controller.signal)
+    if (!isCurrent(owner, controller)) return
     completed.value = true
-    emit('saved', { ...result, note: note.value })
+    emit('saved', { ...result, note: persistedNote })
     emit('close')
   } catch {
-    if (!controller.signal.aborted) error.value = t('groups.edit.saveFailed')
+    if (isCurrent(owner, controller)) error.value = t('groups.edit.saveFailed')
   } finally {
-    saving.value = false
+    if (isCurrent(owner, controller)) {
+      requestController = undefined
+      saving.value = false
+    }
   }
 }
 async function saveName(name: string): Promise<void> {
-  await cache.cancelQueries({ queryKey: credentialDetailKey(props.group.id, props.row.id) })
-  const result = await updateCredential(
-    client,
-    props.group.id,
-    props.row.id,
-    { name },
-    controller.signal,
-  )
-  if (controller.signal.aborted) return
-  if (saved.value) saved.value = { ...saved.value, name: result.name, label: result.label }
-  cache.setQueryData(credentialDetailKey(props.group.id, props.row.id), {
-    ...item.value,
-    name: result.name,
-    label: result.label,
-  })
-  emit('saved', { ...result, note: saved.value?.note ?? item.value.note })
+  if (!mounted || saving.value || requestController) throw new Error('CREDENTIAL_BUSY')
+  const persistedNote = saved.value?.note ?? item.value.note
+  const owner = ++requestOwner
+  const controller = new AbortController()
+  requestController = controller
+  try {
+    await cache.cancelQueries({ queryKey: credentialDetailKey(groupID, credentialID), exact: true })
+    if (!isCurrent(owner, controller)) return
+    const result = await updateCredential(
+      client,
+      groupID,
+      credentialID,
+      { name },
+      controller.signal,
+    )
+    if (!isCurrent(owner, controller)) return
+    if (saved.value) saved.value = { ...saved.value, name: result.name, label: result.label }
+    cache.setQueryData(credentialDetailKey(groupID, credentialID), {
+      ...item.value,
+      name: result.name,
+      label: result.label,
+    })
+    // 名称响应不含备注，只回填持久值；备注草稿继续留在设置表单中。
+    emit('saved', { ...result, note: persistedNote })
+  } finally {
+    if (isCurrent(owner, controller)) requestController = undefined
+  }
 }
-onScopeDispose(() => controller.abort())
+onScopeDispose(() => {
+  mounted = false
+  requestOwner++
+  requestController?.abort()
+})
 useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : undefined))
 useMessageSource(() =>
   query.isError.value && saved.value
@@ -186,6 +241,18 @@ useMessageSource(() =>
     @close="emit('close')"
     @save="save"
   >
+    <template v-if="isMobile" #toolbar
+      ><div class="modern-credential-mobile-toolbar">
+        <AppSegmentedControl
+          v-model="mobileSection"
+          :label="t('groupDetail.credentialDetails')"
+          :options="[
+            { value: 'runtime', label: t('credentialCards.runtime') },
+            { value: 'usage', label: t('credentialCards.trends') },
+            { value: 'settings', label: t('credentialCards.settings') },
+          ]"
+        /></div
+    ></template>
     <AppCollectionState v-if="query.isPending.value" :title="t('collection.loading')" loading />
     <AppCollectionState
       v-else-if="query.isError.value && !saved"
@@ -207,6 +274,7 @@ useMessageSource(() =>
         @pending="namePending = $event"
       />
       <CredentialTrends
+        v-show="!isMobile || mobileSection === 'usage'"
         :subscription="group.connectionType === 'subscription'"
         :group="group.id"
         :credential="row.id"
@@ -214,10 +282,17 @@ useMessageSource(() =>
       />
       <CredentialWindowUsage
         v-if="item.observation?.windows.length"
+        v-show="!isMobile || mobileSection === 'usage'"
         :windows="item.observation.windows"
       />
-      <RPMTrend :scope="{ kind: 'credential', id: row.id, group: group.id }" />
-      <section class="modern-credential-detail-section">
+      <RPMTrend
+        v-show="!isMobile || mobileSection === 'usage'"
+        :scope="{ kind: 'credential', id: row.id, group: group.id }"
+      />
+      <section
+        v-show="!isMobile || mobileSection === 'runtime'"
+        class="modern-credential-detail-section"
+      >
         <div class="modern-credential-detail-title">
           <h3>{{ t('credentialCards.runtime') }}</h3>
           <AppBadge :tone="state.tone" dot>{{ t(state.key) }}</AppBadge>
@@ -273,12 +348,17 @@ useMessageSource(() =>
       </section>
       <section
         v-if="group.connectionType === 'subscription'"
+        v-show="!isMobile || mobileSection === 'runtime'"
         class="modern-credential-detail-section"
       >
         <h3>{{ t('credentialCards.accountInfo') }}</h3>
         <CredentialAccountInfo :row="item" />
       </section>
-      <section v-if="item.modelCooldowns.length" class="modern-credential-detail-section">
+      <section
+        v-if="item.modelCooldowns.length"
+        v-show="!isMobile || mobileSection === 'runtime'"
+        class="modern-credential-detail-section"
+      >
         <h3>{{ t('credentialCards.cooldownModels') }}</h3>
         <div
           v-for="cooldown in item.modelCooldowns"
@@ -290,12 +370,16 @@ useMessageSource(() =>
           }}</small>
         </div>
       </section>
-      <section class="modern-credential-detail-section">
+      <section
+        v-show="!isMobile || mobileSection === 'settings'"
+        ref="settingsSection"
+        class="modern-credential-detail-section"
+      >
         <div class="modern-credential-detail-settings-title">
           <h3>{{ t('credentialCards.settings') }}</h3>
-          <AppTooltip :label="t('credentialCards.autoWeight')">
+          <AppTooltip :label="t('credentialCards.autoWeight')" touchable>
             <span
-              class="modern-credential-detail-help"
+              class="modern-credential-detail-help modern-help-trigger"
               tabindex="0"
               :aria-label="t('credentialCards.autoWeight')"
             >
@@ -313,40 +397,47 @@ useMessageSource(() =>
           :disabled="saving"
           autocomplete="off"
         />
-        <div class="modern-credential-detail-routing">
-          <AppTextField
-            v-model="weight"
-            :label="t('groups.edit.weight')"
-            :placeholder="t('credentialCards.automatic')"
-            size="sm"
-            inputmode="numeric"
-            :disabled="saving"
-            :error="attempted && weightInvalid ? t('groups.edit.weightError') : undefined"
-          />
-          <AppSegmentedField
-            v-if="channel?.proxy"
-            v-model="proxyMode"
-            :label="t('groupCreate.proxy')"
-            :options="proxyOptions"
-            size="sm"
-            :disabled="saving"
-          />
-        </div>
-        <ProxySelect
-          v-if="channel?.proxy && proxyMode === 'custom'"
-          v-model="proxyID"
-          :saved-id="saved?.proxy.id"
-          :saved-name="saved?.proxy.name"
-          :saved-address="saved?.proxy.display"
-          :reference-state="saved?.proxy.referenceState"
+        <AppTextField
+          v-model="weight"
+          :label="t('groups.edit.weight')"
+          :placeholder="t('credentialCards.automatic')"
+          size="sm"
+          inputmode="numeric"
           :disabled="saving"
-          :error="attempted && proxyInvalid ? t('proxies.selectHelp') : undefined"
+          :error="attempted && weightInvalid ? t('groups.edit.weightError') : undefined"
         />
+        <AppFormSection v-if="channel?.proxy" compact :title="t('groupCreate.proxy')">
+          <template #actions>
+            <AppSegmentedControl
+              v-model="proxyMode"
+              :label="t('groupCreate.proxy')"
+              :options="proxyOptions"
+              appearance="field"
+              size="xs"
+              :disabled="saving"
+            />
+          </template>
+          <ProxySelect
+            v-if="proxyMode === 'custom'"
+            v-model="proxyID"
+            :saved-id="saved?.proxy.id"
+            :saved-name="saved?.proxy.name"
+            :saved-address="saved?.proxy.display"
+            :reference-state="saved?.proxy.referenceState"
+            :disabled="saving"
+            :error="attempted && proxyInvalid ? t('proxies.selectHelp') : undefined"
+          />
+        </AppFormSection>
       </section>
     </template>
   </GroupWorkspacePanel>
 </template>
 <style scoped>
+.modern-credential-mobile-toolbar {
+  padding: var(--modern-space-2) var(--modern-space-5);
+  border-bottom: var(--modern-line-width) solid var(--modern-border);
+}
+
 .modern-credential-detail-section {
   display: grid;
   gap: var(--modern-space-3);
@@ -414,23 +505,9 @@ useMessageSource(() =>
   display: inline-flex;
   color: var(--modern-muted);
 }
-.modern-credential-detail-routing {
-  display: grid;
-  grid-template-columns: minmax(0, 112px) minmax(0, 1fr);
-  align-items: start;
-  gap: var(--modern-space-3);
-}
 @container modern-workspace-panel (max-width: 380px) {
   .modern-credential-detail-metrics {
     grid-template-columns: max-content minmax(0, 1fr);
-  }
-}
-@container modern-workspace-panel (max-width: 340px) {
-  .modern-credential-detail-routing {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .modern-credential-detail-routing > :first-child {
-    max-width: 112px;
   }
 }
 </style>

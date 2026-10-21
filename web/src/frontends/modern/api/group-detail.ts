@@ -1,4 +1,5 @@
 import { credentialDisplayText } from '@shared/credential-display'
+import { readErrorRules, type ErrorRule } from '@shared/error-rules'
 import { codexLiveModes, type CodexLiveMode } from '@shared/codex-live'
 import type { ApiClient } from '@shared/http/client'
 import { ApiError, InvalidResponseError } from '@shared/http/errors'
@@ -64,8 +65,10 @@ export type RuntimeSettings = Partial<
   codex_live_mode?: CodexLiveMode
   header_rules?: HeaderRules
   parameter_overrides?: ParameterRule[]
+  error_rules?: ErrorRule[]
 }
 export interface GroupSettings extends GroupBasics {
+  defaultErrorRules: ErrorRule[]
   channelID: string
   params: Record<string, string>
   validationModel: string | null
@@ -95,6 +98,7 @@ function stringMap(value: unknown): Record<string, string> {
 function readRuntime(value: unknown): RuntimeSettings {
   const raw = record(value)
   const result: RuntimeSettings = {}
+  if (raw.error_rules !== undefined) result.error_rules = readErrorRules(raw.error_rules)
   for (const key of runtimeNumbers) if (raw[key] !== undefined) result[key] = integer(raw[key])
   for (const key of runtimeSwitches) if (raw[key] !== undefined) result[key] = boolean(raw[key])
   if (raw.codex_live_mode !== undefined)
@@ -123,6 +127,7 @@ function readSettings(value: unknown): GroupSettings {
   const data = record(value)
   const proxy = record(data.proxy)
   const effective = readRuntime(data.effective)
+  effective.error_rules ??= []
   if (
     [...runtimeNumbers, ...runtimeSwitches, 'codex_live_mode', 'header_rules'].some(
       (key) => effective[key as keyof RuntimeSettings] === undefined,
@@ -131,6 +136,7 @@ function readSettings(value: unknown): GroupSettings {
     throw new InvalidResponseError()
   return {
     ...readGroupBasics(data),
+    defaultErrorRules: readErrorRules(data.default_error_rules ?? []),
     channelID: text(data.channel_id),
     params: stringMap(data.params),
     validationModel: data.validation_model === null ? null : text(data.validation_model),
@@ -277,6 +283,7 @@ export interface CredentialRow {
   lastRefresh?: number
   authError?: string
   failureCategory: string
+  lastFailureSummary?: string
   lastStatusCode: number | null
   modelCooldowns: { model: string; until: number }[]
   recovery: {
@@ -352,6 +359,8 @@ export function readCredential(value: unknown): CredentialRow {
       account?.last_refresh_at_ms === undefined ? undefined : integer(account.last_refresh_at_ms),
     authError: row.auth_error_code === undefined ? undefined : text(row.auth_error_code),
     failureCategory: text(row.last_failure_category),
+    lastFailureSummary:
+      row.last_failure_summary === undefined ? undefined : text(row.last_failure_summary),
     lastStatusCode: row.last_status_code === null ? null : integer(row.last_status_code),
     modelCooldowns: list(row.model_cooldowns).map((value) => {
       const cooldown = record(value)

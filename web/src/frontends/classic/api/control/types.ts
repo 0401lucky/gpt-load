@@ -1,4 +1,5 @@
 import type { CodexLiveMode } from '@shared/codex-live'
+import type { ErrorRule } from '@shared/error-rules'
 import type { ProtocolValue } from './protocols'
 
 export type GroupProtocol = ProtocolValue
@@ -117,6 +118,7 @@ export interface ParameterOverrideRuleDto {
 }
 
 export interface GroupRuntimeConfigDto {
+  error_rules?: ErrorRule[]
   first_byte_timeout?: number
   request_timeout?: number
   stream_idle_timeout?: number
@@ -132,6 +134,7 @@ export interface GroupRuntimeConfigDto {
 }
 
 export interface GroupEffectiveConfigDto {
+  error_rules: ErrorRule[]
   first_byte_timeout: number
   request_timeout: number
   stream_idle_timeout: number
@@ -146,6 +149,7 @@ export interface GroupEffectiveConfigDto {
 }
 
 export interface GroupSettingsDto {
+  default_error_rules: ErrorRule[]
   priority: number
   name: string
   price_multiplier: string
@@ -351,6 +355,7 @@ export interface CredentialItemDto {
   recent_failure_count: number
   consecutive_failure_count: number
   last_failure_category: FailureCategory
+  last_failure_summary?: string
   last_status_code: number | null
   cooldown_until_ms: number | null
   last_used_at_ms?: number
@@ -612,6 +617,7 @@ export interface AccessKeyDto {
   filters: AccessKeyFiltersDto
   expires_at_ms: number | null
   rpm_limit: number
+  record_request_body: boolean
   cost_limit_rules: AccessKeyCostLimitRuleDto[]
   cost_limit_status: AccessKeyCostLimitStatusDto | null
   created_at_ms: number

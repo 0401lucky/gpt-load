@@ -62,13 +62,15 @@ func TestLegacyModelCyclesAreDiscardedWithoutLosingHealth(t *testing.T) {
 		until := now.Add(time.Hour)
 		checkpoint := CredentialRuntimeCheckpoint{ID: 1, GroupID: 10, IdentityGeneration: 1,
 			Blacklisted: true, FailureCount: 3, CooldownUntil: until, ModelCycleVersion: version,
-			ModelCooldowns:   map[string]time.Time{"model-a": until},
-			ModelCycleStarts: map[string]time.Time{"model-a": now.Add(-time.Hour)},
-			ModelNextResets:  map[string]time.Time{"model-a": until}}
+			ModelCooldowns:     map[string]time.Time{"model-a": until},
+			ModelCycleStarts:   map[string]time.Time{"model-a": now.Add(-time.Hour)},
+			ModelNextResets:    map[string]time.Time{"model-a": until},
+			QuotaCooldownUntil: until, QuotaModelCooldowns: map[string]time.Time{"model-a": until}}
 		r.RestoreRuntimeCheckpoint([]CredentialRuntimeCheckpoint{checkpoint})
 		got := r.CaptureRuntimeCheckpoint()[0]
 		if !got.Blacklisted || got.FailureCount != 3 || !got.CooldownUntil.Equal(until) ||
-			!got.ModelCooldowns["model-a"].Equal(until) || len(got.ModelCycleStarts) != 0 || len(got.ModelNextResets) != 0 {
+			!got.ModelCooldowns["model-a"].Equal(until) || !got.QuotaCooldownUntil.Equal(until) ||
+			!got.QuotaModelCooldowns["model-a"].Equal(until) || len(got.ModelCycleStarts) != 0 || len(got.ModelNextResets) != 0 {
 			t.Fatalf("legacy restore changed health or trusted old cycle: %+v", got)
 		}
 	}

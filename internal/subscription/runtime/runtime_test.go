@@ -62,7 +62,7 @@ func (testObservation) Observe(context.Context, Credential, Target) (Observation
 type testResetCredit struct{ id spec.ActionID }
 
 func (value testResetCredit) ID() spec.ActionID { return value.id }
-func (testResetCredit) Consume(context.Context, Credential, Target, string) (ResetCreditResult, error) {
+func (testResetCredit) Consume(context.Context, Credential, Target, ResetCreditRequest) (ResetCreditResult, error) {
 	return ResetCreditResult{}, nil
 }
 
@@ -77,22 +77,23 @@ func (testBrowserDriver) LocalCallback() (LocalCallbackSpec, bool)  { return Loc
 
 func completeTestRuntimeImplementations() ([]Driver, []ModelDiscovery, []QuotaObservation, []ResetCreditAction) {
 	return []Driver{
-			testBrowserDriver{duplicateDriver{id: modules.CodexSubscriptionDriver}},
-			testBrowserDriver{duplicateDriver{id: modules.ClaudeSubscriptionDriver}},
-			testBrowserDriver{duplicateDriver{id: modules.AntigravitySubscriptionDriver}},
-			duplicateDriver{id: modules.GrokSubscriptionDriver},
-		}, []ModelDiscovery{
-			testDiscovery{id: modules.CodexModelDiscovery},
-			testDiscovery{id: modules.ClaudeModelDiscovery},
-			testDiscovery{id: modules.AntigravityModelDiscovery},
-			testDiscovery{id: modules.GrokModelDiscovery},
-		}, []QuotaObservation{
-			testObservation{id: modules.CodexQuotaObservation},
-			testObservation{id: modules.ClaudeQuotaObservation},
-			testObservation{id: modules.AntigravityQuotaObservation},
-		}, []ResetCreditAction{
-			testResetCredit{id: modules.CodexResetCreditAction},
-		}
+		testBrowserDriver{duplicateDriver{id: modules.CodexSubscriptionDriver}},
+		testBrowserDriver{duplicateDriver{id: modules.ClaudeSubscriptionDriver}},
+		testBrowserDriver{duplicateDriver{id: modules.AntigravitySubscriptionDriver}},
+		duplicateDriver{id: modules.GrokSubscriptionDriver},
+	}, []ModelDiscovery{
+		testDiscovery{id: modules.CodexModelDiscovery},
+		testDiscovery{id: modules.ClaudeModelDiscovery},
+		testDiscovery{id: modules.AntigravityModelDiscovery},
+		testDiscovery{id: modules.GrokModelDiscovery},
+	}, []QuotaObservation{
+		testObservation{id: modules.CodexQuotaObservation},
+		testObservation{id: modules.ClaudeQuotaObservation},
+		testObservation{id: modules.AntigravityQuotaObservation},
+	}, []ResetCreditAction{
+		testResetCredit{id: modules.CodexResetCreditAction},
+		testResetCredit{id: modules.ClaudeResetCreditAction},
+	}
 }
 
 func TestRuntimeRejectsDeviceOAuthWithoutDriverSupport(t *testing.T) {

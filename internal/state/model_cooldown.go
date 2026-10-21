@@ -28,7 +28,8 @@ func (r *CredentialRegistry) SetModelCooldownWithReset(ref CredentialRef, model 
 	defer r.mu.Unlock()
 	entry, ok := r.entryLocked(ref.ID)
 	if !ok || entry.GroupID != ref.GroupID || entry.IdentityGeneration != ref.IdentityGeneration ||
-		entry.ModelCooldownGeneration != ref.ModelCooldownGeneration {
+		entry.ModelCooldownGeneration != ref.ModelCooldownGeneration ||
+		!reset.IsZero() && entry.QuotaCooldownGeneration != ref.QuotaCooldownGeneration {
 		return false, false
 	}
 	pruneModelCooldowns(entry.ModelCooldowns, now)
@@ -40,16 +41,26 @@ func (r *CredentialRegistry) SetModelCooldownWithReset(ref CredentialRef, model 
 		entry.ModelCooldowns[model] = until
 		changed = true
 	}
+	return true, recordModelReset(entry, model, reset, now) || changed
+}
+
+// recordModelReset requires the caller to hold the registry lock and validate
+// both the target identity and the recovery generation before changing anchors.
+func recordModelReset(entry *CredentialEntry, model string, reset, now time.Time) bool {
 	if reset.IsZero() {
-		return true, changed
+		return false
 	}
+	changed := false
 	// 最近一次已知的重置时刻若已经发生，它就是本组合新的周期起点。
 	// 该锚点只在能确认重置已发生时迁移，冷却期间的重复 429 不会改写它。
 	if previousReset, ok := entry.ModelNextResets[model]; ok && !previousReset.After(now) {
 		if entry.ModelCycleStarts == nil {
 			entry.ModelCycleStarts = make(map[string]time.Time)
 		}
-		entry.ModelCycleStarts[model] = previousReset
+		if !entry.ModelCycleStarts[model].Equal(previousReset) {
+			entry.ModelCycleStarts[model] = previousReset
+			changed = true
+		}
 	}
 	if entry.ModelNextResets == nil {
 		entry.ModelNextResets = make(map[string]time.Time)
@@ -61,7 +72,7 @@ func (r *CredentialRegistry) SetModelCooldownWithReset(ref CredentialRef, model 
 		changed = true
 	}
 	pruneModelCycles(entry.ModelCycleStarts, entry.ModelNextResets, now)
-	return true, changed
+	return changed
 }
 
 func (r *CredentialRegistry) ModelCooldowns(credentialID uint, now time.Time) map[string]time.Time {
@@ -72,7 +83,8 @@ func (r *CredentialRegistry) ModelCooldowns(credentialID uint, now time.Time) ma
 		return nil
 	}
 	pruneModelCooldowns(entry.ModelCooldowns, now)
-	return cloneModelTimes(entry.ModelCooldowns)
+	pruneModelCooldowns(entry.QuotaModelCooldowns, now)
+	return effectiveModelCooldowns(entry)
 }
 
 // CredentialModelCycleView 是一个 (凭据, 上游模型) 的周期锚点与冷却状态快照。
@@ -101,7 +113,7 @@ func (r *CredentialRegistry) GroupModelCycles(groupID uint, now time.Time) map[u
 	}
 	views := make(map[uint][]CredentialModelCycleView, len(bucket))
 	for _, entry := range bucket {
-		models := make(map[string]struct{}, len(entry.ModelCycleStarts)+len(entry.ModelNextResets)+len(entry.ModelCooldowns))
+		models := make(map[string]struct{}, len(entry.ModelCycleStarts)+len(entry.ModelNextResets)+len(entry.ModelCooldowns)+len(entry.QuotaModelCooldowns))
 		for model := range entry.ModelCycleStarts {
 			models[model] = struct{}{}
 		}
@@ -109,6 +121,11 @@ func (r *CredentialRegistry) GroupModelCycles(groupID uint, now time.Time) map[u
 			models[model] = struct{}{}
 		}
 		for model, until := range entry.ModelCooldowns {
+			if until.After(now) {
+				models[model] = struct{}{}
+			}
+		}
+		for model, until := range entry.QuotaModelCooldowns {
 			if until.After(now) {
 				models[model] = struct{}{}
 			}
@@ -121,6 +138,9 @@ func (r *CredentialRegistry) GroupModelCycles(groupID uint, now time.Time) map[u
 				NextReset:  entry.ModelNextResets[model],
 			}
 			if until := entry.ModelCooldowns[model]; until.After(now) {
+				cycle.CooldownUntil = until
+			}
+			if until := entry.QuotaModelCooldowns[model]; until.After(now) && until.After(cycle.CooldownUntil) {
 				cycle.CooldownUntil = until
 			}
 			list = append(list, cycle)
@@ -140,6 +160,8 @@ func (r *CredentialRegistry) ClearModelCooldowns(credentialID uint) bool {
 		return false
 	}
 	entry.ModelCooldowns = nil
+	entry.QuotaModelCooldowns = nil
+	entry.QuotaCooldownGeneration++
 	entry.ModelCooldownGeneration++
 	return true
 }
@@ -152,6 +174,7 @@ func (r *CredentialRegistry) ExpireModelCooldowns(now time.Time) {
 		for _, entry := range bucket {
 			pruneModelCooldowns(entry.ModelCooldowns, now)
 			pruneModelCycles(entry.ModelCycleStarts, entry.ModelNextResets, now)
+			pruneModelCooldowns(entry.QuotaModelCooldowns, now)
 		}
 	}
 }
@@ -201,14 +224,22 @@ func preserveModelCooldowns(next *CredentialEntry, previous *CredentialEntry) {
 		return
 	}
 	next.ModelCooldownGeneration = previous.ModelCooldownGeneration
+	next.QuotaCooldownGeneration = previous.QuotaCooldownGeneration
 	if next.ID == previous.ID && next.GroupID == previous.GroupID && next.IdentityGeneration == previous.IdentityGeneration {
 		next.ModelCooldowns = cloneModelTimes(previous.ModelCooldowns)
 		next.ModelCycleStarts = cloneModelTimes(previous.ModelCycleStarts)
 		next.ModelNextResets = cloneModelTimes(previous.ModelNextResets)
+		next.QuotaModelCooldowns = cloneModelTimes(previous.QuotaModelCooldowns)
+		next.QuotaCooldownUntil = previous.QuotaCooldownUntil
+		next.lastQuotaRejectedAt = previous.lastQuotaRejectedAt
 	} else {
 		next.ModelCooldowns = nil
 		next.ModelCycleStarts = nil
 		next.ModelNextResets = nil
+		next.QuotaModelCooldowns = nil
+		next.QuotaCooldownUntil = time.Time{}
+		next.lastQuotaRejectedAt = time.Time{}
+		next.QuotaCooldownGeneration++
 		next.ModelCooldownGeneration++
 	}
 }

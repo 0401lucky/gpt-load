@@ -15,6 +15,7 @@ import (
 
 	"gpt-load/internal/channel"
 	"gpt-load/internal/execution"
+	"gpt-load/internal/execution/responsemodel"
 	"gpt-load/internal/protocol"
 	"gpt-load/internal/reasoning"
 )
@@ -607,6 +608,7 @@ func (r *Runtime) executeConvertedResponsesStream(
 	defer preResponse.stop()
 
 	bifrostContext := r.newStreamingSDKContext(callContext, spec, prepared.directKey)
+	captureStreamErrorStatus(bifrostContext, prepared.upstreamProtocol)
 	enableConvertedWireCapture(bifrostContext, prepared)
 	if prepared.request != nil && prepared.upstreamProtocol == protocol.Anthropic {
 		body, err := anthropic.BuildAnthropicChatRequestBody(bifrostContext, prepared.request, anthropic.AnthropicRequestBuildConfig{
@@ -674,7 +676,8 @@ func (r *Runtime) executeConvertedResponsesStream(
 	encoder := newConvertedResponsesStreamEncoder(prepared.clientProtocol)
 	encoder.anthropicSource = wireUsage != nil
 	sequence := uint64(1)
-	model := spec.UpstreamModel
+	modelObserver := responsemodel.New(prepared.upstreamProtocol, spec.UpstreamModel)
+	model := ""
 	var usageEvidence *execution.UsageEvidence
 	idleTimer := newIdleTimer(spec.Timeouts.StreamIdle)
 	defer idleTimer.stop()
@@ -729,7 +732,8 @@ func (r *Runtime) executeConvertedResponsesStream(
 			var chunkUsage *execution.UsageEvidence
 			if response.Response != nil {
 				if response.Response.Model != "" {
-					model = response.Response.Model
+					modelObserver.ObserveModel(response.Response.Model)
+					model = modelObserver.Model
 				}
 				var err error
 				if err = wireUsage.applyResponses(response.Response.Usage); err != nil {

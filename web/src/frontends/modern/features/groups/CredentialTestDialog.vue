@@ -28,11 +28,20 @@ import {
   AppSelect,
 } from '@modern/components/ui'
 import { useApiClient } from '@shared/http/client-context'
+import type { CredentialTestOptions } from '@shared/credential-test-batch'
 import AppDraftGuard from '@modern/components/AppDraftGuard.vue'
 import { groupValidationModelOptions } from './group-model-options'
-const props = defineProps<{ groupId: number; row: CredentialRow }>()
-const emit = defineEmits<{ close: []; changed: [] }>()
+const props = defineProps<{ groupId: number; row?: CredentialRow; batchCount?: number }>()
+const emit = defineEmits<{ close: []; changed: []; start: [options: CredentialTestOptions] }>()
 const { t, n } = useI18n()
+const title = computed(() =>
+  t(props.batchCount ? 'credentialBatchTest.title' : 'credentialCards.test'),
+)
+const description = computed(() =>
+  props.batchCount
+    ? t('credentialBatchTest.description', { count: n(props.batchCount) })
+    : (props.row?.label ?? ''),
+)
 const client = useApiClient()
 const settings = useQuery({
   queryKey: groupSettingsKey(props.groupId),
@@ -47,7 +56,17 @@ const protocol = ref('')
 const pending = ref(false)
 const result = ref<CredentialTestResult>()
 const error = ref('')
-const controller = new AbortController()
+let mounted = true
+let requestOwner = 0
+let requestController: AbortController | undefined
+function isCurrent(owner: number, controller: AbortController): boolean {
+  return (
+    mounted &&
+    requestOwner === owner &&
+    requestController === controller &&
+    !controller.signal.aborted
+  )
+}
 let modelInitialized = false
 let protocolInitialized = false
 watch(
@@ -65,9 +84,24 @@ watch(
   { immediate: true },
 )
 watch([model, protocol], () => {
+  requestOwner++
+  requestController?.abort()
+  requestController = undefined
+  pending.value = false
   result.value = undefined
   error.value = ''
 })
+watch(
+  () => [props.groupId, props.row?.id, props.batchCount],
+  () => {
+    requestOwner++
+    requestController?.abort()
+    requestController = undefined
+    pending.value = false
+    result.value = undefined
+    error.value = ''
+  },
+)
 const protocols = computed(() =>
   (settings.data.value?.validationProtocols ?? []).map((value) => ({
     value,
@@ -93,42 +127,57 @@ async function reloadSettings(): Promise<void> {
   await Promise.all([settings.refetch(), models.refetch()])
 }
 async function run(restore = false): Promise<void> {
-  if (pending.value || (!restore && (!model.value.trim() || !protocol.value))) return
+  if (!mounted || pending.value || (!restore && (!model.value.trim() || !protocol.value))) return
+  if (props.batchCount) {
+    if (!restore) emit('start', { protocol: protocol.value, model: model.value.trim() })
+    return
+  }
+  const credentialID = props.row?.id
+  const proof = result.value?.proof
+  if (!credentialID || (restore && !proof)) return
+  const groupID = props.groupId
+  const owner = ++requestOwner
+  const controller = new AbortController()
+  requestController = controller
   pending.value = true
   error.value = ''
   try {
-    if (restore && result.value?.proof) {
-      await restoreTestedCredential(
-        client,
-        props.groupId,
-        props.row.id,
-        result.value.proof,
-        controller.signal,
-      )
+    if (restore && proof) {
+      await restoreTestedCredential(client, groupID, credentialID, proof, controller.signal)
+      if (!isCurrent(owner, controller)) return
       result.value = undefined
       emit('changed')
       emit('close')
     } else {
-      result.value = await testCredential(
+      const tested = await testCredential(
         client,
-        props.groupId,
-        props.row.id,
+        groupID,
+        credentialID,
         protocol.value,
         model.value.trim(),
         controller.signal,
       )
+      if (!isCurrent(owner, controller)) return
+      result.value = tested
       emit('changed')
     }
   } catch {
-    if (!controller.signal.aborted) error.value = t('credentialCards.actionFailed')
+    if (isCurrent(owner, controller)) error.value = t('credentialCards.actionFailed')
   } finally {
-    pending.value = false
+    if (isCurrent(owner, controller)) {
+      requestController = undefined
+      pending.value = false
+    }
   }
 }
 function close(): void {
   if (!pending.value) emit('close')
 }
-onScopeDispose(() => controller.abort())
+onScopeDispose(() => {
+  mounted = false
+  requestOwner++
+  requestController?.abort()
+})
 useLoadingActivity(pending)
 useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : undefined))
 </script>
@@ -141,10 +190,10 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
       }
     "
   >
-    <AppDialogContent :title="t('credentialCards.test')" :description="row.label">
+    <AppDialogContent :title="title" :description="description">
       <AppDialogHeader
-        :title="t('credentialCards.test')"
-        :description="row.label"
+        :title="title"
+        :description="description"
         :close-label="t('shell.close')"
         :close-disabled="pending"
         @close="close"
@@ -233,7 +282,7 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
             variant="primary"
             :loading="pending"
             :disabled="!model.trim() || !protocol || pending"
-            >{{ t('credentialCards.test') }}</AppButton
+            >{{ t(batchCount ? 'credentialBatchTest.start' : 'credentialCards.test') }}</AppButton
           >
         </div>
       </form>

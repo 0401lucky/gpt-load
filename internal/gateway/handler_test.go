@@ -190,6 +190,14 @@ type recordingRuntimeRegistry struct {
 	clearCalls           int
 }
 
+func (registry *recordingRuntimeRegistry) SetQuotaCooldown(ref state.CredentialRef, model string, until, now time.Time) (bool, bool) {
+	if model == "" {
+		registry.cooldownCalls++
+		registry.cooldownCredentialID, registry.cooldownUntil = ref.ID, until
+	}
+	return registry.CredentialRegistry.SetQuotaCooldown(ref, model, until, now)
+}
+
 type captureCountingRuntimeRegistry struct {
 	runtimeCredentialRegistry
 	captureCalls int
@@ -1948,6 +1956,14 @@ type panicRuntimeRegistry struct{}
 
 func (panicRuntimeRegistry) SetModelCooldownWithReset(state.CredentialRef, string, time.Time, time.Time, time.Time) (bool, bool) {
 	panic("model endpoint mutated cooldown")
+}
+
+func (panicRuntimeRegistry) SetQuotaCooldownWithReset(state.CredentialRef, string, time.Time, time.Time, time.Time) (bool, bool) {
+	panic("model endpoint mutated quota cooldown and reset")
+}
+
+func (panicRuntimeRegistry) SetQuotaCooldown(state.CredentialRef, string, time.Time, time.Time) (bool, bool) {
+	panic("model endpoint mutated quota cooldown")
 }
 
 func (panicRuntimeRegistry) SchedulingState() *state.SchedulingState {

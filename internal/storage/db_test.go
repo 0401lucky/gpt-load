@@ -635,6 +635,7 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 		"access_key_cost_limit_rules",
 		"access_key_cost_limit_states",
 		"request_logs",
+		"request_log_bodies",
 		"usage_aggregation_journal",
 		"usage_stats",
 		"model_prices",
@@ -694,6 +695,7 @@ func TestAutoMigrateCreatesUsageJournalAndMigrationLedger(t *testing.T) {
 		"0030_remove_request_log_output_timing",
 		"0031_request_log_client_ip",
 		"0032_group_priority",
+		"0033_request_body_recording",
 	}
 	if !reflect.DeepEqual(migrationIDs, wantMigrationIDs) {
 		t.Fatalf("schema_migrations IDs = %v, want %v", migrationIDs, wantMigrationIDs)

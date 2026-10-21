@@ -93,7 +93,7 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		"credential_reset_operations", "credential_attempt_stats", "schema_migrations",
 		"access_key_cost_limit_rules", "access_key_cost_limit_states",
 		"auto_decision_usage_stats",
-		"rpm_stats", "proxies",
+		"rpm_stats", "proxies", "request_log_bodies",
 	} {
 		if !db.Migrator().HasTable(table) {
 			t.Fatalf("table %q is missing", table)
@@ -105,7 +105,7 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 	for table, columns := range map[string][]string{
 		"groups":      {"connection_type", "proxy_config", "price_multiplier_micros", "priority"},
 		"credentials": {"identity_fingerprint", "secret_version", "auth_state", "auth_error_code", "proxy_config", "note", "name"},
-		"access_keys": {"expires_at_ms", "price_multiplier_micros", "concurrency_limit"},
+		"access_keys": {"expires_at_ms", "price_multiplier_micros", "concurrency_limit", "record_request_body"},
 		"request_log_attempts": {
 			"upstream_protocol", "failure_origin", "failure_scope",
 			"retry_directive", "effect", "rule_id",
@@ -168,9 +168,10 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		"0030_remove_request_log_output_timing",
 		"0031_request_log_client_ip",
 		"0032_group_priority",
+		"0033_request_body_recording",
 	}
 	if !slices.Equal(migrationIDs, wantMigrationIDs) {
-		t.Fatalf("migration ledger = %v, want complete 0001-0032 chain", migrationIDs)
+		t.Fatalf("migration ledger = %v, want complete 0001-0033 chain", migrationIDs)
 	}
 	if !db.Migrator().HasIndex("usage_stats", "idx_usage_stats_group_bucket") {
 		t.Fatal("usage_stats group activity index is missing")

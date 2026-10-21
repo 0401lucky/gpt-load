@@ -28,6 +28,9 @@ func TestInferenceRateLimitsCooldownOnlyTheirModel(t *testing.T) {
 			if result.Effect != want {
 				t.Fatalf("scope=%s committed=%t decision=%#v", scope, committed, result)
 			}
+			if result.QuotaCooldown != (want != EffectNone) {
+				t.Fatalf("quota recovery flag disagrees with effect: %+v", result)
+			}
 			if want != EffectNone && !result.CooldownUntil.Equal(now.Add(7*time.Hour)) {
 				t.Fatalf("deadline = %v", result.CooldownUntil)
 			}
@@ -52,6 +55,9 @@ func TestQuotaResetRequiresDailyQuotaEvidenceAndKeepsRetryDeadline(t *testing.T)
 					DecisionContext{Operation: execution.OperationChatCompletion, RateLimitResetHint: enabled})
 				if !result.CooldownUntil.Equal(now.Add(time.Minute)) {
 					t.Fatalf("retry scheduling changed: %+v", result)
+				}
+				if !result.QuotaCooldown {
+					t.Fatalf("quota cooldown lost its recovery flag: %+v", result)
 				}
 				wantReset := enabled && summary != "rate limited" && summary != "Try again in 30s"
 				if wantReset {
@@ -154,5 +160,50 @@ func TestModelCooldownUsesResetHintOnlyWhenEnabled(t *testing.T) {
 					result, EffectCooldownModel, test.wantRule, now.Add(test.want))
 			}
 		})
+	}
+}
+
+func TestCustomCooldownKeepsTrustedModelResetIndependentOfQuotaRecovery(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Millisecond)
+	for _, effect := range []Effect{EffectCooldownModel, EffectCooldownCredential, EffectNone} {
+		for _, committed := range []bool{false, true} {
+			cooldownSeconds := int64(90)
+			if effect == EffectNone {
+				cooldownSeconds = 0
+			}
+			rules := mustCompileErrorRules(t, []ErrorRule{{Keywords: []string{"daily free limit"},
+				Retry: RetryNone, Effect: effect, CooldownSeconds: cooldownSeconds}}, "group")
+			result := JudgeExecution(ExecutionAttempt{DispatchState: execution.DispatchMaybeSent,
+				StatusCode: 200, Now: now, DownstreamCommitted: committed,
+				Evidence: &execution.ErrorEvidence{Kind: execution.ErrorKindProvider,
+					Hint: execution.FailureHintRateLimited, OriginHint: execution.ErrorOriginUpstream,
+					ScopeHint: execution.ErrorScopeModel, ReplaySafety: execution.ReplaySafetyRejectedBeforeProcessing,
+					Summary:    "Daily free limit reached on model fixture. Try again in 3h 18m",
+					RetryAfter: time.Hour}}, DecisionContext{ErrorRules: rules, RateLimitResetHint: true,
+				Method: http.MethodPost, Operation: execution.OperationChatCompletion})
+			wantEffect := effect
+			if committed && effect == EffectCooldownCredential {
+				wantEffect = EffectNone
+			}
+			if result.Effect != wantEffect || result.QuotaCooldown {
+				t.Fatalf("effect=%s committed=%t: custom cooldown changed the evidence boundary: %+v", effect, committed, result)
+			}
+			if wantEffect != EffectNone && !result.CooldownUntil.Equal(now.Add(90*time.Second)) {
+				t.Fatalf("custom retry scheduling was not applied: %+v", result)
+			}
+			if wantEffect == EffectNone && !result.CooldownUntil.IsZero() {
+				t.Fatalf("discarded effect retained a scheduling deadline: %+v", result)
+			}
+			if effect == EffectCooldownModel {
+				if !result.QuotaResetAt.Equal(now.Add(3*time.Hour+18*time.Minute)) || result.QuotaResetSource != "reset_hint" {
+					t.Fatalf("custom scheduling erased independent quota evidence: %+v", result)
+				}
+			} else if !result.QuotaResetAt.IsZero() || result.QuotaResetSource != "" {
+				t.Fatalf("non-model effect retained model reset: %+v", result)
+			}
+			if err := result.Validate(); err != nil {
+				t.Fatal(err)
+			}
+		}
 	}
 }
