@@ -288,3 +288,34 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 10: 兼容合并上游 main 至 41c82ac0
+<!-- trellis-session: v=2 fp=37ed7c53b894a8e8 -->
+
+**Date**: 2026-10-21
+**Task**: 兼容合并上游 main 至 41c82ac0
+**Branch**: `main`
+
+### Summary
+
+合入41个上游提交并解决17处冲突，冻结旧32条迁移且追加0033；保留捐献、备注/别名、模型用量、可信周期、诊断及fork GHCR。前端/构建/SQLite/CPA门禁通过，23个Windows顶层基线失败与旧版相同，无新增失败。已合入本地main，未push或部署。
+
+### Main Changes
+
+兼容合并固定上游41c82ac0的41个提交，解决17处冲突并形成保留双方历史的本地merge。保留捐献独立鉴权与恢复、备注/别名、模型用量、可信额度周期、连接诊断和fork GHCR配置。冻结旧32条迁移、追加0033，验证真实SQLite 24/27/32→33和重启幂等。
+
+前端冻结安装/lint/styles/format/build、根tidy/vet/build、CPA独立tidy/vet/full tests、核心交叉回归通过。根完整测试65pass/8skip/5fail，23顶层/82含子测试失败与本轮固定216024cc同条件Windows基线完全一致，无新增失败。没有push或部署；真实MySQL/PostgreSQL与浏览器E2E未实测。
+
+实现中修复ReplaceCredentials使用原始entries同步调度的遗漏；spec记录恢复代次和可信周期、0033请求体合同以及单/批前端所有权。用户原有95个文件与32个旧迁移blob、fork发布配置核对不变。详细证据在任务archive的research目录。
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0aee0a0037baaf72ee6cfe0311e33e65d15f3d81` | merge: 兼容合并上游 main 至 41c82ac0（请求体迁移顺延为 0033） |
+
+### Status
+
+[OK] **Completed**
