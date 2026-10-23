@@ -319,3 +319,36 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 11: 合并上游余额显示修复并诊断 Gemini 503
+<!-- trellis-session: v=2 fp=da707f288175fe6a -->
+
+**Date**: 2026-10-23
+**Task**: 合并上游余额显示修复并诊断 Gemini 503
+**Branch**: `merge/upstream-20261023`
+
+### Summary
+
+真实合并 dd33ae3，完成前端与编译验证；线上直连复现 Gemini 503，记录调度策略及改善草案，未修改生产配置。
+
+### Main Changes
+
+- 上游两个订阅凭据卡片统一将正余额向上取整；保留 fork 提交及原有未跟踪目录。
+- Gemini 首次采样前24小时39次请求：11成功、17次503、8超时、3请求格式错误。直连Google两枚Key复现503，相同Key其他模型及稍后3.8 Flash可成功；默认skip_group只作用当前请求。
+- 诊断证据：tmp/diagnostics/gemini-503-20261023.md；针对high demand的分组规则草案未应用，API Key未写入本机或报告。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a3c71d5c` | merge: 兼容合并上游 main 至 dd33ae3（余额显示向上取整） |
+
+### Testing
+
+- [OK] ESLint、现代样式、Vue/TS类型检查、Vite、Go vet、Go build及diff检查通过。
+- [OK] Windows完整Go测试5包57个顶层测试未通过；未做baseline复测，不声称make check全绿。报告：tmp/upstream-merge-quality-20261023.md。
+
+### Status
+
+[OK] **Completed**

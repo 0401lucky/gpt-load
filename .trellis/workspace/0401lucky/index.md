@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 10
-- **Last Active**: 2026-10-21
+- **Total Sessions**: 11
+- **Last Active**: 2026-10-23
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~321 | Active |
+| `journal-1.md` | ~354 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 11 | 2026-10-23 | 合并上游余额显示修复并诊断 Gemini 503 | `a3c71d5c` | `merge/upstream-20261023` |
 | 10 | 2026-10-21 | 兼容合并上游 main 至 41c82ac0 | `0aee0a0037baaf72ee6cfe0311e33e65d15f3d81` | `main` |
 | 9 | 2026-10-08 | 兼容合并上游 main 至 a5c691bb | `b2cbb156` | `main` |
 | 8 | 2026-10-03 | 模型用量周期修复与缺失提示 | `42adbdaf` | `main` |
