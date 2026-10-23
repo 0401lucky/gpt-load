@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/index.md","reason":"检查变更范围与经典/新版兼容性"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"运行现有静态门禁及构建，不新增测试框架"}
