@@ -352,3 +352,38 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 12: 兼容合并上游 main 的 50 个提交
+<!-- trellis-session: v=2 fp=bfa3425044831868 -->
+
+**Date**: 2026-11-19
+**Task**: 兼容合并上游 main 的 50 个提交
+**Branch**: `main`
+
+### Summary
+
+接续完成固定上游 e4a6ddec 的兼容合并，本地 main 保留双方历史和 fork 定制；迁移顺延为 0034，修复网关准备失败顺序与诊断编码脱敏。
+
+### Main Changes
+
+- 冻结旧 33 个迁移，保留捐献、凭据备注、窗口用量、冷却/可信周期和双前端诊断合同；任务已归档。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f409d105a20ce64076f990039cc136ab46cd26b9` | merge: 兼容合并上游 main 至 e4a6ddec（0034 迁移与安全诊断） |
+
+### Testing
+
+- [OK] Linux make check PNPM=pnpm 全通过：75 个 Go 测试包、前端静态门禁及构建；CPA tidy/vet/完整测试通过。
+- [OK] Windows 既有失败在固定 fork 基线复现；真实 MySQL/PostgreSQL 未实测，验证边界见归档任务 validation.md。
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- 远端推送和发布待用户明确确认；未操作生产环境。
