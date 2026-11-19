@@ -38,3 +38,10 @@
 - 未提供专用 MySQL/PostgreSQL 测试 DSN，真实网络库未实测；现有方言和恢复合同测试保留。测试进程清除真实 provider/live 与外部数据库 opt-in，不操作生产数据或服务。
 - 后端三语言各 50 个 key 一致；本次诊断字段和文案同步。classic 日语 `monitor.ts` 的 `affinityPromptPrefix`、`affinityPromptCacheKey`、`affinityResponseContinuity` 在两个父提交都已缺失，保留为既有 fallback 观察，不扩大本任务修改范围。
 - 初始未跟踪 `.playwright-mcp/`、`.trellis/tasks/09-28-credential-probe-real-chat/` 与 ignored `tmp/baseline-59d75050/` 均保留。
+
+## 本地合并结果
+
+- 合并提交：`f409d105a20ce64076f990039cc136ab46cd26b9`；父提交依次为固定 fork 起点 `72b24ef8` 与上游目标 `e4a6ddec`。
+- 本地 main 已快进到该合并提交；双方起点均为 main 祖先，固定上游剩余未合入提交为 0。
+- 交付源码与已验收 tree `525d32260a943ea8ca0585eb8e995307c5af4aa8` 一致；验收后仅更新任务记录。
+- 后续归档和 journal 为本地 bookkeeping 提交；未推送 GitHub、发布镜像或操作生产环境。

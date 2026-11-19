@@ -23,12 +23,12 @@
 
 ## Acceptance Criteria
 
-- [ ] AC1（R1）：最终本地 main 包含固定 fork 起点与上游目标，真实 merge commit 有双方父提交，上游目标是 main 的祖先。
+- [x] AC1（R1）：最终本地 main 包含固定 fork 起点与上游目标，真实 merge commit 有双方父提交，上游目标是 main 的祖先。
 - [x] AC2（R2、R5）：定制功能路径和现有回归仍保留；无未解决冲突，合并差异没有无关业务变更。
 - [x] AC3（R3）：完整迁移链为 34 项，旧 33 项为严格前缀，已发布迁移 Git blob 不变；真实临时 SQLite 从旧 fork 链升级、重开与幂等执行通过。
 - [x] AC4（R4）：连接测试安全诊断、错误详情、协议 fallback 与恢复 proof 回归通过；classic/modern 静态检查、三语言 key 和资源投影一致。
 - [x] AC5（R6）：`make check` 或本机逐项等价门禁通过；CPA 独立 module tidy/vet 及相关测试通过。无法实测的部分有具体原因和证据。
-- [ ] AC6（R1、R2）：形成可审查的本地提交与验证记录，任务产物归档，初始未跟踪目录保留。
+- [x] AC6（R1、R2）：形成可审查的本地提交与验证记录，任务产物归档，初始未跟踪目录保留。
 
 ## Out of Scope
 

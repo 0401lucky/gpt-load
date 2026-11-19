@@ -13,8 +13,8 @@
 - [x] 执行 Linux `make check PNPM=pnpm`：精确依赖、gofmt、根 module tidy/vet、75 个 Go 测试包、前端 lint/styles/format/type-check、等待 Go 结束后 Vite build、最终 Go build 与 diff --check 全通过。
 - [x] 修复网关准备失败顺序和诊断百分号编码大小写缺陷；Windows 原有失败同环境基线复现，并用 Linux 完整验收补齐证据。
 - [x] 主会话更新必要 spec 和最终验证记录并审阅范围。
-- [ ] 创建真实 merge commit，快进本地 main 并核验双方父提交和上游祖先关系。
-- [ ] Trellis finish-work 归档任务、记录 journal，交付 commit 和验证结果。远端发布最后另行确认。
+- [x] 创建真实 merge commit `f409d105`，快进本地 main 并核验双方父提交和上游祖先关系，固定上游剩余未合入提交为 0。
+- [x] Trellis finish-work 归档任务、记录 journal，交付 commit 和验证结果。远端发布最后另行确认。
 
 ## Git 与文件所有权
 
