@@ -251,7 +251,10 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
             v-if="result.reason"
           >
             · {{ t('credentialCards.testReason.' + result.reason) }}</span
-          ></AppNotice
+          >
+          <div v-if="result.errorDetail" class="modern-credential-test-error">
+            {{ result.errorDetail }}
+          </div></AppNotice
         >
         <dl v-if="result" class="modern-credential-test-details">
           <template v-if="result.upstreamStatusCode !== null"
@@ -270,8 +273,7 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
           >
         </dl>
         <div class="modern-credential-test-actions">
-          <AppButton :disabled="pending" @click="close">{{ t('shell.close') }}</AppButton
-          ><AppButton
+          <AppButton :disabled="pending" @click="close">{{ t('shell.close') }}</AppButton><AppButton
             v-if="result?.proof"
             variant="outline"
             :loading="pending"
@@ -296,6 +298,12 @@ useMessageSource(() => (error.value ? { text: error.value, tone: 'danger' } : un
   display: grid;
   gap: var(--modern-space-4);
   padding: var(--modern-space-5) var(--modern-space-6);
+}
+.modern-credential-test-error {
+  max-height: 8lh;
+  margin-top: var(--modern-space-2);
+  overflow: auto;
+  white-space: pre-wrap;
 }
 .modern-credential-test-actions {
   display: flex;

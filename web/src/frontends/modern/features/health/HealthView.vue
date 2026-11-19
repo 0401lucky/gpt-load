@@ -302,8 +302,7 @@ useMessageSource(() =>
     >
       <template #header>
         <div class="modern-health-row modern-health-heading" aria-hidden="true">
-          <span>{{ t('health.object') }}</span
-          ><span>{{ t('health.group') }}</span
+          <span>{{ t('health.object') }}</span><span>{{ t('health.group') }}</span
           ><span>{{ t('health.problem') }}</span
           ><span>{{ t('health.impact') }}</span
           ><span>{{ t('health.recoveryColumn') }}</span
@@ -392,8 +391,7 @@ useMessageSource(() =>
             <div class="modern-health-stack" :data-label="t('health.problem')">
               <AppBadge :tone="row.severity" size="xs" dot>{{
                 t('health.kinds.' + row.kind)
-              }}</AppBadge
-              ><AppOverflowText :text="row.reason" class="modern-health-secondary" />
+              }}</AppBadge><AppOverflowText :text="row.reason" class="modern-health-secondary" />
             </div>
             <div class="modern-health-impact" :data-label="t('health.impact')">
               <AppOverflowText :text="row.impact" />
@@ -516,8 +514,8 @@ useMessageSource(() =>
   flex: none;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--modern-space-3);
-  padding-block: var(--modern-space-5) var(--modern-space-3);
+  gap: var(--modern-page-toolbar-gap);
+  padding: var(--modern-page-toolbar-top) 0 var(--modern-page-toolbar-bottom);
 }
 .modern-health-search {
   flex: 2 1 320px;
@@ -533,8 +531,8 @@ useMessageSource(() =>
   align-items: center;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: var(--modern-space-3);
-  padding-bottom: var(--modern-space-3);
+  gap: var(--modern-page-statusbar-gap);
+  padding-bottom: var(--modern-page-statusbar-bottom);
 }
 .modern-health-summary {
   display: flex;
@@ -643,18 +641,11 @@ useMessageSource(() =>
   .modern-health-workspace :deep(.modern-list-scroll) {
     overscroll-behavior-y: auto;
   }
-  .modern-health-filters {
-    padding-block: var(--modern-space-1-5);
-    gap: var(--modern-space-1-5);
-  }
   .modern-health-search {
     flex-basis: 100%;
   }
   .modern-health-choice {
     flex-basis: 120px;
-  }
-  .modern-health-statusbar {
-    padding-bottom: var(--modern-space-1-5);
   }
   .modern-health-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));

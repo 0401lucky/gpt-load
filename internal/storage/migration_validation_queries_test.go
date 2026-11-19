@@ -58,7 +58,7 @@ func verifyMigrationValidationQueryLimits(t *testing.T, db *gorm.DB) {
 	initialLimit := 1000
 	if db.Dialector.Name() == "sqlite" {
 		// The fork also initializes donation intake, manual review and credential
-		// notes. Its 33-migration chain uses 1160 statements; retain modest headroom
+		// notes. Its 34-migration chain uses 1189 statements; retain modest headroom
 		// for that schema without weakening the repeated-startup guard below.
 		initialLimit = 1200
 	}
@@ -77,8 +77,9 @@ func verifyMigrationValidationQueryLimits(t *testing.T, db *gorm.DB) {
 	if counter.total > 400 {
 		t.Errorf("repeat startup executed %d SQL statements, want at most 400", counter.total)
 	}
-	if db.Dialector.Name() == "mysql" && counter.currentDatabase > 10 {
-		t.Errorf("MySQL repeated SELECT DATABASE() %d times, want at most 10", counter.currentDatabase)
+	// 0034 首次校验 model_prices 的列类型，多出一次 GORM schema 查询；每表仍只读取一次。
+	if db.Dialector.Name() == "mysql" && counter.currentDatabase > 11 {
+		t.Errorf("MySQL repeated SELECT DATABASE() %d times, want at most 11", counter.currentDatabase)
 	}
 }
 

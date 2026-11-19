@@ -252,11 +252,21 @@ defer func() {
 
 1. **适用范围**：管理端单凭据连接测试；“暂时无法判断”是凭据有效性的结论，不代表可以丢弃已知上游错误。
 2. **入口**：`POST /api/groups/:group_id/credentials/:credential_id/test`，`CredentialProbeResponse` 定义于 `internal/control/credential_probe.go`。
-3. **响应**：保留 `outcome` / `reason` / 恢复证明；附带 `upstream_status_code`（无上游 HTTP 响应则 null）、`error_summary`（安全摘要或 null）、`retry_after_seconds`（明确上游建议或 null）。正文 `Try again in` 可以保留在摘要，不得把已加余量且钳制的 `ParseResetHint` 返回值当作供应商原始时长。
+3. **响应**：保留 `outcome` / `reason` / 恢复证明；附带 `upstream_status_code`（无上游 HTTP 响应则 null）、`error_summary`（安全摘要或 null）、`retry_after_seconds`（明确上游建议或 null），并兼容可省略的 `error_detail`（Go `string` + `omitempty`）。正文 `Try again in` 可以保留在摘要，不得把已加余量且钳制的 `ParseResetHint` 返回值当作供应商原始时长。
 4. **错误矩阵**：上游 429 → 原分类 `inconclusive/rate_limited` 加具体摘要；401 → 既有凭据无效分类加可用摘要；超时/无响应 → 状态 null；成功 → 无错误摘要；内部/准备失败 → 现有安全错误出口。管理 API 的 HTTP 200 不能冒充上游状态码。
-5. **正常/基础/异常样例**：`Daily free limit reached ... Try again in 23h 54m` 可展示；只有 429 无摘要时显示分类；原始 HTML、凭据回显、内部堆栈不得直传。沿用 `platform/redact` 和执行层摘要限长，先用已知秘密脱敏再截断。
-6. **必要测试**：正文限流、Retry-After 秒数/日期、401、成功、超时、非法 AttemptResult、非标准 key/代理认证回显、超长文本、控制字符；检查探测不改变调度/冷却状态，两套前端投影字段同时更新。
+5. **正常/基础/异常样例**：`Daily free limit reached ... Try again in 23h 54m` 可展示；只有 429 无摘要时显示分类；原始 HTML、凭据回显、内部堆栈不得直传。`projectCredentialProbeDiagnostics(result, spec, now)` 在执行阶段已知秘密仍在作用域时投影；两套字段共用凭据 JSON 字段、认证头、代理账号/密码和 Basic 值及 URL query/path 编码变体，`code` / `request_id` 也须脱敏，再按执行层限长。百分号转义的十六进制大小写按等价表示匹配，普通 token 字符仍精确区分大小写。
+6. **必要测试**：正文限流、Retry-After 秒数/日期、401、成功、超时、非法 AttemptResult、非标准 key/代理认证回显、超长文本、控制字符；`TestCredentialProbeDiagnosticsRedactBothFieldSetsAndMetadata` 和 `TestCredentialProbeDiagnosticsRedactEncodedSecrets` 检查两个字段集及元数据共用脱敏边界。检查探测不改变调度/冷却状态，两套前端投影字段同时更新。
 7. **错误与正确做法**：错误：只返回分类或直接返回原始响应 body。正确：原分类 + 可安全展示的诊断字段，Vue 文本插值渲染；日志只能复用同一份安全诊断。
+
+## 网关请求准备失败与 Responses 恢复
+
+1. **适用范围**：`internal/gateway/handler.go` 将请求准备结果交给 encrypted replay 或 invalid lineage 清理时，准备失败可能没有可用请求。
+2. **签名**：`h.prepareRequest(...)` 返回带 `request` / `err` 的准备结果；任何 `prepared.request.Body` 访问都必须在既有 `prepared.err` 分支处理之后。
+3. **合同**：保留原准备错误的健康决策、重试/failover 和安全响应语义；恢复改写仅处理成功准备的请求，不得绕过请求脱敏失败。
+4. **错误矩阵**：lineage 或 `item_id` 已失效且脱敏失败 → 返回原 `redaction_failed`，不能 panic 或发送未脱敏正文；恢复重放后切换分组再次准备失败 → 同样处理准备错误。
+5. **正常/基础/异常样例**：准备成功后仍按既有规则清理失效状态；无恢复标记的普通失败沿用原出口；有恢复标记但请求为 nil 的失败必须在正文改写前结束。
+6. **必要回归**：`TestResponsesContextRecoveryRejectsRedactionFailureBeforeLineageRewrite` 覆盖 lineage 和 `item_id` 两种标记；`TestResponsesContextRecoveryRejectsRedactionFailureDuringFailover` 覆盖恢复后的跨组准备失败，断言安全状态码/原因及无未脱敏上游调用。
+7. **错误/正确**：错误：先清理 `prepared.request.Body`，再检查 `prepared.err`。正确：将完整的原错误处理分支放在所有请求访问之前，再执行成功态恢复改写。
 
 ## 反模式
 

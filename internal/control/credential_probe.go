@@ -11,8 +11,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -59,6 +61,7 @@ type CredentialProbeResponse struct {
 	Protocol           protocol.Protocol      `json:"protocol"`
 	LatencyMS          int64                  `json:"latency_ms"`
 	Reason             *CredentialProbeReason `json:"reason"`
+	ErrorDetail        string                 `json:"error_detail,omitempty"`
 	CanRestore         bool                   `json:"can_restore"`
 	RestoreProof       *string                `json:"restore_proof"`
 	TestedAtMS         int64                  `json:"tested_at_ms"`
@@ -262,6 +265,7 @@ type credentialProbeDiagnostics struct {
 	status  *int
 	summary *string
 	retry   *int64
+	detail  string
 }
 
 // Project while the attempt's known secrets are still in scope. No raw body,
@@ -302,12 +306,16 @@ func projectCredentialProbeDiagnostics(result execution.AttemptResult, spec exec
 		username := parsed.User.Username()
 		secrets = append(secrets, parsed.User.String(), username, password, base64.StdEncoding.EncodeToString([]byte(username+":"+password)))
 	}
-	summary := redact.ExtractErrorMessage([]byte(result.Error.Summary))
-	// Nested message fields can still contain HTML; never expose markup or stacks.
-	if strings.ContainsAny(summary, "<>") || strings.Contains(summary, "goroutine ") || strings.Contains(summary, "Traceback (") {
-		summary = ""
+	// 上游可能回显 URL 编码的认证材料；先扩展已知表示，再脱敏和截断。
+	for _, secret := range secrets {
+		if secret != "" {
+			secrets = append(secrets, url.QueryEscape(secret), url.PathEscape(secret))
+		}
 	}
-	summary = redact.New().String(summary, secrets...)
+	// 两套响应字段共享完整的已知秘密集合，详情中的 code/request_id 也必须脱敏。
+	diagnostics.detail = credentialProbeErrorDetail(result, secrets...)
+	summary := credentialProbeErrorMessageText(redact.ExtractErrorMessage([]byte(result.Error.Summary)))
+	summary = redactCredentialProbeText(summary, secrets...)
 	summary = strings.Join(strings.Fields(summary), " ")
 	if runes := []rune(summary); len(runes) > execution.MaxErrorSummaryLength {
 		summary = string(runes[:execution.MaxErrorSummaryLength-1]) + "…"
@@ -335,6 +343,68 @@ func projectCredentialProbeDiagnostics(result execution.AttemptResult, spec exec
 		}
 	}
 	return diagnostics
+}
+
+var credentialProbePercentEscapePattern = regexp.MustCompile(`%[0-9a-fA-F]{2}`)
+
+func redactCredentialProbeText(value string, secrets ...string) string {
+	if strings.Contains(value, "%") {
+		for _, secret := range secrets {
+			if !credentialProbePercentEscapePattern.MatchString(secret) {
+				continue
+			}
+			// 仅百分号转义的十六进制大小写等效，其他 token 字符仍精确匹配。
+			pattern := credentialProbePercentEscapePattern.ReplaceAllStringFunc(regexp.QuoteMeta(secret), func(escape string) string {
+				return "(?i:" + escape + ")"
+			})
+			matcher, err := regexp.Compile(pattern)
+			if err != nil {
+				return ""
+			}
+			value = matcher.ReplaceAllString(value, redact.Placeholder)
+		}
+	}
+	return redact.New().String(value, secrets...)
+}
+
+// 手动测试只返回执行层的安全错误证据，不返回上游原始响应体或响应头。
+func credentialProbeErrorDetail(result execution.AttemptResult, secrets ...string) string {
+	if result.Validate() != nil || result.Error == nil || result.StatusCode == 0 ||
+		(result.Error.Kind != execution.ErrorKindHTTP && result.Error.Kind != execution.ErrorKindProvider) {
+		return ""
+	}
+	var metadata []string
+	if result.Error.StatusCode != 0 {
+		metadata = append(metadata, fmt.Sprintf("HTTP %d", result.Error.StatusCode))
+	}
+	if code := credentialProbeErrorMessageText(result.Error.Code); code != "" {
+		metadata = append(metadata, code)
+	}
+	if requestID := credentialProbeErrorMessageText(result.Error.RequestID); requestID != "" {
+		metadata = append(metadata, "request_id="+requestID)
+	}
+	detail := strings.Join(metadata, " · ")
+	if message := credentialProbeErrorMessageText(result.Error.Summary); message != "" {
+		if detail != "" {
+			detail += "\n"
+		}
+		detail += message
+	}
+	detail = redactCredentialProbeText(detail, secrets...)
+	if utf8.RuneCountInString(detail) > execution.MaxErrorSummaryLength {
+		const marker = "...[truncated]"
+		detail = string([]rune(detail)[:execution.MaxErrorSummaryLength-len(marker)]) + marker
+	}
+	return detail
+}
+
+func credentialProbeErrorMessageText(value string) string {
+	value = redact.SanitizeErrorMessageText(value)
+	// 已提取的 message 仍可能夹带标记或堆栈，不能经任一诊断字段泄漏。
+	if strings.ContainsAny(value, "<>") || strings.Contains(value, "goroutine ") || strings.Contains(value, "Traceback (") {
+		return ""
+	}
+	return value
 }
 
 func newCredentialProbeFailure(stage string, cause error) error {
@@ -481,6 +551,7 @@ func (s *Service) TestGroupCredential(
 		UpstreamStatusCode: executed.diagnostics.status,
 		ErrorSummary:       executed.diagnostics.summary,
 		RetryAfterSeconds:  executed.diagnostics.retry,
+		ErrorDetail:        executed.diagnostics.detail,
 		Outcome:            outcome, Model: target.model, Protocol: executed.protocol,
 		LatencyMS:  max(executed.latency.Milliseconds(), 0),
 		Reason:     reason,

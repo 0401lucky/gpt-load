@@ -1,0 +1,8 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端检查边界"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"旧迁移 blob、升级前缀和数据保留"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"诊断不泄漏秘密"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"完整验收门禁与独立 CPA module"}
+{"file":".trellis/spec/frontend/index.md","reason":"两套前端质量边界"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"资源投影和竞态守卫"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"lint/format/type-check"}
+{"file":".trellis/tasks/11-19-merge-upstream-november-19/research/recon.md","reason":"合并语义复核范围"}

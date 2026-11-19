@@ -28,10 +28,23 @@ func TestCodexClientModelUsesGPT61SolTemplate(t *testing.T) {
 	if model["minimal_client_version"] != "0.153.0" || model["tool_mode"] != "code_mode_only" ||
 		model["multi_agent_version"] != "v2" || model["use_responses_lite"] != true ||
 		model["supports_reasoning_effort_updates"] != true || model["default_reasoning_level"] != "low" ||
-		model["context_window"] != json.Number("272000") || model["max_context_window"] != json.Number("872000") {
+		model["context_window"] != json.Number("500000") || model["max_context_window"] != json.Number("872000") {
 		t.Fatal("GPT-6.1 Sol did not retain its native capabilities")
 	}
 	assertCodexInstructionFields(t, model)
+}
+
+func TestCodexClientModelUsesGPT61TerraTemplate(t *testing.T) {
+	model, automatic, _, err := BuildCodexClientModel("gpt-6.1-terra", 0, ClientModelOverrides{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if model["context_window"] != json.Number("500000") || model["default_reasoning_level"] != "low" ||
+		model["supports_reasoning_effort_updates"] != true ||
+		!reflect.DeepEqual(automatic.SupportedReasoningLevels, []string{"low", "medium", "high", "xhigh", "max", "ultra"}) {
+		t.Fatalf("GPT-6.1 Terra did not retain its native capabilities: context=%v, updates=%v, profile=%#v",
+			model["context_window"], model["supports_reasoning_effort_updates"], automatic)
+	}
 }
 
 func TestCodexClientModelUsesGPT6Templates(t *testing.T) {

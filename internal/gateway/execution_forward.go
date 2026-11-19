@@ -116,6 +116,15 @@ func (forwarder *ExecutionForwarder) Forward(
 			result.ClassificationBody,
 		)
 	}
+	if input.ObserveUsage && input.ClientProtocol == protocol.Anthropic && input.RouteMode == execution.RouteNative &&
+		result.HasResponse() && result.StatusCode >= http.StatusOK &&
+		result.StatusCode < http.StatusMultipleChoices && forwarder.usageCapture != nil {
+		// 与原生流一致，以响应体用量为准：SDK 只给汇总数字，会丢失 advisor 等按轮次计费的明细。
+		captured := forwarder.usageCapture.extractNonStreamingPlain(input.Dialect, result.ClassificationBody)
+		if captured.State != usage.StateMissing {
+			result.Usage = captured
+		}
+	}
 	if embeddingsProtocol(input.ClientProtocol) && result.Err == nil &&
 		result.StatusCode >= http.StatusOK && result.StatusCode < http.StatusMultipleChoices {
 		result.ClassificationBody = nil
@@ -496,7 +505,7 @@ func (forwarder *ExecutionForwarder) ForwardStream(
 			}
 		}
 	}
-	emptyResponse := !committed && downstreamErr == nil && terminal.Error == nil &&
+	emptyResponse := !committed && downstreamErr == nil && terminal.Error == nil && !terminal.Incomplete &&
 		ready != nil && ready.StatusCode >= http.StatusOK && ready.StatusCode < http.StatusMultipleChoices &&
 		preread.active() && streamEvents.endedWithoutContent()
 	if !emptyResponse {
@@ -1205,7 +1214,11 @@ func executionStreamObservation(
 		return observeStreamTermination(ctx, downstreamErr, streamEvents)
 	}
 	if terminal.Error == nil {
-		return streamEvents.endObservation()
+		observation := streamEvents.endObservation()
+		if terminal.Incomplete && observation.EndReason == StreamEndCleanEOF {
+			return streamTerminalObservation(StreamEndProviderIncomplete)
+		}
+		return observation
 	}
 	switch terminal.Error.Kind {
 	case execution.ErrorKindCanceled:

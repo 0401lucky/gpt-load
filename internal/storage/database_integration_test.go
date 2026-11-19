@@ -110,7 +110,7 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 			"upstream_protocol", "failure_origin", "failure_scope",
 			"retry_directive", "effect", "rule_id",
 		},
-		"model_prices":            {"mode_price_schedules"},
+		"model_prices":            {"mode_price_schedules", "source_price_id"},
 		"credential_observations": {"last_auth_refresh_secret_version"},
 		"request_logs": {
 			"auto_decision", "decision_model", "decision_cost_nano_usd",
@@ -169,9 +169,10 @@ func TestExternalDatabaseLifecycle(t *testing.T) {
 		"0031_request_log_client_ip",
 		"0032_group_priority",
 		"0033_request_body_recording",
+		"0034_model_price_reference",
 	}
 	if !slices.Equal(migrationIDs, wantMigrationIDs) {
-		t.Fatalf("migration ledger = %v, want complete 0001-0033 chain", migrationIDs)
+		t.Fatalf("migration ledger = %v, want complete 0001-0034 chain", migrationIDs)
 	}
 	if !db.Migrator().HasIndex("usage_stats", "idx_usage_stats_group_bucket") {
 		t.Fatal("usage_stats group activity index is missing")

@@ -247,22 +247,34 @@ type textMatch struct {
 	plaintext        string
 }
 
-func (c *Compiled) rewriteText(value string, cipher TokenCipher, protected []tokenSpan, jsonText bool) (string, error) {
+func (c *Compiled) textMatches(value string) ([]textMatch, error) {
 	spans := []textMatch{}
 	for i, p := range c.patterns {
 		matches := p.FindAllStringIndex(value, 65537)
 		if len(matches) > 65536 {
-			return "", ErrContent
+			return nil, ErrContent
 		}
 		for _, span := range matches {
 			if span[0] == span[1] {
 				continue
 			}
-			if c.rules[i].Mode == ModeEncrypt && cipher == nil {
-				return "", ErrContent
-			}
 			spans = append(spans, textMatch{start: span[0], end: span[1], rule: i})
 			if len(spans) > 65536 {
+				return nil, ErrContent
+			}
+		}
+	}
+	return spans, nil
+}
+
+func (c *Compiled) rewriteText(value string, cipher TokenCipher, protected []tokenSpan, jsonText bool) (string, error) {
+	spans, err := c.textMatches(value)
+	if err != nil {
+		return "", err
+	}
+	if cipher == nil {
+		for _, span := range spans {
+			if c.rules[span.rule].Mode == ModeEncrypt {
 				return "", ErrContent
 			}
 		}
@@ -289,23 +301,7 @@ func (c *Compiled) rewriteText(value string, cipher TokenCipher, protected []tok
 	if len(spans) == 0 {
 		return value, nil
 	}
-	sort.Slice(spans, func(i, j int) bool {
-		if spans[i].start == spans[j].start {
-			return spans[i].rule < spans[j].rule
-		}
-		return spans[i].start < spans[j].start
-	})
-	merged := spans[:0]
-	for i := 0; i < len(spans); {
-		span := spans[i]
-		i++
-		for i < len(spans) && spans[i].start < span.end {
-			span.end = max(span.end, spans[i].end)
-			span.rule = min(span.rule, spans[i].rule)
-			i++
-		}
-		merged = append(merged, span)
-	}
+	merged := mergeTextMatches(spans)
 	for i := range merged {
 		merged[i].plaintext = value[merged[i].start:merged[i].end]
 	}
@@ -349,6 +345,28 @@ func (c *Compiled) rewriteText(value string, cipher TokenCipher, protected []tok
 	}
 	out.WriteString(value[pos:])
 	return out.String(), nil
+}
+
+// mergeTextMatches 保留现有的重叠合并与规则顺序，预览和生产改写共用。
+func mergeTextMatches(spans []textMatch) []textMatch {
+	sort.Slice(spans, func(i, j int) bool {
+		if spans[i].start == spans[j].start {
+			return spans[i].rule < spans[j].rule
+		}
+		return spans[i].start < spans[j].start
+	})
+	merged := spans[:0]
+	for i := 0; i < len(spans); {
+		span := spans[i]
+		i++
+		for i < len(spans) && spans[i].start < span.end {
+			span.end = max(span.end, spans[i].end)
+			span.rule = min(span.rule, spans[i].rule)
+			i++
+		}
+		merged = append(merged, span)
+	}
+	return merged
 }
 
 // ProtocolField 报告字段是否是协议标识或不透明数据。请求加密上游生成的历史内容、
@@ -444,8 +462,6 @@ func (c *Compiled) apply(body []byte, data, decisions bool, depth int, patchCoun
 	// 上游生成、随历史回传的内容（助手消息、推理与各类工具调用）按字段整体加密，
 	// 与响应侧整体还原对应，只跳过协议字段。
 	inModel := false
-	// inSigned 表示正在按普通上游内容处理客户端改动过的签名内容，内部不再识别签名。
-	inSigned := false
 	var walk func(gjson.Result, bool, bool, int, bool) error
 	var toolResult func(gjson.Result, int) error
 	// 签名内容由上游生成，必须逐字节还给上游：签名块与记录完全一致时按位置换回上游原文和原签名；
@@ -480,9 +496,24 @@ func (c *Compiled) apply(body []byte, data, decisions bool, depth int, patchCoun
 			}
 			return nil
 		}
-		inSigned = true
-		defer func() { inSigned = false }()
 		return walk(v, content, false, depth, questions)
+	}
+	// signedArray 遍历上游生成内容的对象（消息、推理项）直属的协议数组：只有这些元素可能是签名块，
+	// 与响应侧写入还原记录的位置一致；更深处同名的数组和对象都按普通上游内容处理。
+	signedArray := func(array gjson.Result, field string, depth int, questions bool) error {
+		if depth > 64 {
+			return ErrContent
+		}
+		var failure error
+		array.ForEach(func(_, element gjson.Result) bool {
+			if signature, path, found := signaturePosition(element, field); element.IsObject() && found {
+				failure = signed(element, signature, path, true, depth+1, questions)
+			} else {
+				failure = walk(element, true, false, depth+1, questions)
+			}
+			return failure == nil
+		})
+		return failure
 	}
 	toolResult = func(value gjson.Result, depth int) error {
 		if depth > 64 {
@@ -550,13 +581,9 @@ func (c *Compiled) apply(body []byte, data, decisions bool, depth int, patchCoun
 				return nil
 			}
 		}
-		if !data && inModel && !inSigned && v.IsObject() {
-			if signature, path, found := signaturePosition(v); found {
-				return signed(v, signature, path, content, depth, questions)
-			}
-		}
+		signedRoot := false
 		if !data && !inModel && v.IsObject() && modelAuthored(v) {
-			inModel = true
+			inModel, signedRoot = true, true
 			defer func() { inModel = false }()
 		}
 		var failure error
@@ -567,6 +594,10 @@ func (c *Compiled) apply(body []byte, data, decisions bool, depth int, patchCoun
 			}
 			if inModel && ProtocolField(k.Str) {
 				return true
+			}
+			if signedRoot && child.IsArray() && signatureArray(k.Str) {
+				failure = signedArray(child, k.Str, depth+1, questions)
+				return failure == nil
 			}
 			switch k.Str {
 			case "questions":

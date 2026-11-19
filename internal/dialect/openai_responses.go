@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"gpt-load/internal/execution"
 	"gpt-load/internal/protocol"
@@ -49,6 +50,10 @@ func (d *OpenAIResponses) InspectRequest(req *ParsedRequest) (RequestMetadata, e
 		metadata = parsed
 		if req.Method == http.MethodPost && req.Path == openAIResponsesPath {
 			metadata.PromptCacheKey = inspectPromptCacheKey(req.Body)
+			metadata.AdvisorModels, err = inspectAdvisorModels(req.Body)
+			if err != nil {
+				return RequestMetadata{}, fmt.Errorf("decode %s request: %w", d.Protocol(), err)
+			}
 		}
 	}
 	if req.Method == http.MethodGet {
@@ -76,6 +81,21 @@ func (d *OpenAIResponses) InspectRequest(req *ParsedRequest) (RequestMetadata, e
 	}
 	metadata.Operation, metadata.RouteRequirement, metadata.ResponsesStorePreference =
 		responsesExecutionMetadata(req)
+	if metadata.Operation != execution.OperationResponsesCreate &&
+		metadata.Operation != execution.OperationResponsesCompact &&
+		metadata.Operation != execution.OperationResponsesInputTokens {
+		if resource, found := strings.CutPrefix(req.Path, openAIResponsesPath+"/"); found {
+			// 扩展方法和资源子路径也必须校验首段 ID，不能通过透传绕过归属检查。
+			metadata.ResponseResourceID, _, _ = strings.Cut(resource, "/")
+			if metadata.ResponseResourceID == "" {
+				return RequestMetadata{}, fmt.Errorf("response resource ID is required")
+			}
+		}
+	}
+	if len(metadata.AdvisorModels) > 0 {
+		// advisor 用量只能从原生响应的轮次明细读取，转换路由会丢失。
+		metadata.RouteRequirement = execution.RouteRequirementNative
+	}
 	return metadata, nil
 }
 

@@ -122,7 +122,7 @@ function setOpen(open: boolean): void {
             <dt>{{ t('group.credentials.test.fields.latency') }}</dt>
             <dd>{{ t('group.credentials.test.latency', { value: n(result.latency_ms) }) }}</dd>
             <dt>{{ t('group.credentials.test.fields.reason') }}</dt>
-            <dd>{{ reasonLabel }}</dd>
+            <dd class="credential-test-dialog__error">{{ result.error_detail || reasonLabel }}</dd>
             <template v-if="result.upstream_status_code !== null">
               <dt>{{ t('group.credentials.test.upstreamStatus') }}</dt>
               <dd>{{ result.upstream_status_code }}</dd>
@@ -232,6 +232,12 @@ function setOpen(open: boolean): void {
   color: var(--color-text);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
+}
+
+.credential-test-dialog__error {
+  max-height: 8lh;
+  overflow: auto;
+  white-space: pre-wrap;
 }
 
 @media (max-width: 480px) {

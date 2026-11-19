@@ -19,9 +19,10 @@ func TestForkMigrationUpgradePreservesPublishedLedgerAndData(t *testing.T) {
 		nextID string
 		count  int
 	}{
-		{name: "24_to_33", nextID: migrationfiles.ID0025, count: 24},
-		{name: "27_to_33", nextID: migrationfiles.ID0028, count: 27},
-		{name: "32_to_33", nextID: migrationfiles.ID0033, count: 32},
+		{name: "24_to_34", nextID: migrationfiles.ID0025, count: 24},
+		{name: "27_to_34", nextID: migrationfiles.ID0028, count: 27},
+		{name: "32_to_34", nextID: migrationfiles.ID0033, count: 32},
+		{name: "33_to_34", nextID: migrationfiles.ID0034, count: 33},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
@@ -47,8 +48,11 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 		db.Migrator().HasColumn("request_logs", "client_ip")) {
 		t.Fatal("published schema already contains pending upstream migrations")
 	}
-	if db.Migrator().HasColumn("access_keys", "record_request_body") || db.Migrator().HasTable("request_log_bodies") {
+	if publishedCount < 33 && (db.Migrator().HasColumn("access_keys", "record_request_body") || db.Migrator().HasTable("request_log_bodies")) {
 		t.Fatal("published schema already contains request body recording")
+	}
+	if db.Migrator().HasColumn("model_prices", "source_price_id") {
+		t.Fatal("published schema already contains model price references")
 	}
 	if publishedCount == 27 && (!db.Migrator().HasColumn("request_logs", "first_output_ms") ||
 		!db.Migrator().HasColumn("request_logs", "last_output_ms")) {
@@ -60,11 +64,12 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 	var priority int32
 	var concurrencyLimit *int64
 	var clientIP *string
-	if publishedCount == 32 {
+	if publishedCount >= 32 {
 		credentialName, priority = "保留已保存别名", 17
 		limit, ip := int64(3), "198.51.100.29"
 		concurrencyLimit, clientIP = &limit, &ip
 	}
+	inputPrice, outputPrice := int64(123), int64(456)
 	fixtures := []any{
 		&models.Group{
 			ID: 17, Name: "fork group", ChannelID: "openai", ConnectionType: models.ConnectionTypeAPIKey,
@@ -107,6 +112,11 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 			Model: "test-model", RequestCount: 1, SuccessCount: 1, UncachedInputTokens: 17, OutputTokens: 23, CacheReadTokens: 31,
 			CacheWrite5MTokens: 37, CacheWrite1HTokens: 41, CacheWriteUnknownTokens: 43,
 		},
+		&models.ModelPrice{
+			ID: 59, ChannelID: "openai", ModelID: "test-model", IsManual: true,
+			InputPriceNanoUSDPerMillionTokens: &inputPrice, OutputPriceNanoUSDPerMillionTokens: &outputPrice,
+			CreatedAtMS: 115, UpdatedAtMS: 116,
+		},
 	}
 	for _, fixture := range fixtures {
 		query := db
@@ -119,6 +129,8 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 			if publishedCount < 29 {
 				query = db.Omit("Name")
 			}
+		case *models.ModelPrice:
+			query = db.Omit("SourcePriceID")
 		}
 		if err := query.Create(fixture).Error; err != nil {
 			t.Fatalf("create legacy %T: %v", fixture, err)
@@ -126,7 +138,11 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 	}
 	key := models.AccessKey{ID: 53, Name: "existing key", KeyValue: "synthetic-encrypted-key", KeyHash: "access-key-hash", KeySuffix: "cafe", CreatedAtMS: 113, UpdatedAtMS: 114}
 	key.ConcurrencyLimit = concurrencyLimit
-	keyQuery := db.Omit("RecordRequestBody")
+	key.RecordRequestBody = publishedCount >= 33
+	keyQuery := db
+	if publishedCount < 33 {
+		keyQuery = keyQuery.Omit("RecordRequestBody")
+	}
 	if publishedCount < 26 {
 		keyQuery = keyQuery.Omit("ConcurrencyLimit", "RecordRequestBody")
 	}
@@ -159,6 +175,24 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 		"error_summary": "", "pricing_receipt": `{"preserved":true}`,
 	}).Error; err != nil {
 		t.Fatalf("create legacy request attempt: %v", err)
+	}
+	bodyText := `{"model":"test-model","input":"synthetic upgrade fixture"}`
+	if publishedCount >= 33 {
+		if err := db.Create(&models.RequestLogBody{
+			RequestID: request.ID, State: "original", OriginalBytes: int64(len(bodyText)), Body: &bodyText,
+		}).Error; err != nil {
+			t.Fatalf("create legacy request body: %v", err)
+		}
+	}
+	const retiredPriceID = 79
+	if err := db.Table("model_prices").Create(map[string]any{
+		"id": retiredPriceID, "channel_id": "openai", "model_id": "removed-before-upgrade",
+		"is_manual": true, "created_at_ms": 117, "updated_at_ms": 118,
+	}).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Exec("DELETE FROM model_prices WHERE id = ?", retiredPriceID).Error; err != nil {
+		t.Fatal(err)
 	}
 
 	var oldLedger []string
@@ -199,6 +233,7 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 		"0031_request_log_client_ip",
 		"0032_group_priority",
 		"0033_request_body_recording",
+		"0034_model_price_reference",
 	}
 	if !slices.Equal(oldLedger, wantLedger[:publishedCount]) {
 		t.Fatalf("published ledger = %v, want %v", oldLedger, wantLedger[:publishedCount])
@@ -206,11 +241,16 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 	// Preserve all original columns except the explicitly retired output timing,
 	// including identity, ciphertext, timestamps, notes, donation receipts and usage.
 	snapshots := make(map[string]forkUpgradeTableSnapshot)
-	for _, table := range []string{
+	tables := []string{
 		"groups", "credentials", "access_keys", "request_logs", "request_log_attempts", "usage_stats", "schema_migrations",
 		"donation_identities", "donation_batches", "donation_items", "donation_resources",
 		"donation_review_actions", "donation_retries",
-	} {
+		"model_prices",
+	}
+	if publishedCount >= 33 {
+		tables = append(tables, "request_log_bodies")
+	}
+	for _, table := range tables {
 		columns, err := db.Migrator().ColumnTypes(table)
 		if err != nil {
 			t.Fatal(err)
@@ -227,7 +267,6 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 			t.Fatalf("fixture %s does not contain exactly one row", table)
 		}
 	}
-	bodyText := `{"model":"test-model","input":"synthetic upgrade fixture"}`
 	for run := range 2 {
 		sqlDB, err := db.DB()
 		if err != nil {
@@ -275,7 +314,7 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 		}
 		if !reflect.DeepEqual(defaults.ConcurrencyLimit, concurrencyLimit) || defaults.Name != credentialName ||
 			defaults.Priority != priority || !reflect.DeepEqual(defaults.ClientIP, clientIP) ||
-			defaults.RecordRequestBody != (publishedCount == 32 && run > 0) {
+			defaults.RecordRequestBody != (publishedCount >= 33 || publishedCount == 32 && run > 0) {
 			t.Fatalf("migration run %d changed legacy values or recording policy: %+v", run+1, defaults)
 		}
 		assertOutputTimingRemoved(t, db)
@@ -284,6 +323,15 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 		}
 		if !db.Migrator().HasTable("request_log_bodies") || !db.Migrator().HasColumn("access_keys", "record_request_body") {
 			t.Fatal("request body recording schema is missing")
+		}
+		var price struct{ SourcePriceID *uint }
+		if err := db.Table("model_prices").Select("source_price_id").Take(&price, "id = ?", 59).Error; err != nil || price.SourcePriceID != nil {
+			t.Fatalf("migration run %d changed legacy price source: %+v, error = %v", run+1, price, err)
+		}
+		if !db.Migrator().HasIndex("model_prices", "idx_model_prices_channel_model") ||
+			!db.Migrator().HasIndex("model_prices", "idx_model_prices_source") ||
+			!db.Migrator().HasConstraint(&models.ModelPrice{}, "SourcePrice") {
+			t.Fatalf("migration run %d lost model price indexes or foreign key", run+1)
 		}
 		if publishedCount == 32 {
 			if run == 0 {
@@ -305,6 +353,10 @@ func testForkMigrationUpgrade(t *testing.T, nextID string, publishedCount int) {
 				}
 			}
 		}
+	}
+	newPrice := models.ModelPrice{ChannelID: "openai", ModelID: "after-upgrade"}
+	if err := db.Create(&newPrice).Error; err != nil || newPrice.ID <= retiredPriceID {
+		t.Fatalf("price after upgrade reused deleted ID: %+v, error = %v", newPrice, err)
 	}
 }
 

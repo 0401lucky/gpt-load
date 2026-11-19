@@ -2,15 +2,18 @@ package control
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 
@@ -121,6 +124,14 @@ func TestCredentialProbeDiagnosticsSanitizeAndPreserveExplicitEvidence(t *testin
 					}
 				}
 			}
+			for _, secret := range []string{"sk_nonstandard_probe_secret", "configured-header-secret", "custom-auth-token", "proxyuser", "proxypassword", "private transport error", "private internal error", "upstream debug"} {
+				if strings.Contains(d.detail, secret) {
+					t.Fatalf("error detail leaked %q", secret)
+				}
+			}
+			if (test.kind == execution.ErrorKindTimeout || test.kind == execution.ErrorKindTransport || result.Validate() != nil) && d.detail != "" {
+				t.Fatalf("internal or invalid evidence exposed in detail: %q", d.detail)
+			}
 			if test.retry == 0 && d.retry != nil || test.retry > 0 && (d.retry == nil || *d.retry != test.retry) {
 				t.Fatalf("retry=%v", d.retry)
 			}
@@ -130,7 +141,7 @@ func TestCredentialProbeDiagnosticsSanitizeAndPreserveExplicitEvidence(t *testin
 		})
 	}
 	passed := projectCredentialProbeDiagnostics(successfulCredentialProbeResult(), spec, now)
-	if passed.status == nil || *passed.status != 200 || passed.summary != nil || passed.retry != nil {
+	if passed.status == nil || *passed.status != 200 || passed.summary != nil || passed.retry != nil || passed.detail != "" {
 		t.Fatalf("passed=%+v", passed)
 	}
 	// Known-secret replacement can lengthen valid evidence; truncate only after redaction.
@@ -140,6 +151,93 @@ func TestCredentialProbeDiagnosticsSanitizeAndPreserveExplicitEvidence(t *testin
 	d := projectCredentialProbeDiagnostics(long, spec, now)
 	if d.summary == nil || len([]rune(*d.summary)) > execution.MaxErrorSummaryLength || strings.Contains(*d.summary, "x") {
 		t.Fatal("redaction/truncation order is unsafe")
+	}
+}
+
+func TestCredentialProbeDiagnosticsRedactBothFieldSetsAndMetadata(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 11, 19, 9, 0, 0, 0, time.UTC)
+	proxyAuth := base64.StdEncoding.EncodeToString([]byte("proxyuser:proxypassword"))
+	secrets := []string{"nonstandard-probe-secret", "refresh_probe_secret", "configured-header-secret", "custom-auth-token", "proxyuser", "proxypassword", proxyAuth}
+	spec := execution.AttemptSpec{
+		Credential: execution.NewCredentialSnapshot(1, 1, 1, []byte(`{"api_key":"nonstandard-probe-secret","refresh_token":"refresh_probe_secret"}`)),
+		Header:     http.Header{"X-Custom-Token": {"configured-header-secret"}, "Authorization": {"Bearer custom-auth-token"}},
+		Proxy:      outboundproxy.Effective{Config: outboundproxy.Config{Mode: outboundproxy.ModeCustom, URL: "http://proxyuser:proxypassword@proxy.test:8080"}},
+	}
+	result := failedCredentialProbeResult(http.StatusTooManyRequests, execution.ErrorKindHTTP, execution.FailureHintRateLimited)
+	result.Error.Code = "refresh_probe_secret"
+	result.Error.RequestID = "configured-header-secret"
+	result.Error.Summary = "Rejected " + strings.Join(secrets, " ")
+	result.Error.RetryAfter = 1500 * time.Millisecond
+	result.Body = []byte("private raw response body")
+	diagnostics := projectCredentialProbeDiagnostics(result, spec, now)
+	if diagnostics.status == nil || *diagnostics.status != 429 || diagnostics.summary == nil ||
+		diagnostics.retry == nil || *diagnostics.retry != 2 || !strings.HasPrefix(diagnostics.detail, "HTTP 429 · [REDACTED] · request_id=[REDACTED]\n") {
+		t.Fatalf("diagnostics lost compatible evidence: %+v", diagnostics)
+	}
+	for _, secret := range append(secrets, "private raw response body") {
+		if strings.Contains(*diagnostics.summary, secret) || strings.Contains(diagnostics.detail, secret) {
+			t.Fatalf("diagnostics leaked %q", secret)
+		}
+	}
+}
+
+func TestCredentialProbeDiagnosticsRedactEncodedSecrets(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 11, 19, 9, 0, 0, 0, time.UTC)
+	secrets := []string{"Probe+Key/Secret", "Opaque+Header/Token", "proxy+user", "p@ss+secret"}
+	credential, err := json.Marshal(map[string]string{"api_key": secrets[0]})
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxyURL := &url.URL{Scheme: "http", Host: "proxy.test:8080", User: url.UserPassword(secrets[2], secrets[3])}
+	spec := execution.AttemptSpec{
+		Credential: execution.NewCredentialSnapshot(1, 1, 1, credential),
+		Header:     http.Header{"X-Custom-Token": {secrets[1]}},
+		Proxy:      outboundproxy.Effective{Config: outboundproxy.Config{Mode: outboundproxy.ModeCustom, URL: proxyURL.String()}},
+	}
+	for _, test := range []struct {
+		name   string
+		encode func(string) string
+	}{
+		{name: "URL query", encode: url.QueryEscape},
+		{name: "URL path", encode: url.PathEscape},
+		{name: "lowercase URL query", encode: func(secret string) string {
+			return strings.NewReplacer("%2B", "%2b", "%2F", "%2f").Replace(url.QueryEscape(secret))
+		}},
+		{name: "lowercase URL path", encode: func(secret string) string {
+			return strings.ReplaceAll(url.PathEscape(secret), "%2F", "%2f")
+		}},
+		{name: "mixed-case URL query", encode: func(secret string) string {
+			return strings.ReplaceAll(url.QueryEscape(secret), "%2B", "%2b")
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			encoded := make([]string, len(secrets))
+			for index, secret := range secrets {
+				encoded[index] = test.encode(secret)
+			}
+			result := failedCredentialProbeResult(http.StatusTooManyRequests, execution.ErrorKindHTTP, execution.FailureHintRateLimited)
+			result.Error.Code = encoded[0]
+			result.Error.RequestID = encoded[1]
+			const publicReference = "probe%2Bkey%2Fsecret"
+			result.Error.Summary = "Rejected " + strings.Join(encoded, " ") + "; reference=" + publicReference
+			if err := result.Validate(); err != nil {
+				t.Fatalf("test evidence is invalid: %v", err)
+			}
+			diagnostics := projectCredentialProbeDiagnostics(result, spec, now)
+			if diagnostics.summary == nil || diagnostics.detail == "" {
+				t.Fatal("safe diagnostic evidence was discarded")
+			}
+			for _, secret := range append(secrets, encoded...) {
+				if strings.Contains(*diagnostics.summary, secret) || strings.Contains(diagnostics.detail, secret) {
+					t.Fatalf("diagnostics retained an encoded secret: %q", secret)
+				}
+			}
+			if !strings.Contains(*diagnostics.summary, publicReference) || !strings.Contains(diagnostics.detail, publicReference) {
+				t.Fatal("ordinary token characters lost their case-sensitive meaning")
+			}
+		})
 	}
 }
 
@@ -291,7 +389,7 @@ func TestGroupCredentialProbeHTTPReturnsCompletedUpstreamFailureAsData(t *testin
 		execution.FailureHintInvalidCredential,
 	)
 	result.Body = []byte("sensitive-upstream-response")
-	result.Error.Summary = "Invalid credential probe-http-failure-secret"
+	result.Error.Summary = "Incorrect API key: probe-http-failure-secret"
 	fixture.service.executor = &credentialProbeTestExecutor{result: result}
 	const auth = "credential-probe-failure-auth"
 	engine := gin.New()
@@ -311,10 +409,114 @@ func TestGroupCredentialProbeHTTPReturnsCompletedUpstreamFailureAsData(t *testin
 		!strings.Contains(response.Body.String(), `"outcome":"failed"`) ||
 		!strings.Contains(response.Body.String(), `"reason":"invalid_credential"`) ||
 		!strings.Contains(response.Body.String(), `"upstream_status_code":401`) ||
-		!strings.Contains(response.Body.String(), "Invalid credential [REDACTED]") ||
+		!strings.Contains(response.Body.String(), `"error_summary":"Incorrect API key: [REDACTED]"`) ||
+		!strings.Contains(response.Body.String(), `"error_detail":"HTTP 401`) ||
+		!strings.Contains(response.Body.String(), "Incorrect API key: [REDACTED]") ||
 		strings.Contains(response.Body.String(), "probe-http-failure-secret") ||
 		strings.Contains(response.Body.String(), "sensitive-upstream-response") {
 		t.Fatalf("probe failure response = %d %s", response.Code, response.Body.String())
+	}
+}
+
+func TestGroupCredentialProbeReturnsBoundedSafeErrorDetail(t *testing.T) {
+	t.Parallel()
+	for _, test := range []struct {
+		name      string
+		summary   string
+		status    int
+		code      string
+		want      string
+		truncated bool
+		invalid   bool
+	}{
+		{
+			name: "quota failure", status: http.StatusForbidden,
+			code: "insufficient_user_quota", summary: "Insufficient user quota, remaining quota: $-0.05",
+			want: "HTTP 403 · insufficient_user_quota · request_id=probe-request-id\nInsufficient user quota, remaining quota: $-0.05",
+		},
+		{
+			name: "credential echoed in message", status: http.StatusBadRequest,
+			summary: "Rejected probe-detail-secret and Bearer abcdefghijklmnopqrstuvwxyz",
+			want:    "HTTP 400 · request_id=probe-request-id\nRejected [REDACTED] and [REDACTED]",
+		},
+		{
+			name: "redacted prefix", status: http.StatusUnauthorized,
+			summary: "[REDACTED] is invalid for this model",
+			want:    "HTTP 401 · request_id=probe-request-id\n[REDACTED] is invalid for this model",
+		},
+		{
+			name: "provider prefix", status: http.StatusBadGateway,
+			summary: "[provider] Model temporarily unavailable",
+			want:    "HTTP 502 · request_id=probe-request-id\n[provider] Model temporarily unavailable",
+		},
+		{
+			name: "raw JSON array", status: http.StatusBadGateway,
+			summary: `["private upstream diagnostic"]`,
+			want:    "HTTP 502 · request_id=probe-request-id",
+		},
+		{
+			name: "raw JSON object", status: http.StatusBadGateway,
+			summary: `{"unexpected":"private upstream diagnostic"}`,
+			want:    "HTTP 502 · request_id=probe-request-id",
+		},
+		{
+			name: "long unicode message", status: http.StatusBadGateway,
+			summary: strings.Repeat("额度不足", 1024), truncated: true,
+		},
+		{
+			name: "markup response", status: http.StatusBadGateway,
+			summary: "<html>private upstream diagnostic</html>",
+			want:    "HTTP 502 · request_id=probe-request-id",
+		},
+		{
+			name: "invalid result", status: http.StatusForbidden,
+			summary: "invalid executor result", invalid: true,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			fixture := newServiceFixture(t)
+			groupID := createGroupWithCredentials(t, fixture, "probe-detail-secret")
+			var credential models.Credential
+			if err := fixture.db.Where("group_id = ?", groupID).Take(&credential).Error; err != nil {
+				t.Fatal(err)
+			}
+			result := failedCredentialProbeResult(test.status, execution.ErrorKindHTTP, "")
+			result.Body = []byte("raw-private-response")
+			result.Error.Code, result.Error.Summary = test.code, test.summary
+			result.Error.RequestID = "probe-request-id"
+			if test.invalid {
+				result.DispatchState = "invalid"
+			}
+			fixture.service.executor = &credentialProbeTestExecutor{result: result}
+			response, err := fixture.service.TestGroupCredential(t.Context(), groupID, credential.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			encoded, err := json.Marshal(response)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var body struct {
+				ErrorDetail string `json:"error_detail"`
+			}
+			if err := json.Unmarshal(encoded, &body); err != nil {
+				t.Fatal(err)
+			}
+			if test.truncated {
+				if utf8.RuneCountInString(body.ErrorDetail) != execution.MaxErrorSummaryLength ||
+					!utf8.ValidString(body.ErrorDetail) || !strings.HasSuffix(body.ErrorDetail, "...[truncated]") {
+					t.Fatalf("long error detail length = %d, want bounded UTF-8 with truncation marker", utf8.RuneCountInString(body.ErrorDetail))
+				}
+			} else if body.ErrorDetail != test.want {
+				t.Fatalf("error detail = %q, want %q", body.ErrorDetail, test.want)
+			}
+			for _, secret := range []string{"raw-private-response", "probe-detail-secret", "abcdefghijklmnopqrstuvwxyz", "private upstream diagnostic"} {
+				if strings.Contains(string(encoded), secret) {
+					t.Fatalf("probe response leaked %q", secret)
+				}
+			}
+		})
 	}
 }
 

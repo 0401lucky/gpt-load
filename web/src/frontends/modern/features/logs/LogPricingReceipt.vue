@@ -16,10 +16,13 @@ const auditCalls = computed(() => props.audit?.calls.filter((call) => call.calle
 function lineName(value: string): string {
   return te('logs.priceLines.' + value) ? t('logs.priceLines.' + value) : value
 }
+function lineLabel(line: LogPricingLine): string {
+  return line.model_id ? `${lineName(line.code)} · ${line.model_id}` : lineName(line.code)
+}
 function rate(line: LogPricingLine): string {
   return line.rate_nano_usd_per_million === null
     ? t('logs.values.unpriced')
-    : exactLogMoney(line.rate_nano_usd_per_million) + ' / 1M'
+    : exactLogMoney(line.rate_nano_usd_per_million) + '/1M'
 }
 function adjustment(line: LogPricingLine): string | undefined {
   return line.multiplier.numerator !== line.multiplier.denominator
@@ -61,8 +64,9 @@ const total = computed(
 <template>
   <div class="modern-log-receipt">
     <div v-if="receipt" class="modern-log-receipt-meta">
-      <span>{{ t('logs.pricingModel') }}</span
-      ><AppOverflowText :text="receipt.rule.model_id" /><span
+      <span>{{ t('logs.pricingModel') }}</span><AppOverflowText
+        :text="receipt.rule.model_id"
+      /><span
         >{{ t('logs.columns.pricing_mode') }} ·
         {{
           te('logs.values.' + receipt.pricing_mode)
@@ -73,8 +77,7 @@ const total = computed(
     </div>
     <div class="modern-log-receipt-scroll">
       <div class="modern-log-price-row modern-log-price-head">
-        <span>{{ t('logs.priceItem') }}</span
-        ><span>{{ t('logs.quantity') }}</span
+        <span>{{ t('logs.priceItem') }}</span><span>{{ t('logs.quantity') }}</span
         ><span>{{ t('logs.unitPrice') }}</span
         ><span>{{ t('logs.amount') }}</span>
       </div>
@@ -102,8 +105,12 @@ const total = computed(
           "
         />
       </div>
-      <div v-for="line in receipt?.line_items ?? []" :key="line.code" class="modern-log-price-row">
-        <span>{{ lineName(line.code) }}</span>
+      <div
+        v-for="line in receipt?.line_items ?? []"
+        :key="[line.code, line.model_id, line.rate_nano_usd_per_million].join(':')"
+        class="modern-log-price-row"
+      >
+        <AppOverflowText :text="lineLabel(line)" />
         <AppOverflowText
           :text="logNumber(line.quantity, locale)"
           :full-text="logNumber(line.quantity, locale, false)"

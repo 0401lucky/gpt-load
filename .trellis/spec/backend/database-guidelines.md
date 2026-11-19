@@ -154,7 +154,7 @@ err := dbtx.Run(ctx, service.db, dbtx.Options{
 ```go
 var migrations = []migration{
     {ID: migrationfiles.ID0001, Up: migrationfiles.Up0001, Validate: ..., ValidateCurrent: ..., ValidateRecoverable: ...},
-    // ... 至 ID0033
+    // ... 至 ID0034
 }
 func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 ```
@@ -176,7 +176,8 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
   - 反例：把 fork 迁移整体顺延到上游之后（2026-09-20 曾采用）会让已上线库的账本中段与注册表错位，每次合并都要停机 + 删账本行 + 重放迁移。
 - 测试里若需要表达「某迁移之前的链前缀」，**按 ID 定位下标**，不要用 `len(migrations)-1` —— 追加迁移后该表达式会静默指向别的迁移（见 `operationIndexMigrationIndex`）。
 - 2026-10-08 新链尾：上游 `0025_proxy_catalog`、`0026_credential_names`、`0027_remove_request_log_output_timing`、`0028_request_log_client_ip`、`0029_group_priority` 分别顺延为 fork `0028`–`0032`；旧 `0001`–`0027` 生产迁移文件保持原样。
-- 2026-10-21 当前链尾：上游 `0030_request_body_recording` 追加为 fork `0033_request_body_recording`；旧 `0001`–`0032` 生产迁移 Git blob 保持不变。`accessKey0030`、`requestLogBody0030` 和实际表/约束名字保留上游形态。
+- 2026-10-21 链尾：上游 `0030_request_body_recording` 追加为 fork `0033_request_body_recording`；旧 `0001`–`0032` 生产迁移 Git blob 保持不变。`accessKey0030`、`requestLogBody0030` 和实际表/约束名字保留上游形态。
+- 2026-11-19 当前链尾：上游 `0031_model_price_reference` 追加为 fork `0034_model_price_reference`；旧 `0001`–`0033` 生产迁移 Git blob 保持不变。`modelPrice0031`、SQLite 临时表、索引和外键名字保留上游形态。
 - **上游迁移测试常硬编码注册表下标**（`migrations[:18]`、`migrations[19]`、`migrations[:20]`）。顺延编号后这些下标会指向别的迁移：要么直接失败，要么**静默测错对象却仍然通过**。合并上游并顺延编号时，必须把这类文件改成按 ID 定位（先例：`autoDecisionAttributionMigrationIndex`、`clientModelOverrideMigrationIndex`、`requestAuditMigrationIndex`）。
 - `ValidateRecoverable000N` 用于检测中断的 MySQL 半成品表（表存在但非空、有意外列 → 拒绝继续）。
 
@@ -218,6 +219,16 @@ func AutoMigrate(db *gorm.DB) error { return applyMigrations(db) }
 7. **错误/正确**：错误：用上游0030覆盖 fork 已发布0030，或按 `migrations[:29]` 测试错误边界。正确：只追加0033，保持内部DDL名称与旧32个迁移 blob，并以语义ID定位升级测试、验证关闭重开及重复执行。
 
 ---
+
+### 模型价格关联与追加迁移 0034
+
+1. **适用范围**：上游 `0031_model_price_reference` 与 fork 已发布编号重叠，只能追加为 `0034`；旧 33 项账本是新 34 项注册表的严格前缀。
+2. **签名**：`ID0034` 注册 `Up0034` / `Validate0034` / `ValidateRecoverable0034`；不改旧迁移源码和 `ValidateCurrent0027` 的既有注册。`model_prices.source_price_id` 对应 `*uint`。
+3. **合同**：关联列可空、默认 NULL，引用 `model_prices.id`，删除父价格受 RESTRICT 约束；索引为 `idx_model_prices_source`。现有价格值仍保存在原列中，升级不重写业务数据。
+4. **校验矩阵**：合法旧结构由 `Up0034` 补齐列/索引/外键；列非整数、不可空、非 NULL 默认值或不支持的方言 → 拒绝。完成态缺列/索引/外键 → `Validate0034` 拒绝；合法 MySQL 中断态走既有恢复账本。
+5. **正常/基础/异常样例**：33→34 只追加关联能力，旧价格的关联为 NULL；空库直接到 34；24/27/32→34 保留既有业务及身份数据；关闭重开、再次迁移均幂等。旧 fixture 用当前模型建价格行时须避开尚不存在的 `SourcePriceID`。
+6. **必要回归**：`model_price_reference_migration_test.go` 按 `ID0034` 定位 fresh/upgrade/interrupted，检查 NULL、FK、RESTRICT、索引和重复执行；`fork_upgrade_migration_test.go` 核对旧账本/价格/请求正文与其他 fork 数据保留。真实 MySQL/PostgreSQL 仍只在明确测试 DSN 下运行，未配置时注明未实测。
+7. **错误/正确**：错误：覆盖旧 `0031`、重排注册表，或沿用上游硬编码下标。正确：只顺延新文件及直接调用者，保留内部 DDL 名字、冻结旧 33 个生产迁移 blob，并按语义 ID 验证升级。
 
 ## 测试中的数据库
 

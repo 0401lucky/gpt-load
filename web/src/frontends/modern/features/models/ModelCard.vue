@@ -75,31 +75,36 @@ function hiddenGroupsLabel(source: ModelSource): string {
       ><AppIcon :icon="ChevronRight" size="sm"
     /></AppButton>
     <div class="modern-model-mobile-meta">
-      <span>{{ t('modelManager.protocolCount', { count: n(model.protocols.length) }) }}</span
-      ><span>{{ t('modelManager.sourceCount', { count: n(model.sources.length) }) }}</span
+      <span>{{
+        t('modelManager.protocolCount', { count: n(model.protocols.length) })
+      }}</span><span>{{ t('modelManager.sourceCount', { count: n(model.sources.length) }) }}</span
       ><span v-if="admin">{{ t('modelManager.groupCount', { count: n(groupCount) }) }}</span>
     </div>
-    <AppButton
-      v-for="source in model.sources.slice(0, 2)"
+    <div
+      v-for="source in admin ? model.sources : model.sources.slice(0, 2)"
       :key="source.price.id"
-      variant="ghost"
-      class="modern-model-mobile-source"
-      :disabled="disabled"
-      @click="emit('open', source.price.id)"
+      class="modern-model-mobile-source-row"
     >
-      <span class="modern-model-mobile-channel"
-        ><AppChannelIcon
-          :icon="source.price.channel.icon"
-          :mark="source.price.channel.mark"
-          :name="source.price.channel.name"
-          size="sm"
-        /><span>{{ source.price.channel.name }}</span></span
+      <AppButton
+        variant="ghost"
+        class="modern-model-mobile-source"
+        :disabled="disabled"
+        @click="emit('open', source.price.id)"
       >
-      <span class="modern-model-mobile-prices"
-        ><span>{{ t('modelManager.slots.input') }} {{ price(source, 'input') }}</span
-        ><span>{{ t('modelManager.slots.output') }} {{ price(source, 'output') }}</span></span
-      >
-    </AppButton>
+        <span class="modern-model-mobile-channel"
+          ><AppChannelIcon
+            :icon="source.price.channel.icon"
+            :mark="source.price.channel.mark"
+            :name="source.price.channel.name"
+            size="sm"
+          /><span>{{ source.price.channel.name }}</span></span
+        >
+        <span class="modern-model-mobile-prices"
+          ><span>{{ t('modelManager.slots.input') }} {{ price(source, 'input') }}</span
+          ><span>{{ t('modelManager.slots.output') }} {{ price(source, 'output') }}</span></span
+        >
+      </AppButton>
+    </div>
   </article>
   <article
     v-else
@@ -199,6 +204,7 @@ function hiddenGroupsLabel(source: ModelSource): string {
             <AppBadge v-if="priceStatus(source.price) === 'pending'" tone="warning" size="xs">{{
               t('modelManager.priceMethods.pending')
             }}</AppBadge>
+
             <template v-else>
               <AppIcon v-if="priceStatus(source.price) === 'manual'" :icon="PencilLine" size="xs" />
               <AppOverflowText
@@ -221,6 +227,15 @@ function hiddenGroupsLabel(source: ModelSource): string {
 </template>
 
 <style scoped>
+.modern-model-mobile-source-row {
+  display: flex;
+  align-items: center;
+  gap: var(--modern-space-3);
+}
+.modern-model-mobile-source-row > .modern-model-mobile-source {
+  flex: 1;
+  min-width: 0;
+}
 .modern-model-mobile {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

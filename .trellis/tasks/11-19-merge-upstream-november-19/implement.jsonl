@@ -1,0 +1,11 @@
+{"file":".trellis/spec/backend/index.md","reason":"后端边界与规范清单"}
+{"file":".trellis/spec/backend/database-guidelines.md","reason":"已发布迁移冻结与上游顺延、用量和冷却合同"}
+{"file":".trellis/spec/backend/error-handling.md","reason":"连接测试安全错误投影"}
+{"file":".trellis/spec/backend/logging-guidelines.md","reason":"诊断日志脱敏与 plane"}
+{"file":".trellis/spec/backend/i18n-guidelines.md","reason":"后端三语言 key"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"必要测试与既有门禁"}
+{"file":".trellis/spec/frontend/index.md","reason":"两套前端约定"}
+{"file":".trellis/spec/frontend/data-layer.md","reason":"DTO projector、诊断和批量操作守卫"}
+{"file":".trellis/spec/frontend/i18n.md","reason":"三语言文案同步"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"前端静态门禁"}
+{"file":".trellis/tasks/11-19-merge-upstream-november-19/research/recon.md","reason":"固定输入、冲突和兼容风险"}

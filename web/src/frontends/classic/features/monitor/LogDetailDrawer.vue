@@ -119,17 +119,24 @@ const cacheRateLabel = computed(() => {
 })
 const formula = computed(() => {
   const lines = receipt.value?.line_items ?? []
-  const input = lines
+  const requestLines = lines.filter((line) => line.model_id === undefined)
+  const input = requestLines
     .filter((line) => line.code !== 'output')
     .map(formatFormulaLine)
     .join(' + ')
-  const output = lines
+  const output = requestLines
     .filter((line) => line.code === 'output')
     .map(formatFormulaLine)
     .join(' + ')
+  const advisors = new Map<string, string[]>()
+  for (const line of lines) {
+    if (line.model_id === undefined) continue
+    advisors.set(line.model_id, [...(advisors.get(line.model_id) ?? []), formatFormulaLine(line)])
+  }
   return {
     input: input || '—',
     output: output || '—',
+    advisors: [...advisors].map(([model, parts]) => ({ model, formula: parts.join(' + ') })),
   }
 })
 
@@ -463,6 +470,7 @@ function decisionRuleLabel(ruleID: string): string {
             {{ log.request_id }}
           </OverflowTooltip>
           <CopyButton
+            compact
             :value="log.request_id"
             :label="t('monitor.logs.drawer.copyRequestId')"
             :success-label="t('common.copied')"
@@ -476,9 +484,10 @@ function decisionRuleLabel(ruleID: string): string {
         <dl class="log-detail__grid">
           <div>
             <dt>{{ t('monitor.logs.columns.clientIP') }}</dt>
-            <dd>
+            <dd class="log-detail__ip">
               <template v-if="log.client_ip">
                 <AppButton
+                  class="log-detail__ip-filter"
                   variant="link"
                   size="inline"
                   :aria-label="t('monitor.logs.filterIP', { value: log.client_ip })"
@@ -487,6 +496,7 @@ function decisionRuleLabel(ruleID: string): string {
                   {{ log.client_ip }}
                 </AppButton>
                 <CopyButton
+                  compact
                   :value="log.client_ip"
                   :label="t('monitor.logs.copyIP')"
                   :success-label="t('common.copied')"
@@ -581,10 +591,11 @@ function decisionRuleLabel(ruleID: string): string {
           <div>
             <dt>{{ t('monitor.logs.drawer.clientModel') }}</dt>
             <dd class="log-detail__model-value">
-              <code>{{ log.client_model ?? '—' }}</code
-              ><small v-if="reasoningLabel(log.reasoning)" class="log-detail__reasoning">{{
-                reasoningLabel(log.reasoning)
-              }}</small>
+              <code>{{ log.client_model ?? '—' }}</code><small
+                v-if="reasoningLabel(log.reasoning)"
+                class="log-detail__reasoning"
+                >{{ reasoningLabel(log.reasoning) }}</small
+              >
             </dd>
           </div>
         </dl>
@@ -741,8 +752,7 @@ function decisionRuleLabel(ruleID: string): string {
           <div>
             <dt>{{ t('monitor.logs.drawer.upstreamModel') }}</dt>
             <dd class="log-detail__model-value">
-              <code>{{ log.upstream_model ?? '—' }}</code
-              ><small
+              <code>{{ log.upstream_model ?? '—' }}</code><small
                 v-if="
                   upstreamReasoningLabel(
                     finalAttempt?.reasoning ?? null,
@@ -874,12 +884,16 @@ function decisionRuleLabel(ruleID: string): string {
               <template v-if="receipt && usageDisplayState === 'reported'">
                 <span>{{ t('monitor.logs.receipt.input') }} = {{ formula.input }}</span>
                 <span>{{ t('monitor.logs.receipt.output') }} = {{ formula.output }}</span>
+                <span v-for="advisor in formula.advisors" :key="'advisor-' + advisor.model"
+                  >{{ t('monitor.logs.receipt.advisor', { model: advisor.model }) }} =
+                  {{ advisor.formula }}</span
+                >
               </template>
               <template
                 v-if="
                   receipt &&
                   usageDisplayState === 'reported' &&
-                  receipt.schema_version === 6 &&
+                  receipt.schema_version >= 6 &&
                   receipt.base_total_nano_usd !== undefined &&
                   receipt.price_multipliers
                 "
@@ -1112,10 +1126,17 @@ function decisionRuleLabel(ruleID: string): string {
   padding: 0;
 }
 
-.log-detail__request-id :deep(.copy-control button) {
-  width: 28px;
-  height: 28px;
-  border-color: transparent;
+.log-detail__ip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.log-detail__ip-filter {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: left;
 }
 
 .log-detail__section {

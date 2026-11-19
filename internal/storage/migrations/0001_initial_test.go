@@ -349,7 +349,8 @@ func TestFinalModelPriceRejectsNegativeScalarPrices(t *testing.T) {
 
 func TestModelPriceValidatesAndNormalizesContextTiersBeforePersistence(t *testing.T) {
 	t.Parallel()
-	db := openMigratedInitialTestDatabase(t)
+	// 初始 schema 没有关联价格列；只在测试写入中排除后续运行时模型字段。
+	db := openMigratedInitialTestDatabase(t).Omit("SourcePriceID")
 
 	empty := models.ModelPrice{
 		ChannelID:         "openai",
@@ -702,7 +703,7 @@ func insertRequestStateFixture(db *gorm.DB, fixture requestStateFixture) error {
 
 func createModelPriceForWritePath(t *testing.T, modelID string) (*gorm.DB, models.ModelPrice) {
 	t.Helper()
-	db := openMigratedInitialTestDatabase(t)
+	db := openMigratedInitialTestDatabase(t).Omit("SourcePriceID")
 	row := models.ModelPrice{
 		ChannelID: "openai",
 		ModelID:   modelID,

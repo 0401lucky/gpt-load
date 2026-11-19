@@ -29,25 +29,11 @@
 <details open>
 <summary>赞助商详情（可折叠）</summary>
 
-<a href="https://modelflare.dev/sign-up?utm_source=github&amp;utm_campaign=gptload" target="_blank" rel="sponsored noopener noreferrer"><img src="./screenshot/modelflare-banner-zh.png" alt="Modelflare"></a>
-
-感谢 Modelflare 赞助本项目！Modelflare：满血稳定不掺水，低成本享受全球 SOTA 模型。站点由美国 LLC 主体 Havenbyte LLC 运营，支持 GPT、Claude、Gemini、Grok 等主流模型和常用兼容协议，还支持 40 多种图片和视频模型。
-
-**缓存补偿**是一大亮点：部分 OpenAI 价格优先、稳定和高级分组提供每日 65%、75%、85% 的缓存命中率保障，符合条件的请求没达到目标的，平台补偿差额，结算后可在用量看板查看。
-
-**特惠活动**：单笔充值 US&#36;20 即可解锁 0.015 倍价格倍率的 GPT 特惠分组，单笔充值 US&#36;50 即可解锁 0.03 倍价格倍率的 Claude 特惠分组。通过<a href="https://modelflare.dev/sign-up?utm_source=github&amp;utm_campaign=gptload" target="_blank" rel="sponsored noopener noreferrer">专属链接</a>注册即可参与。
-
----
-
 <table>
 <tbody>
 <tr>
 <td width="180"><a href="https://ofox.ai/?utm_source=github&amp;utm_medium=sponsorship&amp;utm_content=gpt_load" target="_blank" rel="noopener noreferrer"><img src="./screenshot/ofoxai.svg" alt="OfoxAI" width="150"></a></td>
 <td><strong>OfoxAI：一个平台，连接文本、图像与视频 AI</strong><br>OfoxAI 是统一的 AI API 平台，汇集多家文本、图像和视频模型，支持 OpenAI 兼容接口及 Anthropic、Gemini 原生接口。开发者可通过一个平台为 AI 应用、智能体和内容创作接入模型，按任务选择合适的能力。 <a href="https://ofox.ai/?utm_source=github&amp;utm_medium=sponsorship&amp;utm_content=gpt_load" target="_blank" rel="noopener noreferrer">探索 OfoxAI 模型与 API →</a></td>
-</tr>
-<tr>
-<td width="180"><a href="https://www.packyapi.ai/register?aff=ahiS" target="_blank" rel="sponsored noopener noreferrer"><picture><source media="(prefers-color-scheme: dark)" srcset="./screenshot/packycode-dark.png"><source media="(prefers-color-scheme: light)" srcset="./screenshot/packycode-light.png"><img src="./screenshot/packycode-light.png" alt="PackyCode" width="150"></picture></a></td>
-<td><strong>PackyCode</strong><br>PackyCode 是一家稳定、高效的 API 中转服务商。一句话接入主流大模型。统一域名、统一密钥、智能容灾切换，97% 可用性。人民币1:1充值，无汇率无手续费坑，新用户首充立享折扣 + $1免费体验额度，多分组折扣低至 2 折起，提供专属Codex/Claude Code高速通道。<a href="https://www.packyapi.ai/register?aff=ahiS" target="_blank" rel="sponsored noopener noreferrer">点此链接注册，立即开始使用！</a></td>
 </tr>
 <tr>
 <td width="180"><a href="https://www.axisnow.io/zh"><img src="./screenshot/axisnow.jpg" alt="AxisNow" width="150"></a></td>
@@ -72,6 +58,12 @@
 - **统一管理 API Key 与订阅账号** — Codex、Claude、Antigravity、Grok 等订阅渠道与 API Key 渠道共享凭据管理、调度和健康体系。
 - **内置调度与故障隔离** — 多凭据调度、可配置权重、重试、冷却、黑名单与会话亲和，降低单个凭据过载或失效的影响。
 - **可观测、易部署、数据自持** — 提供健康、路由、日志、用量与成本估算；单个 Go 二进制内嵌管理界面，支持 SQLite、MySQL、PostgreSQL 和本地凭据加密。
+
+## 在线演示
+
+[https://demo.gpt-load.com](https://demo.gpt-load.com)
+
+登录密钥：`gpt-load-demo`
 
 ## 快速开始
 
@@ -146,7 +138,8 @@ Codex、Claude、Antigravity 的 OAuth 客户端使用固定回调端口。Compo
 | OpenAI Images           | `POST /v1/images/...`                                              |
 | OpenAI Embeddings       | `POST /v1/embeddings`                                              |
 | Rerank                  | `POST /v1/rerank`                                                  |
-| Mistral 原生            | `/v1/ocr`、`/v1/audio/...` |
+| Audio Speech            | `POST /v1/audio/speech`                                            |
+| Mistral 原生            | `/v1/ocr`、`/v1/audio/transcriptions` |
 | Anthropic Messages      | `POST /v1/messages`                                                |
 | Gemini                  | `/v1beta/models/...`                                               |
 | Gemini Embeddings       | `POST /v1beta/models/{model}:embedContent` / `:batchEmbedContents` |
@@ -249,6 +242,7 @@ Windows 普通用户可改为下载 `gpt-load-windows-setup.exe`。双击并确�
 | `HTTP_PROXY`                    | 空                                          | HTTP 上游请求的环境代理。                                                                                                                                |
 | `HTTPS_PROXY`                   | 空                                          | HTTPS 上游请求的环境代理。                                                                                                                               |
 | `NO_PROXY`                      | 空                                          | 逗号分隔的不经过环境代理的主机、域名或 IP。                                                                                                              |
+| `UPSTREAM_USER_AGENT_FALLBACK` | 空，使用 `GPT-Load/<version>` | 普通渠道 API 请求、凭据探测、模型发现和 Responses WebSocket 握手的兜底 User-Agent。仅在请求头规则应用后最终 UA 缺失、为空或全是空白时生效，不覆盖规则或客户端提供的非空 UA。例如 `Go-http-client/1.1`（固定值，不随 HTTP 协议变化）。不改变订阅适配器身份。修改后重启。 |
 | `LOG_LEVEL`                     | `info`                                      | 支持 `panic`、`fatal`、`error`、`warn`、`warning`、`info`、`debug`、`trace`；无效值会告警并回退到 `info`。                                               |
 | `LOG_FORMAT`                    | `text`                                      | 支持 `text`、`json`；其他值会导致启动失败。                                                                                                              |
 | `MODELS_DEV_AUTO_SYNC_ENABLED`  | 未设置，初始默认 `true`                     | 未设置时使用管理界面的持久化设置；设置后强制开启或关闭 Models.dev 自动同步，并使管理界面中的同名选项变为只读。                                           |

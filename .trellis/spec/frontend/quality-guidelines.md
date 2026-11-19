@@ -6,12 +6,13 @@
 
 ## 门禁
 
-`web/package.json` 只有 6 个 script：
+`web/package.json` 有 7 个 script：
 
 ```json
 "dev": "vite",
 "build": "pnpm run type-check && vite build",
-"lint": "eslint . --max-warnings=0",
+"lint": "eslint . --max-warnings=0 && pnpm run check:styles",
+"check:styles": "node scripts/check-modern-styles.mjs",
 "format": "prettier --check .",
 "format:write": "prettier --write .",
 "type-check": "vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json"
@@ -21,10 +22,11 @@
 
 - **`build` 不是单纯打包**，它串了 `type-check`。
 - **`lint` 带 `--max-warnings=0`** —— 一个 warning 就失败。
+- `lint` 还串联 modern 样式边界检查 `check:styles`，只运行 eslint 不等于完整 lint。
 - `format` 只检查不改写，写用 `format:write`。
 - 依赖版本**全部精确 pin，无 `^`/`~`**；`engines` 要求 node >=24.11.0，`packageManager` 锁 `pnpm@11.17.0`。
 
-完整门禁仍然是仓库根的 `make check`（会自动跑上面的 lint / format / build）。
+完整门禁仍然是仓库根的 `make check`：Go 检查与前端 lint / format / type-check 并行，两边结束后才执行 Vite build 和最终 Go build，避免前端清空内嵌产物时影响 Go 编译。
 
 ---
 

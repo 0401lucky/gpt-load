@@ -10,15 +10,12 @@
 make check
 ```
 
-它按顺序跑 7 件事（`Makefile`）：
+它先执行 `pnpm --dir web install --frozen-lockfile`，再并行执行两条队列（`Makefile`）：
 
-1. `gofmt -l .` 必须**无输出**
-2. `go mod tidy -diff` 必须干净
-3. `go vet ./...`
-4. `pnpm --dir web run lint`（eslint，`--max-warnings=0`）
-5. `pnpm --dir web run format`（prettier `--check`，只检查不改写）
-6. `pnpm --dir web run build`（含 `vue-tsc --noEmit` + `tsc --noEmit`）
-7. `go build -o gpt-load .` + `go test -count=1 . ./internal/...` + `git --no-pager diff --check`
+- Go：`gofmt -l .` 必须**无输出** → `go mod tidy -diff` 必须干净 → `go vet ./...` → `go test -count=1 . ./internal/...`。
+- Web：`pnpm --dir web run lint`（eslint 零 warning 与 `check:styles`）→ `pnpm --dir web run format`（prettier 只检查）→ `pnpm --dir web run type-check`。
+
+两条队列都通过后，依次执行 `pnpm --dir web exec vite build`、`go build -o gpt-load .`、`git --no-pager diff --check`。**Vite 会清空 `internal/webui/dist`，必须等 Go 编译和测试结束后再构建前端**；不能把 `pnpm run build` 放进并行的 Web 队列。
 
 **完整测试的固定命令是 `go test -count=1 . ./internal/...`** —— `-count=1` 关缓存，范围是根包 + `internal/...`。
 

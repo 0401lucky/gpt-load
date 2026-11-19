@@ -71,13 +71,16 @@ type streamSDKResult struct {
 
 // Execute executes one non-streaming attempt.
 func (r *Runtime) Execute(parent context.Context, spec execution.AttemptSpec) (result execution.AttemptResult) {
-	spec = withUserAgent(spec)
+	spec = withUserAgent(spec, r.userAgentFallback)
 	defer func() {
 		normalizeImagesAttemptResult(spec, &result)
 		normalizeEmbeddingsAttemptResult(spec, &result)
 		normalizeRerankAttemptResult(spec, &result)
 		normalizeDecisionsAttemptResult(spec, &result)
-		if r.providerKind(spec) == channel.ProviderMultiProtocolGateway || spec.ClientProtocol == protocol.GeminiEmbeddings {
+		// 百炼只有原生凭据测试返回所选协议的格式；转换路由返回的是 Chat 响应。
+		if providerKind := r.providerKind(spec); providerKind == channel.ProviderMultiProtocolGateway ||
+			providerKind == channel.ProviderAlibaba && spec.RouteMode == execution.RouteNative ||
+			spec.ClientProtocol == protocol.GeminiEmbeddings {
 			normalizeGatewayProtocolProbeResult(spec, &result)
 		}
 	}()
@@ -194,7 +197,7 @@ func (r *Runtime) ExecuteStream(
 	spec execution.AttemptSpec,
 	sink execution.StreamSink,
 ) (result execution.StreamResult) {
-	spec = withUserAgent(spec)
+	spec = withUserAgent(spec, r.userAgentFallback)
 	defer func() {
 		normalizeImagesStreamResult(spec, &result)
 	}()
@@ -503,7 +506,8 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 		}
 	}
 	convertedImages := mode == channel.RouteConverted && spec.ClientProtocol == protocol.OpenAIImages && providerKind == channel.ProviderGemini
-	convertedEmbeddings := mode == channel.RouteConverted && spec.ClientProtocol == protocol.OpenAIEmbeddings && providerKind == channel.ProviderGemini
+	convertedEmbeddings := mode == channel.RouteConverted && spec.ClientProtocol == protocol.OpenAIEmbeddings &&
+		(providerKind == channel.ProviderGemini || providerKind == channel.ProviderGoogleVertex)
 	nativeGeminiFamily := spec.ClientProtocol == protocol.Gemini || spec.ClientProtocol == protocol.GeminiEmbeddings
 	if convertedImages || convertedEmbeddings || mode == channel.RouteNative && nativeGeminiFamily &&
 		(providerKind == channel.ProviderGemini || providerKind == channel.ProviderGoogleVertex ||
@@ -536,6 +540,9 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 	if spec.ClientProtocol == protocol.Decisions {
 		return prepareDecisions(spec, resolved, provider, directKey, secrets)
 	}
+	if spec.ClientProtocol == protocol.AudioSpeech {
+		return prepareAudioSpeech(spec, resolved, provider, directKey, secrets, stream)
+	}
 	if spec.ClientProtocol == protocol.Mistral {
 		return prepareMistral(spec, resolved, provider, directKey, secrets)
 	}
@@ -553,7 +560,16 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 				directKey: directKey, secrets: secrets,
 			}, nil
 		}
-		if spec.ClientProtocol == protocol.GeminiEmbeddings && providerKind == channel.ProviderGemini {
+		if spec.ClientProtocol == protocol.GeminiEmbeddings &&
+			(providerKind == channel.ProviderGemini || providerKind == channel.ProviderGoogleVertex) {
+			path := "/models/" + url.PathEscape(spec.UpstreamModel) + ":embedContent"
+			if providerKind == channel.ProviderGoogleVertex {
+				path, err = vertexNativeGeminiPath(spec.UpstreamModel, "embedContent")
+				if err != nil {
+					failure := notSentUnaryFailure(execution.ErrorKindInvalidRequest, "invalid Vertex Embeddings probe target")
+					return preparedAttempt{}, &failure
+				}
+			}
 			return preparedAttempt{
 				provider:         provider,
 				mode:             mode,
@@ -562,7 +578,7 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 					Provider:    provider,
 					Model:       spec.UpstreamModel,
 					Method:      http.MethodPost,
-					Path:        "/models/" + url.PathEscape(spec.UpstreamModel) + ":embedContent",
+					Path:        path,
 					Body:        []byte(geminiEmbeddingsProbeBody),
 					SafeHeaders: map[string]string{"Content-Type": "application/json"},
 				},
@@ -596,6 +612,9 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 		}
 		if providerKind == channel.ProviderMultiProtocolGateway && spec.ClientProtocol != protocol.OpenAICompletions {
 			return prepareGatewayProtocolProbe(spec, resolved, provider, directKey, secrets)
+		}
+		if providerKind == channel.ProviderAlibaba && mode == channel.RouteNative && spec.ClientProtocol != protocol.OpenAICompletions {
+			return prepareAlibabaProtocolProbe(spec, provider, directKey, secrets, r.fixedConfig.targetBaseURL)
 		}
 		request := newProbeRequest(provider, providerKind, spec.UpstreamModel)
 		if providerKind == channel.ProviderMultiProtocolGateway {
@@ -719,6 +738,9 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 				return preparedAttempt{}, &failure
 			}
 			passthroughPath = "/models/" + url.PathEscape(spec.UpstreamModel) + ":batchEmbedContents"
+			if providerKind == channel.ProviderGoogleVertex {
+				passthroughPath, err = vertexNativeGeminiPath(spec.UpstreamModel, "batchEmbedContents")
+			}
 			embeddingConversion = &conversion
 		} else {
 			passthroughPath, err = nativePassthroughPath(spec, providerKind)
@@ -727,12 +749,19 @@ func (r *Runtime) prepare(spec execution.AttemptSpec, stream bool) (preparedAtte
 			failure := notSentUnaryFailure(execution.ErrorKindInvalidRequest, "invalid native request path")
 			return preparedAttempt{}, &failure
 		}
+		if providerKind == channel.ProviderGoogleVertex && (convertedEmbeddings || spec.ClientProtocol == protocol.GeminiEmbeddings) {
+			body, err = vertexEmbeddingsBody(body, strings.HasSuffix(passthroughPath, ":batchEmbedContents"))
+			if err != nil {
+				failure := notSentUnaryFailure(execution.ErrorKindInvalidRequest, "invalid Vertex Embeddings request body")
+				return preparedAttempt{}, &failure
+			}
+		}
 		passthroughHeaders := safePassthroughHeaders(sanitizedHeaders)
 		passthroughUpstreamURL := ""
 		if nativeMessagePassthrough && spec.ClientProtocol != protocol.Anthropic {
 			passthroughUpstreamURL = r.fixedConfig.targetBaseURL
 		}
-		if providerKind == channel.ProviderOpenAICompatible &&
+		if openAICompatibleBase(providerKind) &&
 			(spec.ClientProtocol == protocol.OpenAICompletions || spec.ClientProtocol == protocol.OpenAIResponses) {
 			passthroughUpstreamURL = r.fixedConfig.targetBaseURL
 			passthroughPath = strings.TrimPrefix(passthroughPath, "/v1")
@@ -957,7 +986,7 @@ func newProbeRequest(
 ) *schemas.BifrostChatRequest {
 	content := "ping"
 	params := &schemas.ChatParameters{MaxCompletionTokens: schemas.Ptr(1)}
-	if providerKind == channel.ProviderOpenAICompatible {
+	if openAICompatibleBase(providerKind) {
 		params.MaxCompletionTokens = nil
 		params.ExtraParams = map[string]any{"max_tokens": 1}
 	}
@@ -980,7 +1009,7 @@ func providerSupportsPassthrough(providerKind channel.ProviderKind) bool {
 		return true
 	case channel.ProviderMultiProtocolGateway:
 		return true
-	case channel.ProviderOpenAICompatible:
+	case channel.ProviderOpenAICompatible, channel.ProviderAlibaba:
 		return true
 	default:
 		return false
@@ -1002,7 +1031,7 @@ func providerKindNativeForClient(providerKind channel.ProviderKind, clientProtoc
 	case channel.ProviderGemini:
 		return clientProtocol == protocol.Gemini || clientProtocol == protocol.GeminiEmbeddings
 	case channel.ProviderGoogleVertex:
-		return clientProtocol == protocol.Gemini
+		return clientProtocol == protocol.Gemini || clientProtocol == protocol.GeminiEmbeddings
 	case channel.ProviderOpenRouter:
 		return clientProtocol == protocol.OpenAICompletions || clientProtocol == protocol.OpenAIResponses ||
 			clientProtocol == protocol.OpenAIEmbeddings || clientProtocol == protocol.Decisions
@@ -1010,6 +1039,9 @@ func providerKindNativeForClient(providerKind channel.ProviderKind, clientProtoc
 		return clientProtocol == protocol.Decisions
 	case channel.ProviderDeepSeek, channel.ProviderGroq, channel.ProviderXAI:
 		return clientProtocol == protocol.OpenAICompletions || clientProtocol == protocol.OpenAIResponses
+	case channel.ProviderAlibaba:
+		return clientProtocol == protocol.OpenAICompletions || clientProtocol == protocol.OpenAIResponses ||
+			clientProtocol == protocol.Anthropic
 	default:
 		return false
 	}
@@ -1086,6 +1118,8 @@ func supportedRequestShape(spec execution.AttemptSpec, stream bool) bool {
 		return !stream && spec.RouteMode == execution.RouteNative && spec.Operation == execution.OperationRerank && spec.Method == http.MethodPost && spec.Path == "/v1/rerank"
 	case protocol.Decisions:
 		return !stream && spec.RouteMode == execution.RouteNative && spec.Operation == execution.OperationDecisionsCreate && spec.Method == http.MethodPost && spec.Path == "/v1/systemone"
+	case protocol.AudioSpeech:
+		return audioSpeechRequestShape(spec)
 	case protocol.Mistral:
 		return mistralRequestShape(spec, stream)
 	case protocol.OpenAIEmbeddings:
@@ -1180,7 +1214,7 @@ func validGeminiGeneratePath(path, action string) bool {
 
 func nativePassthroughPath(spec execution.AttemptSpec, providerKind channel.ProviderKind) (string, error) {
 	switch providerKind {
-	case channel.ProviderOpenAI, channel.ProviderOpenAICompatible:
+	case channel.ProviderOpenAI, channel.ProviderOpenAICompatible, channel.ProviderAlibaba:
 		return spec.Path, nil
 	case channel.ProviderMultiProtocolGateway:
 		if spec.ClientProtocol != protocol.Gemini && spec.ClientProtocol != protocol.GeminiEmbeddings {
@@ -1233,8 +1267,14 @@ func nativePassthroughPath(spec execution.AttemptSpec, providerKind channel.Prov
 }
 
 func vertexNativeGeminiPath(model, action string) (string, error) {
-	model, ok := channel.NormalizeVertexGeminiModel(model)
-	if !ok || (action != "generateContent" && action != "streamGenerateContent") {
+	var ok bool
+	switch action {
+	case "generateContent", "streamGenerateContent":
+		model, ok = channel.NormalizeVertexGeminiModel(model)
+	case "embedContent", "batchEmbedContents":
+		model, ok = channel.NormalizeVertexEmbeddingsModel(model)
+	}
+	if !ok {
 		return "", fmt.Errorf("invalid Vertex Gemini target")
 	}
 	if allDigitsASCII(model) {
@@ -1293,7 +1333,7 @@ func directKeyForAttempt(
 	switch providerKind {
 	case channel.ProviderOpenAI, channel.ProviderAnthropic, channel.ProviderGemini, channel.ProviderMultiProtocolGateway,
 		channel.ProviderDeepSeek, channel.ProviderOpenRouter, channel.ProviderGroq, channel.ProviderXAI,
-		channel.ProviderOpenAICompatible, channel.ProviderJev, channel.ProviderCline:
+		channel.ProviderOpenAICompatible, channel.ProviderJev, channel.ProviderCline, channel.ProviderAlibaba:
 		if apiKey == "" {
 			return schemas.Key{}, nil, fmt.Errorf("api_key is required")
 		}
@@ -1479,8 +1519,11 @@ func (r *Runtime) newSDKContext(parent context.Context, spec execution.AttemptSp
 		spec.ClientProtocol == protocol.Anthropic {
 		bifrostContext.SetValue(schemas.BifrostContextKeyPassthroughExtraParams, true)
 	}
+	if spec.RouteMode == execution.RouteConverted && spec.ChannelID == string(channel.OpenRouter) {
+		bifrostContext.SetValue(schemas.BifrostContextKeyPassthroughExtraParams, true)
+	}
 	if spec.Operation == execution.OperationProbe &&
-		r.providerKind(spec) == channel.ProviderOpenAICompatible {
+		openAICompatibleBase(r.providerKind(spec)) {
 		bifrostContext.SetValue(schemas.BifrostContextKeyPassthroughExtraParams, true)
 	}
 	if spec.Timeouts.StreamIdle > 0 {
